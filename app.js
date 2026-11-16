@@ -129,7 +129,8 @@ function renderSettings() {
   $('#answer-block').style.display = s.mode === 'qcm' ? 'none' : '';
   $$('.tog input').forEach(i => { i.checked = !!s[i.dataset.key]; i.onchange = () => setSetting({ [i.dataset.key]: i.checked }); });
   if (document.activeElement !== $('#custom-link')) $('#custom-link').value = s.customLink || '';
-  $('#pl-status').textContent = s.customLink ? (s.customTitle ? `✅ ${s.customTitle}` : '🎵 Playlist perso ajoutée à la partie') : '';
+  $('#pl-status').textContent = s.customLink ? `✅ ${s.customSource ? s.customSource + ' · ' : ''}${s.customTitle || 'Playlist perso ajoutée à la partie'}` : '';
+  $('#custom-only-row').classList.toggle('hidden', !s.customLink);
   $('#settings').classList.toggle('readonly', !isHost());
   $('#btn-start').style.display = isHost() ? '' : 'none';
   $('#wait-host').style.display = isHost() ? 'none' : '';
@@ -141,14 +142,15 @@ $('#btn-check-pl').onclick = () => {
   $('#pl-status').textContent = '⏳ Vérification…';
   socket.emit('checkPlaylist', link, (r) => {
     if (r.error) { $('#pl-status').textContent = '❌ ' + r.error; return; }
-    setSetting({ customLink: link });
-    setTimeout(() => $('#pl-status').textContent = `✅ « ${r.title} » — ${r.count} extraits ajoutés`, 100);
+    setSetting({ customLink: link, customTitle: r.title, customSource: r.source });
+    setTimeout(() => $('#pl-status').textContent = `✅ ${r.source} · « ${r.title} » — ${r.count} morceaux ajoutés`, 100);
   });
 };
 $('#btn-start').onclick = () => socket.emit('start');
 $('#btn-replay').onclick = () => socket.emit('start');
 $('#btn-lobby').onclick = () => socket.emit('backToLobby');
 $('#btn-skip').onclick = () => socket.emit('skip');
+$('#btn-next').onclick = () => { $('#btn-next').classList.add('hidden'); socket.emit('next'); };
 $('#btn-stop').onclick = () => socket.emit('stop');
 
 // ───────────── État du salon ─────────────
@@ -200,13 +202,15 @@ socket.on('round', (r) => {
   const text = r.mode === 'text';
   $('#text-answer').style.display = text ? '' : 'none';
   $('#qcm-answer').style.display = text ? 'none' : '';
-  $('#b-artist').style.display = r.answer === 'title' ? 'none' : '';
-  $('#b-title').style.display = r.answer === 'artist' ? 'none' : '';
+  $('#b-artist').style.display = r.work || r.answer === 'title' ? 'none' : '';
+  $('#b-title').style.display = !r.work && r.answer === 'artist' ? 'none' : '';
+  $('#b-title').textContent = r.work ? '📺 ' + (r.label || 'Nom de l\'œuvre') : '🎵 Titre';
   $('#b-artist').classList.remove('ok'); $('#b-title').classList.remove('ok');
-  $('#guess').placeholder = r.answer === 'both' ? 'Artiste ou titre… (Entrée pour valider)' : r.answer === 'title' ? 'Le titre… (Entrée pour valider)' : 'L\'artiste… (Entrée pour valider)';
+  round.answer = r.work ? 'title' : r.answer;
+  $('#guess').placeholder = r.work ? `${r.label || 'Nom de l\'œuvre'}… (Entrée pour valider)` : r.answer === 'both' ? 'Artiste ou titre… (Entrée pour valider)' : r.answer === 'title' ? 'Le titre… (Entrée pour valider)' : 'L\'artiste… (Entrée pour valider)';
   $('#guess').disabled = false;
   $('#qcm-answer').className = 'qcm';
-  $('#qcm-answer').innerHTML = (r.choices || []).map(c => `<button data-id="${esc(c.id)}"><b>${esc(c.title)}</b><span>${esc(c.artist)}</span></button>`).join('');
+  $('#qcm-answer').innerHTML = (r.choices || []).map(c => `<button data-id="${esc(c.id)}" class="${c.artist ? '' : 'work'}"><b>${esc(c.title)}</b>${c.artist ? `<span>${esc(c.artist)}</span>` : ''}</button>`).join('');
   $$('#qcm-answer button').forEach(b => b.onclick = () => {
     if ($('#qcm-answer').classList.contains('locked') || Date.now() < round.startAt) return;
     b.classList.add('picked'); $('#qcm-answer').classList.add('locked');
@@ -261,13 +265,12 @@ $('#guess-form').onsubmit = (e) => {
       const pts = res.gained.reduce((s, g) => s + (g.pts || 0), 0);
       const parts = [];
       if (res.gained.some(g => g.type === 'artist')) parts.push('Artiste trouvé');
-      if (res.gained.some(g => g.type === 'title')) parts.push('Titre trouvé');
+      if (res.gained.some(g => g.type === 'title')) parts.push(round.work ? 'Trouvé' : 'Titre trouvé');
       if (res.gained.some(g => g.type === 'first')) parts.push('🥇 premier');
       if (res.gained.some(g => g.type === 'combo')) parts.push('🎯 combo');
       fb.textContent = `✅ ${parts.join(' · ')} ! +${pts}`; fb.className = 'feedback good';
       $('#guess').value = '';
-      const need = round.answer === 'both' ? (res.artist && res.title) : round.answer === 'title' ? res.title : res.artist;
-      if (need) { $('#guess').disabled = true; $('#guess').placeholder = '🎉 Bravo, tout trouvé ! Attends les autres…'; }
+      if (res.done) { $('#guess').disabled = true; $('#guess').placeholder = '🎉 Bravo, tout trouvé ! Attends les autres…'; }
     } else if (res.close) {
       fb.textContent = '🔥 Tu chauffes ! Presque…'; fb.className = 'feedback close';
       $('#guess').classList.add('shake'); setTimeout(() => $('#guess').classList.remove('shake'), 300);
@@ -289,12 +292,14 @@ socket.on('reveal', (rv) => {
   showView('v-reveal');
   // on laisse la musique continuer quelques secondes pendant la révélation
   if (audio.paused && audio.src && round?.preview) audio.play().catch(() => {});
-  setTimeout(() => { if (state?.phase !== 'playing') audio.pause(); }, 6500);
   $('#rv-cover').src = rv.track.cover || '';
   $('#rv-cover').style.display = rv.track.cover ? '' : 'none';
   $('#rv-title').textContent = rv.track.title;
   $('#rv-artist').textContent = rv.track.artist;
-  $('#rv-link').href = rv.track.link;
+  $('#rv-artist').style.display = rv.track.artist ? '' : 'none';
+  $('#rv-sub').textContent = rv.track.sub ? '🎵 ' + rv.track.sub : '';
+  $('#rv-link').href = rv.track.link || '#';
+  $('#rv-link').style.display = rv.track.link ? '' : 'none';
   const byId = Object.fromEntries(state.players.map(p => [p.id, p]));
   const rows = rv.results.filter(r => byId[r.id]).sort((a, b) => b.gained - a.gained);
   $('#rv-results').innerHTML = rows.map(r => {
@@ -302,8 +307,15 @@ socket.on('reveal', (rv) => {
     const what = state.settings.mode === 'qcm' ? (r.correct ? '✅' : '❌') : `${r.artist ? '🎤' : ''}${r.title ? '🎵' : ''}${!r.artist && !r.title ? '❌' : ''}`;
     return `<li class="${r.gained ? 'win' : ''}">${p.avatar} ${esc(p.name)} ${what} ${r.gained ? `<b>+${r.gained}</b>` : ''}${r.time && r.gained ? ` <span class="muted small">${r.time.toFixed(1)} s</span>` : ''}</li>`;
   }).join('');
+  const manual = !rv.pause;
+  $('#next-wrap').classList.toggle('hidden', manual);
+  $('#btn-next').classList.toggle('hidden', !(manual && isHost()));
+  $('#wait-next').classList.toggle('hidden', !(manual && !isHost()));
   const bar = $('#next-bar'); bar.style.transition = 'none'; bar.style.width = '0';
-  requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.transition = 'width 7s linear'; bar.style.width = '100%'; }));
+  if (!manual) requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.transition = `width ${rv.pause}s linear`; bar.style.width = '100%'; }));
+  // la musique continue pendant la révélation, puis s'arrête avant le morceau suivant
+  clearTimeout(window._stopRv);
+  window._stopRv = setTimeout(() => { if (state?.phase !== 'playing') audio.pause(); }, manual ? 15000 : Math.max(1500, rv.pause * 1000 - 400));
   if (rv.results.find(r => r.id === pid)?.gained) confetti(14);
 });
 

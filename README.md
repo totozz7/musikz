@@ -1,7 +1,11 @@
 # 🎵 MUSIKZ — le blind test entre potes
 
-Blind test multijoueur en temps réel (jusqu'à 12 joueurs), extraits Deezer de 30 s, 39 catégories
-(Dessins animés FR, Disney VF, films, séries, animés, jeux vidéo, rap FR, variété, décennies, genres, monde…).
+Blind test multijoueur en temps réel (jusqu'à 12 joueurs), extraits Deezer de 30 s, 34 catégories
+choisies à la main (~900 morceaux) : Dessins animés 2000-2010, Disney VF, films, séries, animés, jeux vidéo,
+rap FR, variété, décennies, genres, monde…
+
+Dans les catégories « Écrans » on devine le **nom de l'œuvre** (dessin animé, film, série…) ;
+dans les autres, l'**artiste** et le **titre**.
 
 ## Mettre le site en ligne (gratuit, ~10 min) avec Render
 
@@ -30,8 +34,11 @@ Blind test multijoueur en temps réel (jusqu'à 12 joueurs), extraits Deezer de 
 - **Mode** : saisie libre (tolérante aux fautes et aux accents) ou QCM 4 choix
 - **À deviner** : artiste + titre, titre seul ou artiste seul
 - **5 à 50 extraits**, **10 à 30 s** d'écoute
+- **Temps entre deux extraits** : 3, 5 (par défaut), 8 ou 12 s, ou « Manuel » (l'hôte clique sur Suivant)
 - **Bonus** : vitesse (50 → 100 pts), premier à trouver (+20), combo artiste + titre (+50)
-- **Playlist perso** : colle un lien de playlist Deezer pour jouer sur tes propres morceaux
+- **Playlist perso** : colle un lien de playlist **Spotify ou Deezer** (option « Jouer uniquement ma playlist »).
+  Pour Spotify, les morceaux sont retrouvés sur Deezer pour avoir l'extrait audio (quelques-uns peuvent manquer).
+  La playlist Spotify doit être publique.
 - **Chat + réactions emoji** pendant la partie (les bonnes réponses sont bloquées dans le chat 🤫)
 - L'hôte peut passer un extrait, arrêter la partie, exclure un joueur. Si l'hôte part, un autre joueur prend la main.
 
@@ -40,5 +47,10 @@ Avec Node.js 18+ installé : `npm install` puis `npm start` et ouvre http://loca
 `npm test` lance un mode test avec de faux morceaux (sans son), pratique pour essayer l'interface.
 
 ## Personnaliser les catégories
-Tout est dans `categories.js` : chaque catégorie = un nom, un emoji et des mots-clés de recherche
-de playlists Deezer. Ajoute une ligne pour créer une catégorie.
+Tout est dans `categories.js`, une ligne par morceau :
+- catégories musique : `Artiste — Titre`
+- catégories « œuvre » : `Nom de l'œuvre|Autre nom accepté :: recherche Deezer`
+
+## Spotify (facultatif)
+L'import Spotify marche sans rien configurer. Si un jour Spotify bloque, crée une appli sur
+developer.spotify.com et ajoute dans Render (Environment) les variables `SPOTIFY_CLIENT_ID` et `SPOTIFY_CLIENT_SECRET`.

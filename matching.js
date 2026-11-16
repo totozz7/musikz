@@ -55,10 +55,10 @@ function artistVariants(name) {
 
 function checkGuess(text, track) {
   const res = { artist: false, title: false, close: false };
-  for (const a of artistVariants(track.artist)) {
+  if (track.artist) for (const a of artistVariants(track.artist)) {
     const m = match(text, a); if (m === 'ok') res.artist = true; else if (m === 'close') res.close = true;
   }
-  for (const t of [track.title, track.fullTitle]) {
+  for (const t of [track.title, track.fullTitle, ...(track.alts || [])].filter(Boolean)) {
     const m = match(text, t); if (m === 'ok') res.title = true; else if (m === 'close') res.close = true;
   }
   return res;

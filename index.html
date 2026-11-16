@@ -72,6 +72,7 @@
         <div id="settings" class="settings">
           <div class="set-block">
             <h4>Catégories <span class="muted" id="cat-count"></span></h4>
+            <p class="muted small hint">📺 Écrans : on devine le nom du dessin animé, du film, de la série… Les autres : artiste et titre.</p>
             <div class="cat-tools">
               <button class="chip-btn" data-catsel="all">Tout</button>
               <button class="chip-btn" data-catsel="none">Rien</button>
@@ -89,7 +90,7 @@
               </div>
             </div>
             <div class="set-block" id="answer-block">
-              <h4>À deviner</h4>
+              <h4>À deviner <span class="muted small">(catégories musique)</span></h4>
               <div class="seg" data-key="answer">
                 <button data-v="both">Artiste + titre</button>
                 <button data-v="title">Titre</button>
@@ -116,6 +117,15 @@
           </div>
 
           <div class="set-block">
+            <h4>Temps entre deux extraits</h4>
+            <div class="seg" data-key="pause">
+              <button data-v="3">3 s</button><button data-v="5">5 s</button><button data-v="8">8 s</button>
+              <button data-v="12">12 s</button><button data-v="0">✋ Manuel</button>
+            </div>
+            <p class="muted small hint">Après chaque réponse, on passe tout seul au morceau suivant. En « Manuel », l'hôte clique sur « Suivant ».</p>
+          </div>
+
+          <div class="set-block">
             <h4>Bonus</h4>
             <div class="toggles">
               <label class="tog"><input type="checkbox" data-key="speedBonus"><span></span> ⚡ Points de vitesse <small>50 à 100 pts selon ta rapidité</small></label>
@@ -125,12 +135,13 @@
           </div>
 
           <div class="set-block">
-            <h4>Playlist perso <span class="muted">(optionnel)</span></h4>
+            <h4>Playlist perso <span class="muted">(optionnel, Deezer ou Spotify)</span></h4>
             <div class="join-row">
-              <input id="custom-link" class="input" placeholder="Colle un lien de playlist Deezer : deezer.com/fr/playlist/…">
+              <input id="custom-link" class="input" placeholder="Lien de playlist Spotify ou Deezer…">
               <button id="btn-check-pl" class="btn btn-yellow">Ajouter</button>
             </div>
             <p id="pl-status" class="muted small"></p>
+            <label class="tog hidden" id="custom-only-row"><input type="checkbox" data-key="customOnly"><span></span> Jouer uniquement ma playlist <small>ignore les catégories cochées</small></label>
           </div>
         </div>
         <div class="lobby-foot">
@@ -185,11 +196,14 @@
             <div class="muted small">C'était…</div>
             <h2 id="rv-title"></h2>
             <h3 id="rv-artist"></h3>
+            <div id="rv-sub" class="rv-sub"></div>
             <a id="rv-link" target="_blank" rel="noopener" class="muted small">Écouter sur Deezer ↗</a>
           </div>
         </div>
         <ul id="rv-results" class="rv-results"></ul>
-        <div class="next-bar"><div id="next-bar"></div></div>
+        <div class="next-bar" id="next-wrap"><div id="next-bar"></div></div>
+        <button id="btn-next" class="btn btn-primary hidden">Suivant ▶</button>
+        <p id="wait-next" class="muted hidden">L'hôte passe au morceau suivant quand tout le monde est prêt…</p>
       </div>
 
       <!-- FIN -->

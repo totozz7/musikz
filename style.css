@@ -243,3 +243,10 @@ button{font-family:inherit;cursor:pointer}
   .players .nm small{display:none}
   .rank{display:none}
 }
+
+.hint{margin:-.3rem 0 .7rem}
+.set-block .hint:last-child{margin:.6rem 0 0}
+#custom-only-row{margin-top:.6rem}
+.rv-sub{color:#fffc;font-size:.9rem;margin-bottom:.3rem}
+#btn-next{margin-top:.4rem}
+.qcm button.work b{font-size:1.2rem}
