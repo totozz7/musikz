@@ -1,0 +1,20 @@
+{
+  "name": "musikz",
+  "version": "1.0.0",
+  "description": "Blind test multijoueur entre potes",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "MOCK=1 node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.3.0",
+    "socket.io": "^4.8.4",
+    "socket.io-client": "^4.8.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

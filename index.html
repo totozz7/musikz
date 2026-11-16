@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>MUSIKZ — Blind test entre potes</title>
+<meta name="theme-color" content="#16070b">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%23ff2e4d'/><circle cx='50' cy='50' r='16' fill='%23ffc21a'/><circle cx='50' cy='50' r='4' fill='%2316070b'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="bg-stripes"></div>
+<div id="reactions-layer"></div>
+<div id="toasts"></div>
+
+<!-- ───────── ACCUEIL ───────── -->
+<section id="home" class="screen active">
+  <div class="home-wrap">
+    <div class="logo-block">
+      <div class="vinyl big"><div class="label">MZ</div></div>
+      <h1 class="logo">MUSI<span>KZ</span></h1>
+      <p class="tagline">Le blind test entre potes. Génériques, tubes, films… qui sera le plus rapide ?</p>
+    </div>
+
+    <div class="card home-card">
+      <label class="lbl">Ton pseudo</label>
+      <input id="name" class="input" maxlength="18" placeholder="Ex. Thomas" autocomplete="off">
+      <label class="lbl">Ton avatar</label>
+      <div id="avatars" class="avatars"></div>
+
+      <button id="btn-create" class="btn btn-primary btn-xl">🎤 Créer un salon</button>
+      <div class="or"><span>ou rejoindre</span></div>
+      <div class="join-row">
+        <input id="code" class="input code-input" maxlength="5" placeholder="CODE" autocomplete="off">
+        <button id="btn-join" class="btn btn-yellow">Rejoindre</button>
+      </div>
+      <p id="home-err" class="err"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── SALON / JEU ───────── -->
+<section id="room" class="screen">
+  <header class="topbar">
+    <div class="logo small">MUSI<span>KZ</span></div>
+    <div class="room-code" id="room-code-box" title="Copier le lien d'invitation">
+      <span class="muted">Salon</span> <b id="room-code">-----</b> <span class="copy">🔗 Copier le lien</span>
+    </div>
+    <div class="top-actions">
+      <div class="vol"><span>🔊</span><input type="range" id="volume" min="0" max="100" value="80"></div>
+      <button class="btn btn-ghost btn-sm" id="btn-chat-toggle">💬</button>
+      <button class="btn btn-ghost btn-sm" id="btn-leave">Quitter</button>
+    </div>
+  </header>
+
+  <div class="room-grid">
+    <aside class="players-panel card">
+      <h3>Joueurs <span id="player-count" class="pill">0</span></h3>
+      <ul id="players" class="players"></ul>
+    </aside>
+
+    <main class="stage">
+      <!-- LOBBY -->
+      <div id="v-lobby" class="view">
+        <div class="lobby-head">
+          <h2>Préparez vos oreilles 🎧</h2>
+          <p class="muted" id="lobby-sub">Invite tes potes avec le lien, choisis les catégories et lance la partie.</p>
+        </div>
+        <div id="settings" class="settings">
+          <div class="set-block">
+            <h4>Catégories <span class="muted" id="cat-count"></span></h4>
+            <div class="cat-tools">
+              <button class="chip-btn" data-catsel="all">Tout</button>
+              <button class="chip-btn" data-catsel="none">Rien</button>
+              <button class="chip-btn" data-catsel="random">🎲 Surprise</button>
+            </div>
+            <div id="cats"></div>
+          </div>
+
+          <div class="set-row">
+            <div class="set-block">
+              <h4>Mode de réponse</h4>
+              <div class="seg" data-key="mode">
+                <button data-v="text">⌨️ Saisie libre</button>
+                <button data-v="qcm">🔘 QCM (4 choix)</button>
+              </div>
+            </div>
+            <div class="set-block" id="answer-block">
+              <h4>À deviner</h4>
+              <div class="seg" data-key="answer">
+                <button data-v="both">Artiste + titre</button>
+                <button data-v="title">Titre</button>
+                <button data-v="artist">Artiste</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="set-row">
+            <div class="set-block">
+              <h4>Nombre d'extraits</h4>
+              <div class="seg" data-key="rounds">
+                <button data-v="5">5</button><button data-v="10">10</button><button data-v="15">15</button>
+                <button data-v="20">20</button><button data-v="30">30</button><button data-v="50">50</button>
+              </div>
+            </div>
+            <div class="set-block">
+              <h4>Durée d'écoute</h4>
+              <div class="seg" data-key="duration">
+                <button data-v="10">10 s</button><button data-v="15">15 s</button><button data-v="20">20 s</button>
+                <button data-v="25">25 s</button><button data-v="30">30 s</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="set-block">
+            <h4>Bonus</h4>
+            <div class="toggles">
+              <label class="tog"><input type="checkbox" data-key="speedBonus"><span></span> ⚡ Points de vitesse <small>50 à 100 pts selon ta rapidité</small></label>
+              <label class="tog"><input type="checkbox" data-key="firstBonus"><span></span> 🥇 Premier qui trouve <small>+20 pts</small></label>
+              <label class="tog"><input type="checkbox" data-key="comboBonus"><span></span> 🎯 Combo artiste + titre <small>+50 pts</small></label>
+            </div>
+          </div>
+
+          <div class="set-block">
+            <h4>Playlist perso <span class="muted">(optionnel)</span></h4>
+            <div class="join-row">
+              <input id="custom-link" class="input" placeholder="Colle un lien de playlist Deezer : deezer.com/fr/playlist/…">
+              <button id="btn-check-pl" class="btn btn-yellow">Ajouter</button>
+            </div>
+            <p id="pl-status" class="muted small"></p>
+          </div>
+        </div>
+        <div class="lobby-foot">
+          <button id="btn-start" class="btn btn-primary btn-xl">▶ Lancer la partie</button>
+          <p id="wait-host" class="muted">En attente que l'hôte lance la partie…</p>
+        </div>
+      </div>
+
+      <!-- CHARGEMENT -->
+      <div id="v-loading" class="view center">
+        <div class="vinyl spin"><div class="label">MZ</div></div>
+        <h2>On fouille les bacs à disques…</h2>
+        <p class="muted">Préparation des extraits</p>
+      </div>
+
+      <!-- MANCHE -->
+      <div id="v-play" class="view">
+        <div class="round-head">
+          <span class="pill big" id="round-num">1 / 15</span>
+          <span class="pill" id="round-cat"></span>
+          <button id="btn-skip" class="btn btn-ghost btn-sm host-only">⏭ Passer</button>
+          <button id="btn-stop" class="btn btn-ghost btn-sm host-only">⏹ Arrêter</button>
+        </div>
+        <div class="player-visual">
+          <div class="countdown" id="countdown">3</div>
+          <div class="vinyl spin" id="play-vinyl"><div class="label">?</div></div>
+          <div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="timer"><div id="timer-bar"></div></div>
+          <div class="time-left" id="time-left"></div>
+          <button id="btn-unmute" class="btn btn-yellow hidden">🔊 Activer le son</button>
+        </div>
+
+        <div id="text-answer">
+          <div class="found-badges">
+            <span id="b-artist" class="badge">🎤 Artiste</span>
+            <span id="b-title" class="badge">🎵 Titre</span>
+          </div>
+          <form id="guess-form" class="guess-row">
+            <input id="guess" class="input big" autocomplete="off" placeholder="Artiste ou titre… (Entrée pour valider)">
+            <button class="btn btn-primary">OK</button>
+          </form>
+          <p id="guess-feedback" class="feedback"></p>
+        </div>
+        <div id="qcm-answer" class="qcm"></div>
+      </div>
+
+      <!-- RÉVÉLATION -->
+      <div id="v-reveal" class="view center">
+        <div class="reveal-card">
+          <img id="rv-cover" alt="">
+          <div>
+            <div class="muted small">C'était…</div>
+            <h2 id="rv-title"></h2>
+            <h3 id="rv-artist"></h3>
+            <a id="rv-link" target="_blank" rel="noopener" class="muted small">Écouter sur Deezer ↗</a>
+          </div>
+        </div>
+        <ul id="rv-results" class="rv-results"></ul>
+        <div class="next-bar"><div id="next-bar"></div></div>
+      </div>
+
+      <!-- FIN -->
+      <div id="v-end" class="view center">
+        <h2 class="end-title">🏆 Classement final</h2>
+        <div class="podium" id="podium"></div>
+        <ol id="final-list" class="final-list"></ol>
+        <details class="history"><summary>📜 Revoir les morceaux</summary><ol id="history"></ol></details>
+        <div class="end-actions">
+          <button id="btn-replay" class="btn btn-primary host-only">🔁 Rejouer</button>
+          <button id="btn-lobby" class="btn btn-yellow host-only">⚙️ Changer les réglages</button>
+          <p class="muted guest-only">L'hôte peut relancer une partie.</p>
+        </div>
+      </div>
+    </main>
+
+    <aside class="chat-panel card" id="chat-panel">
+      <h3>Chat</h3>
+      <ul id="chat" class="chat"></ul>
+      <div class="reacts" id="reacts"></div>
+      <form id="chat-form" class="chat-form">
+        <input id="chat-input" class="input" maxlength="200" placeholder="Message…" autocomplete="off">
+        <button class="btn btn-yellow btn-sm">➤</button>
+      </form>
+    </aside>
+  </div>
+</section>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
