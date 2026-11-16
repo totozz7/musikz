@@ -14,6 +14,7 @@
 <body>
 <div class="bg-stripes"></div>
 <div id="reactions-layer"></div>
+<div id="freeze-layer" class="freeze-layer hidden"><div>🧊<b>GELÉ !</b><span id="freeze-count"></span></div></div>
 <div id="toasts"></div>
 
 <!-- ───────── ACCUEIL ───────── -->
@@ -125,6 +126,13 @@
             <p class="muted small hint">Après chaque réponse, on passe tout seul au morceau suivant. En « Manuel », l'hôte clique sur « Suivant ».</p>
           </div>
 
+          <div class="set-block zizanie-block">
+            <h4>🃏 Mode Zizanie</h4>
+            <label class="tog"><input type="checkbox" data-key="funMode"><span></span> Activer le mode Zizanie <small>avant chaque extrait, chacun choisit une carte</small></label>
+            <p class="muted small hint">🎁 Bonus pour toi : première lettre, pendu, pochette floue, année, points ×2, bouclier…<br>
+            😈 Malus pour l'adversaire de ton choix : soundboard (buzzers, klaxons, canards), écran à l'envers, voix de chipmunk, gel, volume yo-yo, lunettes noires…</p>
+          </div>
+
           <div class="set-block">
             <h4>Bonus</h4>
             <div class="toggles">
@@ -157,6 +165,20 @@
         <p class="muted">Préparation des extraits</p>
       </div>
 
+      <!-- ZIZANIE : choix des cartes -->
+      <div id="v-powers" class="view center">
+        <div class="round-head wide">
+          <span class="pill big" id="pw-num">1 / 15</span>
+          <button id="btn-skip-pw" class="btn btn-ghost btn-sm host-only">⏭ Lancer l'extrait</button>
+        </div>
+        <h2 class="pw-title">🃏 Zizanie ! Choisis ta carte</h2>
+        <div class="timer pw-timer"><div id="pw-bar"></div></div>
+        <div id="pw-cards" class="pw-cards"></div>
+        <div id="pw-targets" class="pw-targets hidden"></div>
+        <p id="pw-status" class="pw-status"></p>
+        <button id="btn-pw-none" class="btn btn-ghost btn-sm">Je ne joue pas de carte</button>
+      </div>
+
       <!-- MANCHE -->
       <div id="v-play" class="view">
         <div class="round-head">
@@ -173,6 +195,7 @@
           <div class="time-left" id="time-left"></div>
           <button id="btn-unmute" class="btn btn-yellow hidden">🔊 Activer le son</button>
         </div>
+        <div id="fx-area" class="fx-area"></div>
 
         <div id="text-answer">
           <div class="found-badges">

@@ -187,8 +187,12 @@ function mockResolve(item) {
 
 // Les liens d'extraits Deezer expirent : on rafraîchit juste avant de jouer.
 async function freshPreview(track) {
-  if (MOCK || !track.id) return track.preview;
-  try { const t = await dz(`/track/${track.id}`); return t.preview || track.preview; } catch { return track.preview; }
+  if (MOCK || typeof track.id !== 'number') return { preview: track.preview, year: MOCK ? 2004 : null };
+  try {
+    const t = await dz(`/track/${track.id}`);
+    const year = parseInt(String(t.release_date || t.album?.release_date || '').slice(0, 4)) || null;
+    return { preview: t.preview || track.preview, year };
+  } catch { return { preview: track.preview, year: null }; }
 }
 
 // ───────────────────────── catégories Deezer "live" (hits) ─────────────────────────
@@ -334,6 +338,7 @@ function defaultSettings() {
     duration: 25,          // secondes d'écoute par extrait
     pause: 5,              // secondes entre deux extraits (0 = l'hôte passe à la main)
     speedBonus: true, comboBonus: true, firstBonus: true,
+    funMode: false,        // 🃏 Mode Zizanie : bonus / malus avant chaque extrait
     customLink: '', customTitle: '', customSource: '', customOnly: false,
   };
 }
@@ -345,6 +350,7 @@ function publicPlayers(room) {
       id: p.id, name: p.name, avatar: p.avatar, color: p.color, score: p.score,
       online: p.online, host: p.id === room.hostId,
       foundArtist: !!f.artist, foundTitle: !!f.title, answered: !!f.answered, streak: p.streak || 0,
+      powered: room.phase === 'powers' && !!room.round?.powers?.has(p.id),
     };
   });
 }
@@ -443,6 +449,67 @@ function makeChoices(room, track) {
   return shuffle(opts);
 }
 
+// ───────────────────────── Mode Zizanie : bonus & malus ─────────────────────────
+const POWERS = {
+  // bonus (pour soi)
+  letter:  { type: 'bonus', emoji: '🔤', name: 'Première lettre', desc: 'Tu vois par quelle lettre commence la réponse' },
+  pattern: { type: 'bonus', emoji: '🧩', name: 'Pendu', desc: 'Tu vois le nombre de lettres de chaque mot' },
+  cover:   { type: 'bonus', emoji: '🖼️', name: 'Pochette floue', desc: 'Tu vois la pochette… très floue' },
+  year:    { type: 'bonus', emoji: '📅', name: 'Année', desc: "Tu connais l'année de sortie" },
+  double:  { type: 'bonus', emoji: '💰', name: 'Points doublés', desc: 'Tes points comptent double sur cet extrait' },
+  shield:  { type: 'bonus', emoji: '🛡️', name: 'Bouclier', desc: 'Tu es protégé de tous les malus' },
+  fifty:   { type: 'bonus', emoji: '✂️', name: '50/50', desc: 'Deux mauvaises réponses disparaissent', qcm: true },
+  // malus (sur un adversaire)
+  buzzer:   { type: 'malus', emoji: '📢', name: 'Soundboard', desc: 'Buzzers, klaxons et canards pendant toute l\'écoute' },
+  flip:     { type: 'malus', emoji: '🙃', name: 'Tête en bas', desc: 'Son écran se retourne pendant 12 s' },
+  chipmunk: { type: 'malus', emoji: '🐿️', name: 'Voix de chipmunk', desc: 'La musique est accélérée et suraiguë' },
+  freeze:   { type: 'malus', emoji: '🧊', name: 'Gel', desc: 'Il ne peut pas répondre pendant 7 s' },
+  yoyo:     { type: 'malus', emoji: '🎚️', name: 'Volume yo-yo', desc: 'Le son monte et descend sans arrêt' },
+  blind:    { type: 'malus', emoji: '🕶️', name: 'Lunettes noires', desc: 'Il ne voit plus ce qu\'il tape' },
+};
+const POWER_SECONDS = 10;
+
+function drawOffers(room) {
+  const qcm = room.settings.mode === 'qcm';
+  const bonus = Object.keys(POWERS).filter(k => POWERS[k].type === 'bonus' && (!POWERS[k].qcm || qcm));
+  const malus = Object.keys(POWERS).filter(k => POWERS[k].type === 'malus');
+  const solo = [...room.players.values()].filter(p => p.online).length < 2;
+  return solo ? shuffle([...bonus]).slice(0, 3) : [...shuffle([...bonus]).slice(0, 2), ...shuffle([...malus]).slice(0, 2)];
+}
+
+const firstLetter = (x) => (String(x).replace(/^(the|le|la|les|l')\s*/i, '').match(/[\p{L}\p{N}]/u) || ['?'])[0].toUpperCase();
+const hangman = (x) => String(x).replace(/[\p{L}\p{N}]/gu, '_');
+
+// Ce que chaque joueur reçoit pour la manche : son bonus (avec l'indice) et les malus qu'on lui a lancés
+function effectsFor(room, pid) {
+  const r = room.round; if (!r.powers) return null;
+  const t = r.track, mine = r.powers.get(pid);
+  const fx = { bonus: null, maluses: [], sent: null };
+  if (mine && POWERS[mine.id]?.type === 'bonus') {
+    const b = { id: mine.id, ...POWERS[mine.id] };
+    const need = needed(room, t);
+    if (mine.id === 'letter') b.hint = t.work ? `« ${firstLetter(t.title)}… »` : need.map(k => `${k === 'artist' ? 'Artiste' : 'Titre'} : « ${firstLetter(t[k])}… »`).join('   ·   ');
+    if (mine.id === 'pattern') b.hint = t.work || need.includes('title') ? hangman(t.title) : hangman(t.artist);
+    if (mine.id === 'cover') { b.image = t.cover || ''; if (!t.cover) b.hint = 'Pas de pochette pour celui-là… 😅 Première lettre : ' + firstLetter(t.title); }
+    if (mine.id === 'year') b.hint = r.year ? String(r.year) : 'Inconnue… mais ça commence par « ' + firstLetter(t.title) + ' »';
+    if (mine.id === 'fifty' && r.choices) b.remove = r.choices.filter(c => c.id !== String(t.id)).slice(0, 2).map(c => c.id);
+    fx.bonus = b;
+  }
+  if (mine && POWERS[mine.id]?.type === 'malus') {
+    const target = room.players.get(mine.target);
+    const shielded = r.powers.get(mine.target)?.id === 'shield';
+    fx.sent = { id: mine.id, ...POWERS[mine.id], target: target?.name, blocked: shielded };
+  }
+  const shielded = mine?.id === 'shield';
+  for (const [from, pw] of r.powers) {
+    if (pw.target === pid && POWERS[pw.id]?.type === 'malus') {
+      const p = room.players.get(from);
+      fx.maluses.push({ id: pw.id, ...POWERS[pw.id], from: p?.name || '?', fromAvatar: p?.avatar || '', blocked: shielded });
+    }
+  }
+  return fx;
+}
+
 const needed = (room, track) => track.work ? ['title'] : room.settings.answer === 'both' ? ['artist', 'title'] : [room.settings.answer];
 
 async function nextRound(room) {
@@ -451,28 +518,76 @@ async function nextRound(room) {
   if (room.roundIndex >= room.queue.length) return endGame(room);
   const track = room.queue[room.roundIndex];
   room.phase = 'prep';
-  const preview = await freshPreview(track);
+  const { preview, year } = await freshPreview(track);
   if (room.phase !== 'prep') return; // partie arrêtée entre-temps
   const s = room.settings;
-  const startAt = Date.now() + 3500; // compte à rebours de 3 s, le temps de charger l'audio
   room.round = {
-    track, preview, startAt, endAt: startAt + s.duration * 1000,
-    found: new Map(), firstArtist: null, firstTitle: null, firstAnswer: null,
+    track, preview, year, found: new Map(), firstArtist: null, firstTitle: null, firstAnswer: null,
     choices: s.mode === 'qcm' ? makeChoices(room, track) : null,
+    powers: null, offers: null,
   };
-  room.phase = 'playing';
+  if (!s.funMode) return startPlaying(room);
+
+  // 🃏 Zizanie : chacun choisit une carte avant l'extrait
+  room.phase = 'powers';
+  room.round.powers = new Map(); room.round.offers = new Map();
+  room.round.powersEnd = Date.now() + POWER_SECONDS * 1000;
   broadcast(room);
-  io.to(room.code).emit('round', roundPayload(room));
-  room.timer = setTimeout(() => revealRound(room), room.round.endAt - Date.now() + 300);
+  for (const p of room.players.values()) {
+    if (!p.online) continue;
+    const offers = drawOffers(room);
+    room.round.offers.set(p.id, offers);
+    io.to(p.socketId).emit('powers', powersPayload(room, p.id));
+  }
+  room.timer = setTimeout(() => startPlaying(room), POWER_SECONDS * 1000);
 }
 
-function roundPayload(room, late = false) {
+function powersPayload(room, pid) {
+  const r = room.round;
+  return {
+    index: room.roundIndex, total: room.queue.length, endsIn: r.powersEnd - Date.now(),
+    offers: (r.offers.get(pid) || []).map(id => ({ id, ...POWERS[id] })),
+    chosen: r.powers.get(pid) || null,
+  };
+}
+
+function allChosePowers(room) {
+  return [...room.players.values()].filter(p => p.online).every(p => room.round.powers.has(p.id));
+}
+
+function startPlaying(room) {
+  if (!['prep', 'powers'].includes(room.phase)) return;
+  clearTimeout(room.timer);
+  const s = room.settings, r = room.round;
+  r.startAt = Date.now() + 3500; // compte à rebours de 3 s, le temps de charger l'audio
+  r.endAt = r.startAt + s.duration * 1000;
+  room.phase = 'playing';
+  broadcast(room);
+  for (const p of room.players.values()) if (p.online) io.to(p.socketId).emit('round', roundPayload(room, false, p.id));
+  if (r.powers && r.powers.size) {
+    const lines = [];
+    for (const [from, pw] of r.powers) {
+      const P = POWERS[pw.id], who = room.players.get(from)?.name;
+      if (!P || !who) continue;
+      if (P.type === 'malus') {
+        const tg = room.players.get(pw.target);
+        const blocked = r.powers.get(pw.target)?.id === 'shield';
+        lines.push(`${P.emoji} ${who} → ${tg?.name || '?'}${blocked ? ' (🛡️ bloqué !)' : ''}`);
+      } else lines.push(`${P.emoji} ${who} prend « ${P.name} »`);
+    }
+    if (lines.length) sysMsg(room, '🃏 ' + lines.join(' · '));
+  }
+  room.timer = setTimeout(() => revealRound(room), r.endAt - Date.now() + 300);
+}
+
+function roundPayload(room, late = false, pid = null) {
   const r = room.round, t = r.track, s = room.settings;
   const cat = CATEGORIES.find(c => c.id === t.cat);
   return {
     index: room.roundIndex, total: room.queue.length, preview: r.preview,
     startIn: r.startAt - Date.now(), duration: s.duration, choices: r.choices,
     mode: s.mode, answer: s.answer, cat: t.cat, work: !!t.work, label: cat?.label || '', late,
+    effects: pid ? effectsFor(room, pid) : null,
   };
 }
 
@@ -554,7 +669,11 @@ io.on('connection', (socket) => {
     socket.join(r.code);
     cb?.({ ok: true, code: r.code, chat: r.chat });
     broadcast(r);
-    if (r.phase === 'playing' && r.round) socket.emit('round', roundPayload(r, true));
+    if (r.phase === 'playing' && r.round) socket.emit('round', roundPayload(r, true, pid));
+    if (r.phase === 'powers' && r.round) {
+      if (!r.round.offers.has(pid)) r.round.offers.set(pid, drawOffers(r));
+      socket.emit('powers', powersPayload(r, pid));
+    }
   }
 
   const isHost = () => room && me && room.hostId === me.id;
@@ -568,7 +687,7 @@ io.on('connection', (socket) => {
     if ([5, 10, 15, 20, 30, 50].includes(+patch.rounds)) s.rounds = +patch.rounds;
     if ([10, 15, 20, 25, 30].includes(+patch.duration)) s.duration = +patch.duration;
     if ([0, 3, 5, 8, 12].includes(+patch.pause) && patch.pause !== undefined) s.pause = +patch.pause;
-    for (const k of ['speedBonus', 'comboBonus', 'firstBonus', 'customOnly']) if (typeof patch[k] === 'boolean') s[k] = patch[k];
+    for (const k of ['speedBonus', 'comboBonus', 'firstBonus', 'customOnly', 'funMode']) if (typeof patch[k] === 'boolean') s[k] = patch[k];
     if (typeof patch.customLink === 'string') {
       s.customLink = patch.customLink.slice(0, 400);
       s.customTitle = patch.customTitle ? String(patch.customTitle).slice(0, 100) : '';
@@ -590,7 +709,30 @@ io.on('connection', (socket) => {
     startGame(room);
   });
 
-  socket.on('skip', () => { if (isHost() && room.phase === 'playing') revealRound(room); });
+  socket.on('skip', () => {
+    if (!isHost()) return;
+    if (room.phase === 'playing') revealRound(room);
+    else if (room.phase === 'powers') startPlaying(room);
+  });
+  // 🃏 choix d'une carte Zizanie
+  socket.on('power', ({ id, target } = {}, cb) => {
+    if (!room || !me || room.phase !== 'powers') return;
+    const r = room.round;
+    if (r.powers.has(me.id)) return cb?.({ error: 'Déjà choisi' });
+    if (id === 'none') r.powers.set(me.id, { id: 'none' });
+    else {
+      if (!(r.offers.get(me.id) || []).includes(id)) return cb?.({ error: 'Carte invalide' });
+      if (POWERS[id].type === 'malus') {
+        const tg = room.players.get(target);
+        if (!tg || tg.id === me.id) return cb?.({ error: 'Choisis une cible' });
+      }
+      r.powers.set(me.id, { id, target: POWERS[id].type === 'malus' ? target : null });
+    }
+    cb?.({ ok: true });
+    broadcast(room);
+    if (allChosePowers(room)) { clearTimeout(room.timer); room.timer = setTimeout(() => startPlaying(room), 700); }
+  });
+
   // l'hôte signale une mauvaise version : on la bannit et on cherchera une autre version la prochaine fois
   socket.on('ban', () => {
     if (!isHost() || room.phase !== 'reveal' || !room.round) return;
@@ -630,6 +772,7 @@ io.on('connection', (socket) => {
         let pts = pointsFor(room, now);
         const fk = k === 'artist' ? 'firstArtist' : 'firstTitle';
         if (s.firstBonus && !r[fk]) { r[fk] = me.id; pts += 20; gained.push({ type: 'first', k }); }
+        if (r.powers?.get(me.id)?.id === 'double') pts *= 2;
         f.points += pts; me.score += pts; gained.push({ type: k, pts });
         if (s.comboBonus && need.length === 2 && f.artist && f.title) { f.points += 50; me.score += 50; gained.push({ type: 'combo', pts: 50 }); }
       }
@@ -655,6 +798,7 @@ io.on('connection', (socket) => {
     if (f.correct) {
       let pts = pointsFor(room, now);
       if (room.settings.firstBonus && !r.firstAnswer) { r.firstAnswer = me.id; pts += 20; }
+      if (r.powers?.get(me.id)?.id === 'double') pts *= 2;
       f.points = pts; me.score += pts; f.artist = f.title = true;
     }
     r.found.set(me.id, f);
@@ -692,6 +836,7 @@ io.on('connection', (socket) => {
     }
     broadcast(room);
     if (room.phase === 'playing' && allDone(room)) revealRound(room);
+    if (room.phase === 'powers' && allChosePowers(room)) startPlaying(room);
     const r = room;
     setTimeout(() => {
       if ([...r.players.values()].every(p => !p.online)) { clearTimeout(r.timer); rooms.delete(r.code); }

@@ -1235,25 +1235,6 @@ Les Feux de l'amour|Feux de l'amour :: Nadia's Theme Feux de l'amour
 Télématin :: Télématin générique
 `});
 
-cat({ id: 'pubs', name: 'Musiques de pub', emoji: '📣', group: 'Fun', items: `
-Melanie Thornton — Wonderful Dream (Holidays Are Coming) ## Pub Coca-Cola (Noël)
-Mr. Oizo — Flat Beat ## Pub Levi's (Flat Eric)
-Stiltskin — Inside ## Pub Levi's
-Babylon Zoo — Spaceman ## Pub Levi's
-The Black Eyed Peas — Hey Mama ## Pub Apple iPod
-Jet — Are You Gonna Be My Girl ## Pub Apple iPod
-Feist — 1234 ## Pub Apple iPod nano
-The Ting Tings — Shut Up and Let Me Go ## Pub Apple iPod
-Yael Naim — New Soul ## Pub Apple MacBook Air
-CSS — Music Is My Hot Hot Sex ## Pub Apple iPod touch
-José González — Heartbeats ## Pub Sony Bravia
-The Rolling Stones — Start Me Up ## Pub Windows 95
-Nina Simone — My Baby Just Cares for Me ## Pub Chanel N°5
-Les Rythmes Digitales — Jacques Your Body (Make Me Sweat) ## Pub Citroën C4
-Pérez Prado — Guaglione ## Pub Guinness
-Mint Royale — Singin' in the Rain ## Pub Volkswagen Golf
-`});
-
 cat({ id: '2020s', name: 'Années 2020 / TikTok', emoji: '📲', group: 'Décennies', items: `
 The Weeknd — Blinding Lights
 Dua Lipa — Levitating

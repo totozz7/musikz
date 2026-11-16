@@ -13,7 +13,8 @@ if (!pid) { pid = Math.random().toString(36).slice(2) + Date.now().toString(36);
 const socket = io();
 const audio = new Audio();
 audio.preload = 'auto';
-audio.volume = +store.get('mz_vol', 80) / 100;
+let baseVolume = +store.get('mz_vol', 80) / 100;
+audio.volume = baseVolume;
 
 let state = null;       // état du salon
 let categories = [];
@@ -43,7 +44,9 @@ function unlockAudio() {
   // les navigateurs exigent un clic avant de jouer du son : on "débloque" l'élément audio ici
   audio.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
   audio.play().catch(() => {});
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); } catch {}
 }
+let actx = null;
 $('#btn-create').onclick = () => {
   const id = identity(); if (!id) return;
   socket.emit('create', id, onJoined);
@@ -83,7 +86,7 @@ $('#room-code-box').onclick = async () => {
   catch { prompt('Copie ce lien :', link); }
 };
 $('#volume').value = Math.round(audio.volume * 100);
-$('#volume').oninput = (e) => { audio.volume = e.target.value / 100; store.set('mz_vol', e.target.value); };
+$('#volume').oninput = (e) => { baseVolume = e.target.value / 100; if (!yoyoTimer) audio.volume = baseVolume; store.set('mz_vol', e.target.value); };
 $('#btn-chat-toggle').onclick = () => $('#chat-panel').classList.toggle('open');
 
 // ───────────── Catégories ─────────────
@@ -150,6 +153,7 @@ $('#btn-start').onclick = () => socket.emit('start');
 $('#btn-replay').onclick = () => socket.emit('start');
 $('#btn-lobby').onclick = () => socket.emit('backToLobby');
 $('#btn-skip').onclick = () => socket.emit('skip');
+$('#btn-skip-pw').onclick = () => socket.emit('skip');
 $('#btn-ban').onclick = () => { socket.emit('ban'); $('#btn-ban').disabled = true; $('#btn-ban').textContent = '🚫 Signalé'; };
 $('#btn-next').onclick = () => { $('#btn-next').classList.add('hidden'); socket.emit('next'); };
 $('#btn-stop').onclick = () => socket.emit('stop');
@@ -164,7 +168,8 @@ socket.on('room', (r) => {
   renderPlayers();
   $$('.host-only').forEach(e => e.style.display = isHost() ? '' : 'none');
   $$('.guest-only').forEach(e => e.style.display = isHost() ? 'none' : '');
-  if (r.phase === 'lobby') { showView('v-lobby'); renderSettings(); stopAudio(); }
+  if (r.phase === 'lobby') { showView('v-lobby'); renderSettings(); stopAudio(); resetEffects(); }
+  if (r.phase === 'powers') renderPowerStatus();
   if (r.phase === 'loading') showView('v-loading');
   if (r.phase === 'end' && prevPhase !== 'end') renderEnd();
 });
@@ -175,7 +180,8 @@ function renderPlayers() {
   const inGame = ['playing', 'reveal'].includes(state.phase);
   $('#players').innerHTML = ps.map((p, i) => {
     const marks = state.phase === 'playing'
-      ? (state.settings.mode === 'qcm' ? (p.answered ? '✅' : '') : `${p.foundArtist ? '🎤' : ''}${p.foundTitle ? '🎵' : ''}`) : '';
+      ? (state.settings.mode === 'qcm' ? (p.answered ? '✅' : '') : `${p.foundArtist ? '🎤' : ''}${p.foundTitle ? '🎵' : ''}`)
+      : state.phase === 'powers' ? (p.powered ? '🃏' : '⏳') : '';
     const done = state.phase === 'playing' && (state.settings.mode === 'qcm' ? p.answered : (p.foundArtist || p.foundTitle));
     return `<li style="--c:${p.color}" class="${p.online ? '' : 'off'} ${done ? 'done' : ''}">
       ${inGame || state.phase === 'end' ? `<span class="rank">${i + 1}</span>` : ''}
@@ -213,7 +219,7 @@ socket.on('round', (r) => {
   $('#qcm-answer').className = 'qcm';
   $('#qcm-answer').innerHTML = (r.choices || []).map(c => `<button data-id="${esc(c.id)}" class="${c.artist ? '' : 'work'}"><b>${esc(c.title)}</b>${c.artist ? `<span>${esc(c.artist)}</span>` : ''}</button>`).join('');
   $$('#qcm-answer button').forEach(b => b.onclick = () => {
-    if ($('#qcm-answer').classList.contains('locked') || Date.now() < round.startAt) return;
+    if ($('#qcm-answer').classList.contains('locked') || Date.now() < round.startAt || Date.now() < frozenUntil) return;
     b.classList.add('picked'); $('#qcm-answer').classList.add('locked');
     socket.emit('choose', b.dataset.id);
   });
@@ -222,6 +228,8 @@ socket.on('round', (r) => {
   stopAudio();
   if (r.preview) { audio.src = r.preview; audio.load(); }
   $('#eq').classList.add('paused');
+  resetEffects();
+  applyEffects(r.effects);
   let started = false;
   tick = setInterval(() => {
     const now = Date.now();
@@ -290,6 +298,7 @@ socket.on('found', (f) => {
 // ───────────── Révélation ─────────────
 socket.on('reveal', (rv) => {
   clearInterval(tick);
+  resetEffects();
   showView('v-reveal');
   // on laisse la musique continuer quelques secondes pendant la révélation
   if (audio.paused && audio.src && round?.preview) audio.play().catch(() => {});
@@ -386,4 +395,170 @@ function confetti(n) {
     $('#reactions-layer').appendChild(el);
     setTimeout(() => el.remove(), 3400);
   }
+}
+
+
+// ═════════════════════ 🃏 MODE ZIZANIE ═════════════════════
+let powersTick = null, myPowers = null;
+
+socket.on('powers', (p) => {
+  stopAudio(); resetEffects();
+  myPowers = { ...p, endAt: Date.now() + p.endsIn };
+  showView('v-powers');
+  $('#pw-num').textContent = `${p.index + 1} / ${p.total}`;
+  $('#pw-targets').classList.add('hidden');
+  $('#pw-cards').className = 'pw-cards';
+  $('#pw-cards').innerHTML = p.offers.map(o => `
+    <button class="pw-card ${o.type}" data-id="${o.id}">
+      <span class="tag">${o.type === 'bonus' ? '🎁 Bonus' : '😈 Malus'}</span>
+      <span class="em">${o.emoji}</span><b>${esc(o.name)}</b><small>${esc(o.desc)}</small>
+    </button>`).join('');
+  $$('#pw-cards .pw-card').forEach(c => c.onclick = () => pickCard(c));
+  $('#btn-pw-none').classList.remove('hidden');
+  $('#pw-status').textContent = p.offers.some(o => o.type === 'malus') ? 'Un bonus pour toi, ou un malus pour embêter quelqu\'un ?' : 'Choisis un bonus !';
+  if (p.chosen) lockCards(p.chosen.id);
+  clearInterval(powersTick);
+  powersTick = setInterval(() => {
+    const left = Math.max(0, myPowers.endAt - Date.now());
+    $('#pw-bar').style.transform = `scaleX(${left / 10000})`;
+    if (!left) clearInterval(powersTick);
+  }, 100);
+  renderPowerStatus();
+});
+
+function pickCard(card) {
+  const id = card.dataset.id;
+  const offer = myPowers.offers.find(o => o.id === id);
+  $$('#pw-cards .pw-card').forEach(c => c.classList.toggle('sel', c === card));
+  if (offer.type === 'bonus') return sendPower(id);
+  // malus : choisir la victime
+  const others = state.players.filter(p => p.id !== pid && p.online);
+  $('#pw-targets').classList.remove('hidden');
+  $('#pw-targets').innerHTML = `<div class="lbl2">${offer.emoji} Sur qui ?</div>` +
+    others.map(p => `<button data-t="${p.id}">${p.avatar} ${esc(p.name)}</button>`).join('');
+  $$('#pw-targets [data-t]').forEach(b => b.onclick = () => sendPower(id, b.dataset.t));
+}
+
+function sendPower(id, target) {
+  socket.emit('power', { id, target }, (r) => {
+    if (r?.error) return toast(r.error, 'error');
+    lockCards(id, target);
+    sfx('pop');
+  });
+}
+function lockCards(id, target) {
+  $('#pw-cards').classList.add('locked');
+  $('#pw-targets').classList.add('hidden');
+  $('#btn-pw-none').classList.add('hidden');
+  const o = myPowers?.offers.find(x => x.id === id);
+  const tg = target && state.players.find(p => p.id === target);
+  $('#pw-status').textContent = id === 'none' ? '😇 Tu passes ton tour. En attente des autres…'
+    : `✅ ${o?.emoji || ''} ${o?.name || ''}${tg ? ' → ' + tg.avatar + ' ' + tg.name : ''} · En attente des autres…`;
+}
+$('#btn-pw-none').onclick = () => sendPower('none');
+
+function renderPowerStatus() {
+  if (!state || state.phase !== 'powers') return;
+  const waiting = state.players.filter(p => p.online && !p.powered).length;
+  if ($('#pw-cards').classList.contains('locked')) {
+    $('#pw-status').textContent = $('#pw-status').textContent.split(' · ')[0] + (waiting ? ` · Encore ${waiting} joueur${waiting > 1 ? 's' : ''}…` : ' · C\'est parti !');
+  }
+}
+
+// ───── effets pendant l'écoute ─────
+let fxTimers = [], yoyoTimer = null, frozenUntil = 0;
+
+function resetEffects() {
+  fxTimers.forEach(clearTimeout); fxTimers = [];
+  clearInterval(yoyoTimer); yoyoTimer = null;
+  frozenUntil = 0;
+  document.body.classList.remove('flipped', 'blind');
+  $('#freeze-layer').classList.add('hidden');
+  $('#fx-area').innerHTML = '';
+  try { audio.playbackRate = 1; audio.preservesPitch = true; audio.mozPreservesPitch = true; audio.loop = false; audio.volume = baseVolume; } catch {}
+}
+
+function at(ms, fn) { fxTimers.push(setTimeout(fn, Math.max(0, ms))); }
+
+function applyEffects(fx) {
+  if (!fx) return;
+  const area = $('#fx-area');
+  const startIn = round.startAt - Date.now();
+  const dur = round.duration * 1000;
+  if (fx.bonus) {
+    const b = fx.bonus;
+    area.insertAdjacentHTML('beforeend', `<div class="fx bonus">
+      ${b.image ? `<div class="fx-img"><img src="${esc(b.image)}" alt=""></div>` : `<span class="em">${b.emoji}</span>`}
+      <div><div>${b.emoji} ${esc(b.name)}</div>${b.hint ? `<div class="hint">${esc(b.hint)}</div>` : ''}${b.id === 'double' ? '<div class="hint">×2 sur cet extrait !</div>' : ''}${b.id === 'shield' ? '<div class="hint">Protégé !</div>' : ''}</div></div>`);
+    if (b.remove) at(startIn, () => b.remove.forEach(id => { const el = $(`#qcm-answer [data-id="${CSS.escape(id)}"]`); if (el) el.style.visibility = 'hidden'; }));
+  }
+  if (fx.sent) toast(fx.sent.blocked ? `🛡️ ${fx.sent.target} avait un bouclier… raté !` : `${fx.sent.emoji} ${fx.sent.name} envoyé à ${fx.sent.target} 😈`);
+  for (const m of fx.maluses) {
+    if (m.blocked) {
+      area.insertAdjacentHTML('beforeend', `<div class="fx blocked"><span class="em">🛡️</span><div>Ton bouclier a bloqué « ${esc(m.name)} » de ${m.fromAvatar} ${esc(m.from)}</div></div>`);
+      continue;
+    }
+    area.insertAdjacentHTML('beforeend', `<div class="fx malus"><span class="em">${m.emoji}</span><div>${m.fromAvatar} ${esc(m.from)} t'a envoyé <b>${esc(m.name)}</b> !</div></div>`);
+    toast(`${m.emoji} ${m.from} t'a envoyé « ${m.name} » !`, 'error');
+    sfx('buzzer', .5);
+    if (m.id === 'buzzer') {
+      const n = 6 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < n; i++) at(startIn + 600 + Math.random() * (dur - 1500), () => { sfx(randomSfx()); document.querySelector('.stage').classList.add('shake-hard'); setTimeout(() => document.querySelector('.stage').classList.remove('shake-hard'), 400); });
+    }
+    if (m.id === 'flip') { at(startIn, () => document.body.classList.add('flipped')); at(startIn + 12000, () => document.body.classList.remove('flipped')); }
+    if (m.id === 'chipmunk') {
+      try { audio.preservesPitch = false; audio.mozPreservesPitch = false; audio.loop = true; } catch {}
+      at(startIn, () => { try { audio.playbackRate = 1.35; } catch {} });
+      // la lecture démarre au même moment que pour les autres : on réapplique la vitesse
+      at(startIn + 300, () => { try { audio.playbackRate = 1.35; } catch {} });
+    }
+    if (m.id === 'freeze') {
+      frozenUntil = round.startAt + 7000;
+      at(startIn, () => {
+        $('#guess').disabled = true; $('#freeze-layer').classList.remove('hidden');
+        const iv = setInterval(() => {
+          const l = Math.ceil((frozenUntil - Date.now()) / 1000);
+          $('#freeze-count').textContent = l > 0 ? l + ' s' : '';
+          if (l <= 0) { clearInterval(iv); $('#freeze-layer').classList.add('hidden'); if (!$('#guess').placeholder.startsWith('🎉')) { $('#guess').disabled = false; $('#guess').focus(); } }
+        }, 200);
+        fxTimers.push(iv);
+      });
+    }
+    if (m.id === 'yoyo') at(startIn, () => {
+      let up = false;
+      yoyoTimer = setInterval(() => { up = !up; audio.volume = up ? baseVolume : Math.min(baseVolume, 0.04 + Math.random() * 0.1); }, 900 + Math.random() * 600);
+    });
+    if (m.id === 'blind') at(startIn, () => document.body.classList.add('blind'));
+  }
+}
+
+// ───── Soundboard (sons générés par le navigateur, aucun fichier) ─────
+const SFX = ['buzzer', 'horn', 'klaxon', 'quack', 'boing', 'siren', 'wrong'];
+const randomSfx = () => SFX[Math.floor(Math.random() * SFX.length)];
+function sfx(name, vol = 1) {
+  if (!actx) return;
+  try { actx.resume(); } catch {}
+  const t0 = actx.currentTime, out = actx.createGain();
+  out.gain.value = Math.max(0.15, baseVolume) * 0.45 * vol;
+  out.connect(actx.destination);
+  const osc = (type, f, start, end, gain = 1) => {
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t0 + start);
+    g.gain.setValueAtTime(0, t0 + start); g.gain.linearRampToValueAtTime(gain, t0 + start + 0.02);
+    g.gain.setValueAtTime(gain, t0 + end - 0.05); g.gain.linearRampToValueAtTime(0, t0 + end);
+    o.connect(g); g.connect(out); o.start(t0 + start); o.stop(t0 + end + 0.05);
+    return o;
+  };
+  if (name === 'buzzer') { osc('square', 110, 0, .7); osc('sawtooth', 116, 0, .7, .6); }
+  if (name === 'wrong') { osc('square', 300, 0, .18); osc('square', 200, .2, .55); }
+  if (name === 'horn') { [440, 554, 659].forEach(f => { const o = osc('sawtooth', f, 0, 1.1, .45); o.frequency.linearRampToValueAtTime(f * 1.03, t0 + 1.1); }); }
+  if (name === 'klaxon') { [0, .35].forEach(d => { osc('square', 392, d, d + .28, .7); osc('square', 494, d, d + .28, .5); }); }
+  if (name === 'quack') {
+    [0, .22].forEach(d => {
+      const o = osc('sawtooth', 950, d, d + .16, .9); o.frequency.exponentialRampToValueAtTime(420, t0 + d + .16);
+    });
+  }
+  if (name === 'boing') { const o = osc('sine', 140, 0, .6, 1); o.frequency.exponentialRampToValueAtTime(700, t0 + .25); o.frequency.exponentialRampToValueAtTime(160, t0 + .6); }
+  if (name === 'siren') { const o = osc('triangle', 650, 0, 1.6, .9); for (let i = 0; i < 4; i++) o.frequency.linearRampToValueAtTime(i % 2 ? 650 : 1250, t0 + .4 * (i + 1)); }
+  if (name === 'pop') { const o = osc('sine', 500, 0, .12, .8); o.frequency.exponentialRampToValueAtTime(1100, t0 + .1); }
 }

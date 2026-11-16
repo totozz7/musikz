@@ -3,7 +3,7 @@
 Blind test multijoueur en temps réel (jusqu'à 12 joueurs), extraits Deezer de 30 s, 43 catégories
 choisies à la main (~1 100 morceaux) : Dessins animés 2000-2010, Disney VF, films, séries, animés, jeux vidéo,
 rap FR, variété, décennies, genres, monde, et des catégories fun (tubes de soirée,
-tubes de l'été, hymnes de stade, Noël, Disney Channel, comédies musicales, émissions télé, musiques de pub)…
+tubes de l'été, hymnes de stade, Noël, Disney Channel, comédies musicales, émissions télé)…
 
 Seules les **versions originales** sont gardées : les reprises piano/guitare, karaoké, live, remix… sont filtrées,
 et parmi les versions restantes on prend la plus écoutée.
@@ -33,6 +33,13 @@ dans les autres, l'**artiste** et le **titre**.
 1. Ouvre le site, choisis un pseudo et un avatar, clique **Créer un salon**.
 2. Clique sur le code du salon en haut (🔗 *Copier le lien*) et envoie le lien à tes potes.
 3. Choisis les catégories et les options, puis **Lancer la partie**.
+
+### 🃏 Mode Zizanie (option)
+Avant chaque extrait, chaque joueur tire 4 cartes (10 s pour choisir) et en joue une :
+- **Bonus pour soi** : 🔤 première lettre, 🧩 pendu (nombre de lettres), 🖼️ pochette floue, 📅 année, 💰 points doublés,
+  🛡️ bouclier (bloque tous les malus), ✂️ 50/50 (en QCM)
+- **Malus sur le joueur de son choix** : 📢 soundboard (buzzers, klaxons, canards…), 🙃 écran à l'envers, 🐿️ voix de chipmunk,
+  🧊 gel (impossible de répondre 7 s), 🎚️ volume yo-yo, 🕶️ lunettes noires (on ne voit plus ce qu'on tape)
 
 ### Options de partie
 - **Mode** : saisie libre (tolérante aux fautes et aux accents) ou QCM 4 choix
