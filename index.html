@@ -29,20 +29,16 @@
     <div class="card home-card">
       <div class="profile-preview">
         <span id="pv-avatar"></span>
-        <div>
+        <div class="pv-txt">
           <div id="pv-name" class="pv-name">Ton pseudo</div>
-          <div class="muted small">Voilà comment les autres te verront</div>
+          <div id="pv-title" class="pv-title"></div>
         </div>
+        <div class="wallet" title="Tes pièces"><span>🪙</span><b id="coins">0</b></div>
       </div>
       <label class="lbl">Ton pseudo</label>
       <input id="name" class="input" maxlength="18" placeholder="Ex. Thomas" autocomplete="off">
-      <label class="lbl">Ton icône</label>
-      <div id="avatars" class="avatars"></div>
-      <label class="lbl">Couleur du pseudo</label>
-      <div id="colors" class="colors"></div>
-      <label class="lbl">Cadre</label>
-      <div id="frames" class="frames"></div>
-
+      <button id="btn-shop" class="btn btn-shop" type="button">🎨 Personnaliser &amp; Boutique</button>
+      <p class="muted small center-txt">Gagne des 🪙 à chaque partie pour débloquer cadres, effets, titres…</p>
       <button id="btn-create" class="btn btn-primary btn-xl">🎤 Créer un salon</button>
       <div class="or"><span>ou rejoindre</span></div>
       <div class="join-row">
@@ -247,6 +243,7 @@
       <!-- FIN -->
       <div id="v-end" class="view center">
         <h2 class="end-title">🏆 Classement final</h2>
+        <div id="earned" class="earned hidden"></div>
         <div class="podium" id="podium"></div>
         <ol id="final-list" class="final-list"></ol>
         <details class="history"><summary>📜 Revoir les morceaux</summary><ol id="history"></ol></details>
@@ -270,6 +267,32 @@
   </div>
 </section>
 
+<!-- ───────── BOUTIQUE ───────── -->
+<div id="shop" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>🎨 Personnalisation</h2>
+      <div class="wallet big"><span>🪙</span><b id="coins2">0</b></div>
+      <button id="shop-close" class="btn btn-ghost btn-sm">✕</button>
+    </div>
+    <div class="shop-preview">
+      <span id="sp-avatar"></span>
+      <div><div id="sp-name" class="pv-name">Ton pseudo</div><div id="sp-title" class="pv-title"></div></div>
+    </div>
+    <div class="tabs" id="shop-tabs">
+      <button data-tab="icons" class="on">Icônes</button>
+      <button data-tab="color">Couleur</button>
+      <button data-tab="frames">Cadres</button>
+      <button data-tab="nameFx">Effets de pseudo</button>
+      <button data-tab="titles">Titres</button>
+      <button data-tab="winFx">Effet de victoire</button>
+      <button data-tab="save">💾 Sauvegarde</button>
+    </div>
+    <div id="shop-body" class="shop-body"></div>
+  </div>
+</div>
+
+<script src="/shop.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/app.js"></script>
 </body>

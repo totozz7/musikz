@@ -30,8 +30,14 @@ dans les autres, l'**artiste** et le **titre**.
 
 ## Jouer
 
-À l'accueil, chacun personnalise son profil : **icône** (une cinquantaine), **couleur du pseudo** et **cadre**
-(classique, or, arc-en-ciel, néon, feu, glace, couronne, étoiles, pixel). C'est mémorisé dans le navigateur.
+### 🪙 Progression, pièces et boutique
+- Chaque partie rapporte des pièces : **15 de participation + 8 par bonne réponse + bonus de podium (60 / 35 / 20)**.
+  On démarre avec 300 🪙.
+- Bouton **🎨 Personnaliser & Boutique** à l'accueil : icônes, couleur, cadres (RGB gamer, néon clignotant, glitch,
+  galaxie, électrique, diamant…), effets de pseudo (RGB qui bouge, néon clignotant, glitch, or brillant…), titres,
+  effets de victoire (ce qui pleut quand tu trouves une réponse).
+- La progression est enregistrée **dans le navigateur** (le serveur gratuit de Render oublie tout quand il s'endort).
+  Onglet **💾 Sauvegarde** : un code à copier pour la retrouver sur un autre appareil.
 
 
 1. Ouvre le site, choisis un pseudo et un avatar, clique **Créer un salon**.
@@ -40,13 +46,14 @@ dans les autres, l'**artiste** et le **titre**.
 
 ### 🃏 Mode Zizanie (option)
 Avant chaque extrait, chaque joueur tire 2 cartes (1 bonus + 1 malus, 10 s pour choisir) et en joue une (ou aucune).
-Rareté de chaque carte : **Commune 74 %**, **Rare 22 %**, **Légendaire 4 %**.
+Rareté de chaque carte : **Commune 68 %**, **◆ Rare 23 %** (bleu), **✦ Épique 7,5 %** (violet), **★ Légendaire 1,5 %** (arc-en-ciel).
 
 | | Bonus (pour soi) | Malus (sur le joueur de son choix) |
 |---|---|---|
-| Communes | 🔤 Première lettre · 🧩 Pendu · 🖼️ Pochette floue · 📅 Année · 💰 Points ×2 · 👂 Avant-première (3 s d'avance) · ✂️ 50/50 (QCM) | 📢 Soundboard · 🙃 Tête en bas · 🧊 Gel 7 s · 🎚️ Volume yo-yo · 🕶️ Lunettes noires · 💩 Pluie d'emojis |
-| Rares | 💎 Points ×3 · 🛡️ Bouclier · 🔀 Anagramme | 🐿️ Voix de chipmunk · 🐢 Ralenti · ⌨️ Clavier fou |
-| Légendaires | 🗣️ Le Souffleur (une voix robot te chuchote la réponse) | 🎪 LE GRAND BAZAR (tout en même temps) |
+| Communes | 🔤 Première lettre · 🧩 Pendu · 🖼️ Pochette floue · 📅 Année · 💰 ×2 · 👂 Avant-première · ⚡ Éclair (+50 si trouvé en 10 s) · ✂️ 50/50 (QCM) | 📢 Soundboard · 🙃 Tête en bas · 🧊 Gel · 🎚️ Volume yo-yo · 🕶️ Lunettes noires · 💩 Pluie d'emojis · 🦟 Moustique |
+| ◆ Rares | 💎 ×3 · 🛡️ Bouclier · 🔀 Anagramme | 🐿️ Chipmunk · 🐢 Ralenti · ⌨️ Clavier fou · 🔌 Coupures de courant |
+| ✦ Épiques | 🗣️ Le Souffleur · 🎰 Jackpot ×4 | 🎪 Le Grand Bazar · 💿 Disque rayé |
+| ★ Légendaires | ✍️ **La Plume Magique** : la réponse s'écrit toute seule | 🎭 **L'Imposteur** : la victime entend une AUTRE chanson, sans le savoir |
 
 ### Options de partie
 - **Mode** : saisie libre (tolérante aux fautes et aux accents) ou QCM 4 choix

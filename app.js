@@ -4,17 +4,32 @@ const $$ = (s) => [...document.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const store = { get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
 
-const AVATARS = ['🦊', '🐼', '🐸', '🦁', '🐙', '🦄', '🐯', '🐵', '🐧', '🦉', '🐺', '🐲', '🐝', '🦖', '🐨', '🐷', '🐶', '🐱', '🦈', '🦩',
-  '👽', '🤖', '👻', '💀', '🤡', '🎃', '😎', '🥸', '🤠', '🥷', '🧛', '🧙', '🦸', '🧜', '👑', '🫠',
-  '🍕', '🍔', '🌮', '🍩', '🥑', '🌶️', '🥖', '🧀', '🎸', '🎧', '🎤', '🥁', '🎷', '🚀', '⚡', '🔥', '🌈', '💎'];
-const COLORS = ['#ff2e4d', '#ff7a1a', '#ffc21a', '#c0ff00', '#4cd964', '#30d5c8', '#00e5ff', '#2fa9ff', '#7c5cff', '#e0b0ff', '#ff4fa3', '#ff9ecf', '#ffd59e', '#ffffff'];
-const FRAMES = [
-  ['none', 'Aucun'], ['classic', 'Classique'], ['gold', 'Or'], ['rainbow', 'Arc-en-ciel'], ['neon', 'Néon'],
-  ['fire', 'Feu'], ['ice', 'Glace'], ['crown', 'Couronne'], ['stars', 'Étoiles'], ['pixel', 'Pixel'],
-];
-// Icône avec son cadre (utilisée partout : joueurs, podium, chat…)
-const avatarHTML = (p, size = 36) => `<span class="avf fr-${esc(p.frame || 'none')}" style="--s:${size}px;--c:${esc(p.color || '#ffc21a')}"><span class="avi">${esc(p.avatar || '🙂')}</span></span>`;
 const REACTS = ['🔥', '😂', '😱', '👏', '💀', '🎉', '😭', '🤯', '❤️', '🐐'];
+const COLORS = ['#ff2e4d', '#ff7a1a', '#ffc21a', '#c0ff00', '#4cd964', '#30d5c8', '#00e5ff', '#2fa9ff', '#7c5cff', '#e0b0ff', '#ff4fa3', '#ff9ecf', '#ffd59e', '#ffffff'];
+// Icône avec son cadre, et pseudo avec son effet (utilisés partout : joueurs, podium, chat…)
+const avatarHTML = (p, size = 36) => `<span class="avf fr-${esc(p.frame || 'none')}" style="--s:${size}px;--c:${esc(p.color || '#ffc21a')}"><span class="avi">${esc(p.avatar || '🙂')}</span></span>`;
+const nameHTML = (p, extra = '') => `<span class="pname nfx-${esc(p.nameFx || 'none')}" style="--c:${esc(p.color || '#fff')}" data-t="${esc(p.name)}">${esc(p.name)}</span>${extra}`;
+
+// ───────────── Sauvegarde (dans le navigateur) ─────────────
+// Le serveur gratuit oublie tout quand il s'endort, donc la progression vit dans le navigateur de chaque joueur.
+const SAVE_KEY = 'mz_save';
+function defaultSave() {
+  return { v: 1, coins: SHOP.startCoins, owned: [], games: 0, wins: 0, good: 0, lastGame: '',
+    look: { avatar: store.get('mz_avatar', SHOP.icons[Math.floor(Math.random() * 20)].id), color: store.get('mz_color', COLORS[Math.floor(Math.random() * 8)]),
+      frame: 'classic', nameFx: 'none', title: 'debutant', winFx: 'party' } };
+}
+let save;
+try { save = JSON.parse(localStorage.getItem(SAVE_KEY)) || defaultSave(); } catch { save = defaultSave(); }
+save = { ...defaultSave(), ...save, look: { ...defaultSave().look, ...(save.look || {}) } };
+const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch {} };
+const owns = (kind, id) => (SHOP[kind].find(x => x.id === id)?.price || 0) === 0 || save.owned.includes(kind + ':' + id);
+// un cosmétique équipé mais pas possédé (ancienne version) revient au gratuit
+for (const [k, d] of [['icons', null], ['frames', 'classic'], ['nameFx', 'none'], ['titles', 'debutant'], ['winFx', 'party']]) {
+  const key = k === 'icons' ? 'avatar' : k === 'frames' ? 'frame' : k === 'titles' ? 'title' : k;
+  if (!owns(k, save.look[key])) save.look[key] = d || SHOP.icons[0].id;
+}
+persist();
+const me = () => ({ ...save.look, name: ($('#name')?.value || '').trim() || 'Ton pseudo', titleName: SHOP.titles.find(t => t.id === save.look.title && t.id !== 'none')?.name || '' });
 
 let pid = store.get('mz_pid');
 if (!pid) { pid = Math.random().toString(36).slice(2) + Date.now().toString(36); store.set('mz_pid', pid); }
@@ -29,26 +44,89 @@ let state = null;       // état du salon
 let categories = [];
 let round = null;       // manche en cours
 let tick = null;
-let myAvatar = store.get('mz_avatar', AVATARS[Math.floor(Math.random() * AVATARS.length)]);
-let myColor = store.get('mz_color', COLORS[Math.floor(Math.random() * 8)]);
-let myFrame = store.get('mz_frame', 'classic');
+
 
 // ───────────── Accueil ─────────────
 $('#name').value = store.get('mz_name', '');
-function renderAvatars() {
-  $('#avatars').innerHTML = AVATARS.map(a => `<button type="button" class="${a === myAvatar ? 'sel' : ''}">${a}</button>`).join('');
-  $$('#avatars button').forEach(b => b.onclick = () => { myAvatar = b.textContent; store.set('mz_avatar', myAvatar); renderAvatars(); });
-  $('#colors').innerHTML = COLORS.map(c => `<button type="button" class="sw ${c === myColor ? 'sel' : ''}" style="--c:${c}" data-c="${c}"></button>`).join('');
-  $$('#colors button').forEach(b => b.onclick = () => { myColor = b.dataset.c; store.set('mz_color', myColor); renderAvatars(); });
-  const me = { avatar: myAvatar, color: myColor };
-  $('#frames').innerHTML = FRAMES.map(([id, label]) => `<button type="button" class="${id === myFrame ? 'sel' : ''}" data-f="${id}">${avatarHTML({ ...me, frame: id }, 40)}<small>${label}</small></button>`).join('');
-  $$('#frames button').forEach(b => b.onclick = () => { myFrame = b.dataset.f; store.set('mz_frame', myFrame); renderAvatars(); });
-  $('#pv-avatar').innerHTML = avatarHTML({ ...me, frame: myFrame }, 76);
-  $('#pv-name').textContent = $('#name').value.trim() || 'Ton pseudo';
-  $('#pv-name').style.color = myColor;
+function renderProfile() {
+  const m = me();
+  for (const [av, nm, tt] of [['#pv-avatar', '#pv-name', '#pv-title'], ['#sp-avatar', '#sp-name', '#sp-title']]) {
+    $(av).innerHTML = avatarHTML(m, 76);
+    $(nm).innerHTML = nameHTML(m);
+    $(tt).textContent = m.titleName ? '« ' + m.titleName + ' »' : '';
+  }
+  $('#coins').textContent = save.coins; $('#coins2').textContent = save.coins;
 }
-renderAvatars();
-$('#name').addEventListener('input', () => { $('#pv-name').textContent = $('#name').value.trim() || 'Ton pseudo'; });
+renderProfile();
+$('#name').addEventListener('input', renderProfile);
+
+// ───────────── Boutique ─────────────
+let shopTab = 'icons';
+$('#btn-shop').onclick = () => { $('#shop').classList.remove('hidden'); renderShop(); };
+$('#shop-close').onclick = () => $('#shop').classList.add('hidden');
+$('#shop').onclick = (e) => { if (e.target.id === 'shop') $('#shop').classList.add('hidden'); };
+$$('#shop-tabs button').forEach(b => b.onclick = () => { shopTab = b.dataset.tab; renderShop(); });
+
+function renderShop() {
+  $$('#shop-tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === shopTab));
+  const body = $('#shop-body'); const m = me();
+  const lookKey = { icons: 'avatar', frames: 'frame', nameFx: 'nameFx', titles: 'title', winFx: 'winFx' }[shopTab];
+  if (shopTab === 'color') {
+    body.innerHTML = `<div class="colors big">${COLORS.map(c => `<button class="sw ${c === save.look.color ? 'sel' : ''}" style="--c:${c}" data-c="${c}"></button>`).join('')}</div>
+      <p class="muted small">Couleur de ton pseudo et de ton cadre classique/néon (gratuit).</p>`;
+    $$('#shop-body .sw').forEach(b => b.onclick = () => { save.look.color = b.dataset.c; persist(); renderProfile(); renderShop(); });
+    return;
+  }
+  if (shopTab === 'save') {
+    body.innerHTML = `
+      <div class="stats"><div><b>${save.games}</b><small>parties</small></div><div><b>${save.wins}</b><small>victoires</small></div>
+      <div><b>${save.good}</b><small>bonnes réponses</small></div><div><b>${save.owned.length}</b><small>objets</small></div></div>
+      <p>Ta progression est enregistrée <b>dans ce navigateur</b>. Pour la garder sur un autre appareil (ou si tu vides ton historique),
+      copie ton code de sauvegarde et colle-le de l'autre côté.</p>
+      <button id="sv-copy" class="btn btn-yellow">📋 Copier mon code de sauvegarde</button>
+      <textarea id="sv-code" class="input" rows="3" placeholder="Colle ici un code de sauvegarde…"></textarea>
+      <button id="sv-load" class="btn btn-ghost">♻️ Restaurer ce code</button>`;
+    $('#sv-copy').onclick = async () => {
+      const code = 'MZ1.' + btoa(unescape(encodeURIComponent(JSON.stringify(save))));
+      try { await navigator.clipboard.writeText(code); toast('📋 Code copié ! Garde-le précieusement'); } catch { $('#sv-code').value = code; $('#sv-code').select(); toast('Copie le code dans la case'); }
+    };
+    $('#sv-load').onclick = () => {
+      try {
+        const raw = $('#sv-code').value.trim().replace(/^MZ1\./, '');
+        const data = JSON.parse(decodeURIComponent(escape(atob(raw))));
+        if (typeof data.coins !== 'number' || !Array.isArray(data.owned)) throw 0;
+        save = { ...defaultSave(), ...data, look: { ...defaultSave().look, ...data.look } }; persist(); renderProfile(); renderShop();
+        toast('♻️ Sauvegarde restaurée !');
+      } catch { toast('Code invalide 😕', 'error'); }
+    };
+    return;
+  }
+  const items = SHOP[shopTab];
+  body.innerHTML = `<div class="shop-grid ${shopTab}">${items.map(it => {
+    const own = owns(shopTab, it.id), eq = save.look[lookKey] === it.id;
+    let prev = '';
+    if (shopTab === 'icons') prev = avatarHTML({ ...m, avatar: it.id }, 52);
+    if (shopTab === 'frames') prev = avatarHTML({ ...m, frame: it.id }, 52);
+    if (shopTab === 'nameFx') prev = `<div class="nprev">${nameHTML({ ...m, nameFx: it.id })}</div>`;
+    if (shopTab === 'titles') prev = `<div class="tprev">${it.id === 'none' ? '—' : '« ' + esc(it.name) + ' »'}</div>`;
+    if (shopTab === 'winFx') prev = `<div class="wprev">${it.emojis}</div>`;
+    const label = shopTab === 'icons' ? '' : `<small>${esc(it.name)}</small>`;
+    const btn = eq ? '<span class="state eq">✔ Équipé</span>' : own ? '<span class="state">Équiper</span>' : `<span class="state price ${save.coins >= it.price ? '' : 'poor'}">🪙 ${it.price}</span>`;
+    return `<button class="item ${eq ? 'eq' : ''} ${own ? '' : 'locked'}" data-id="${esc(it.id)}">${prev}${label}${btn}</button>`;
+  }).join('')}</div>`;
+  $$('#shop-body .item').forEach(b => b.onclick = () => {
+    const it = items.find(x => x.id === b.dataset.id);
+    if (!owns(shopTab, it.id)) {
+      if (save.coins < it.price) return toast(`Il te manque ${it.price - save.coins} 🪙`, 'error');
+      save.coins -= it.price; save.owned.push(shopTab + ':' + it.id);
+      toast(`🛍️ Acheté ! (-${it.price} 🪙)`); sfx('legend');
+    }
+    save.look[lookKey] = it.id; persist(); renderProfile(); renderShop();
+    if (shopTab === 'winFx') burst(it.id);
+    // déjà dans un salon : on met à jour son look pour les autres
+    if (joinedCode) socket.emit('join', { code: joinedCode, name: store.get('mz_name'), pid, ...save.look }, () => {});
+  });
+}
 
 const urlCode = (location.pathname.match(/^\/r\/([A-Za-z0-9]{5})/) || [])[1] || new URLSearchParams(location.search).get('room');
 if (urlCode) { $('#code').value = urlCode.toUpperCase(); $('#btn-join').textContent = 'Rejoindre ' + urlCode.toUpperCase(); }
@@ -58,7 +136,7 @@ function identity() {
   if (!name) { $('#home-err').textContent = 'Choisis un pseudo d\'abord 😉'; $('#name').focus(); return null; }
   store.set('mz_name', name);
   unlockAudio();
-  return { name, avatar: myAvatar, pid, color: myColor, frame: myFrame };
+  return { name, pid, ...save.look };
 }
 function unlockAudio() {
   // les navigateurs exigent un clic avant de jouer du son : on "débloque" l'élément audio ici
@@ -91,7 +169,7 @@ function onJoined(res) {
 }
 // reconnexion automatique (ex. téléphone en veille)
 socket.on('connect', () => {
-  if (joinedCode) socket.emit('join', { code: joinedCode, name: store.get('mz_name'), avatar: myAvatar, pid, color: myColor, frame: myFrame }, (r) => {
+  if (joinedCode) socket.emit('join', { code: joinedCode, name: store.get('mz_name'), pid, ...save.look }, (r) => {
     if (r.error) { toast(r.error, 'error'); leave(); } else { $('#chat').innerHTML = ''; r.chat.forEach(addChat); }
   });
 });
@@ -206,7 +284,7 @@ function renderPlayers() {
     return `<li style="--c:${p.color}" class="${p.online ? '' : 'off'} ${done ? 'done' : ''}">
       ${inGame || state.phase === 'end' ? `<span class="rank">${i + 1}</span>` : ''}
       ${avatarHTML(p, 38)}
-      <span class="nm" style="color:${esc(p.color)}">${esc(p.name)}${p.host ? ' 👑' : ''}${p.id === pid ? ' <small>(toi)</small>' : ''}${p.streak >= 3 ? ` <small>🔥 série de ${p.streak}</small>` : ''}</span>
+      <span class="nm">${nameHTML(p)}${p.host ? ' 👑' : ''}${p.title ? `<small class="ptitle">« ${esc(p.title)} »</small>` : p.id === pid ? ' <small>(toi)</small>' : ''}${p.streak >= 3 ? ` <small>🔥 série de ${p.streak}</small>` : ''}</span>
       <span class="marks">${marks}</span>
       <span class="sc">${p.score}</span>
       ${isHost() && p.id !== pid && state.phase === 'lobby' ? `<button class="kick" data-kick="${p.id}" title="Exclure">✕</button>` : ''}
@@ -313,12 +391,18 @@ $('#guess-form').onsubmit = (e) => {
 
 socket.on('found', (f) => {
   addChat({ found: true, text: `${f.avatar} ${f.name} a trouvé ${f.what} !` });
+  burst(f.winFx, f.id === pid ? 22 : 9);
 });
 
 // ───────────── Révélation ─────────────
 socket.on('reveal', (rv) => {
   clearInterval(tick);
   resetEffects();
+  if (round?.imposteur) {
+    round.imposteur = false;
+    toast("🎭 SURPRISE : tu écoutais un IMPOSTEUR ! Ce n'était pas la bonne chanson 😂", 'error');
+    if (rv.track && round.preview) { try { audio.src = round.preview; audio.load(); audio.play().catch(() => {}); } catch {} }
+  }
   showView('v-reveal');
   // on laisse la musique continuer quelques secondes pendant la révélation
   if (audio.paused && audio.src && round?.preview) audio.play().catch(() => {});
@@ -337,7 +421,7 @@ socket.on('reveal', (rv) => {
   $('#rv-results').innerHTML = rows.map(r => {
     const p = byId[r.id];
     const what = state.settings.mode === 'qcm' ? (r.correct ? '✅' : '❌') : `${r.artist ? '🎤' : ''}${r.title ? '🎵' : ''}${!r.artist && !r.title ? '❌' : ''}`;
-    return `<li class="${r.gained ? 'win' : ''}">${avatarHTML(p, 26)} <span style="color:${esc(p.color)}">${esc(p.name)}</span> ${what} ${r.gained ? `<b>+${r.gained}</b>` : ''}${r.time && r.gained ? ` <span class="muted small">${r.time.toFixed(1)} s</span>` : ''}</li>`;
+    return `<li class="${r.gained ? 'win' : ''}">${avatarHTML(p, 26)} ${nameHTML(p)} ${what} ${r.gained ? `<b>+${r.gained}</b>` : ''}${r.time && r.gained ? ` <span class="muted small">${r.time.toFixed(1)} s</span>` : ''}</li>`;
   }).join('');
   const manual = !rv.pause;
   $('#next-wrap').classList.toggle('hidden', manual);
@@ -353,17 +437,27 @@ socket.on('reveal', (rv) => {
 
 // ───────────── Fin ─────────────
 socket.on('end', (e) => {
+  const mine = e.coins?.[pid];
+  if (mine && save.lastGame !== e.gameId) {
+    save.lastGame = e.gameId; save.coins += mine.coins; save.games++; save.good += mine.good; if (mine.win) save.wins++;
+    persist(); renderProfile();
+  }
+  if (mine) {
+    $('#earned').classList.remove('hidden');
+    $('#earned').innerHTML = `<span class="coin-spin">🪙</span> +${mine.coins} pièces <small>(${mine.good} bonne${mine.good > 1 ? 's' : ''} réponse${mine.good > 1 ? 's' : ''}${mine.rank <= 3 && Object.keys(e.coins).length > 1 ? ' · bonus podium' : ''})</small> · Total : <b>${save.coins} 🪙</b>`;
+  }
   $('#history').innerHTML = e.history.map(h => `<li><b>${esc(h.title)}</b> — ${esc(h.artist)}</li>`).join('');
 });
 function renderEnd() {
   stopAudio();
+  $('#earned').classList.add('hidden');
   showView('v-end');
   const ps = [...state.players].sort((a, b) => b.score - a.score);
   const order = [ps[1], ps[0], ps[2]];
   $('#podium').innerHTML = order.map((p, i) => p ? `<div class="step p${[2, 1, 3][i]}">
-    ${avatarHTML(p, 70)}<span class="nm" style="color:${esc(p.color)}">${esc(p.name)}</span><span class="pts">${p.score} pts</span>
+    ${avatarHTML(p, 70)}<span class="nm">${nameHTML(p)}</span>${p.title ? `<small class="ptitle">« ${esc(p.title)} »</small>` : ''}<span class="pts">${p.score} pts</span>
     <div class="block">${[2, 1, 3][i]}</div></div>` : '').join('');
-  $('#final-list').innerHTML = ps.slice(3).map((p, i) => `<li value="${i + 4}">${avatarHTML(p, 28)} <span style="color:${esc(p.color)}">${esc(p.name)}</span> — ${p.score} pts</li>`).join('');
+  $('#final-list').innerHTML = ps.slice(3).map((p, i) => `<li value="${i + 4}">${avatarHTML(p, 28)} ${nameHTML(p)} — ${p.score} pts</li>`).join('');
   if (ps[0]?.id === pid) confetti(60); else confetti(20);
 }
 
@@ -372,7 +466,7 @@ function addChat(m) {
   const li = document.createElement('li');
   if (m.sys) { li.className = 'sys'; li.textContent = m.text; }
   else if (m.found) { li.className = 'found'; li.textContent = m.text; }
-  else { li.style.setProperty('--c', m.color); li.innerHTML = `${avatarHTML(m, 22)} <b>${esc(m.name)}</b> ${esc(m.text)}`; }
+  else { li.style.setProperty('--c', m.color); li.innerHTML = `${avatarHTML(m, 22)} <b>${nameHTML(m)}</b> ${esc(m.text)}`; }
   const ul = $('#chat'); ul.appendChild(li);
   while (ul.children.length > 150) ul.firstChild.remove();
   ul.scrollTop = ul.scrollHeight;
@@ -431,11 +525,12 @@ socket.on('powers', (p) => {
   $('#pw-cards').innerHTML = p.offers.map(o => `
     <button class="pw-card ${o.type} ${o.rarity}" data-id="${o.id}">
       <span class="tag">${o.type === 'bonus' ? '🎁 Bonus' : '😈 Malus'}</span>
-      <span class="rar">${{ common: 'Commune', rare: '◆ Rare', legendary: '★ LÉGENDAIRE ★' }[o.rarity] || ''}</span>
+      <span class="rar">${{ common: 'Commune', rare: '◆ Rare', epic: '✦ ÉPIQUE ✦', legendary: '★ LÉGENDAIRE ★' }[o.rarity] || ''}</span>
       <span class="em">${o.emoji}</span><b>${esc(o.name)}</b><small>${esc(o.desc)}</small>
     </button>`).join('');
   $$('#pw-cards .pw-card').forEach(c => c.onclick = () => pickCard(c));
-  if (p.offers.some(o => o.rarity === 'legendary')) { sfx('legend'); toast('🌟 Carte LÉGENDAIRE dans ta main !'); }
+  if (p.offers.some(o => o.rarity === 'legendary')) { sfx('legend'); setTimeout(() => sfx('legend'), 350); toast('🌈 Carte LÉGENDAIRE dans ta main !!!'); }
+  else if (p.offers.some(o => o.rarity === 'epic')) { sfx('legend'); toast('💜 Carte ÉPIQUE !'); }
   $('#btn-pw-none').classList.remove('hidden');
   $('#pw-status').textContent = p.offers.some(o => o.type === 'malus') ? 'Un bonus pour toi, ou un malus pour embêter quelqu\'un ?' : 'Choisis un bonus !';
   if (p.chosen) lockCards(p.chosen.id);
@@ -457,7 +552,7 @@ function pickCard(card) {
   const others = state.players.filter(p => p.id !== pid && p.online);
   $('#pw-targets').classList.remove('hidden');
   $('#pw-targets').innerHTML = `<div class="lbl2">${offer.emoji} Sur qui ?</div>` +
-    others.map(p => `<button data-t="${p.id}">${avatarHTML(p, 30)} <span style="color:${esc(p.color)}">${esc(p.name)}</span></button>`).join('');
+    others.map(p => `<button data-t="${p.id}">${avatarHTML(p, 30)} ${nameHTML(p)}</button>`).join('');
   $$('#pw-targets [data-t]').forEach(b => b.onclick = () => sendPower(id, b.dataset.t));
 }
 
@@ -488,6 +583,7 @@ function renderPowerStatus() {
 }
 
 // ───── effets pendant l'écoute ─────
+let mosquitoNode = null;
 let fxTimers = [], yoyoTimer = null, frozenUntil = 0, crazyKeys = false, rainTimer = null;
 
 function resetEffects() {
@@ -496,6 +592,8 @@ function resetEffects() {
   frozenUntil = 0;
   document.body.classList.remove('flipped', 'blind');
   crazyKeys = false; clearInterval(rainTimer); rainTimer = null;
+  document.body.classList.remove('blackout'); try { audio.muted = false; } catch {}
+  if (mosquitoNode) { try { mosquitoNode.stop(); } catch {} mosquitoNode = null; }
   try { speechSynthesis.cancel(); } catch {}
   $('#freeze-layer').classList.add('hidden');
   $('#fx-area').innerHTML = '';
@@ -513,17 +611,28 @@ function applyEffects(fx) {
     const b = fx.bonus;
     area.insertAdjacentHTML('beforeend', `<div class="fx bonus ${b.rarity || ''}">
       ${b.image ? `<div class="fx-img"><img src="${esc(b.image)}" alt=""></div>` : `<span class="em">${b.emoji}</span>`}
-      <div><div>${b.emoji} ${esc(b.name)}</div>${b.hint ? `<div class="hint">${esc(b.hint)}</div>` : ''}${b.id === 'double' ? '<div class="hint">×2 sur cet extrait !</div>' : ''}${b.id === 'triple' ? '<div class="hint">×3 sur cet extrait !!</div>' : ''}${b.id === 'souffleur' ? '<div class="small">🎧 Monte le son, la voix arrive dans 4 s…</div>' : ''}${b.id === 'shield' ? '<div class="hint">Protégé !</div>' : ''}</div></div>`);
+      <div><div>${b.emoji} ${esc(b.name)}</div>${b.hint ? `<div class="hint">${esc(b.hint)}</div>` : ''}${b.id === 'double' ? '<div class="hint">×2 sur cet extrait !</div>' : ''}${b.id === 'triple' ? '<div class="hint">×3 sur cet extrait !!</div>' : ''}${b.id === 'jackpot' ? '<div class="hint">🎰 ×4 !!!</div>' : ''}${b.id === 'eclair' ? '<div class="hint">+50 si trouvé en moins de 10 s</div>' : ''}${b.id === 'plume' ? '<div class="hint">✍️ Pose ton clavier…</div>' : ''}${b.id === 'souffleur' ? '<div class="small">🎧 Monte le son, la voix arrive dans 4 s…</div>' : ''}${b.id === 'shield' ? '<div class="hint">Protégé !</div>' : ''}</div></div>`);
     if (b.id === 'early' && round.preview) {
       round.early = true;
       area.lastElementChild.querySelector('div:last-child').insertAdjacentHTML('beforeend', '<div class="hint">Écoute… 🤫</div>');
       at(startIn - 3000, () => { try { audio.currentTime = 0; } catch {} audio.play().then(() => $('#eq').classList.remove('paused')).catch(() => {}); });
     }
     if (b.whisper) at(startIn + 4000, () => whisper(b.whisper));
+    if (b.autotype) at(startIn + 2500, () => autoType(b.autotype));
+    if (b.autoChoice) at(startIn + 3000, () => { const el = $(`#qcm-answer [data-id="${CSS.escape(b.autoChoice)}"]`); if (el) { el.classList.add('magic'); el.click(); } });
     if (b.remove) at(startIn, () => b.remove.forEach(id => { const el = $(`#qcm-answer [data-id="${CSS.escape(id)}"]`); if (el) el.style.visibility = 'hidden'; }));
   }
   if (fx.sent) toast(fx.sent.blocked ? `🛡️ ${fx.sent.target} avait un bouclier… raté !` : `${fx.sent.emoji} ${fx.sent.name} envoyé à ${fx.sent.target} 😈`);
-  for (const m of fx.maluses) {
+  for (let m of fx.maluses) {
+    if (m.id === 'imposteur' && !m.blocked) {
+      if (m.decoy && m.decoy !== 'mock-decoy') {
+        // la victime n'est PAS prévenue : elle entend juste une autre chanson 😈
+        round.imposteur = true;
+        try { audio.src = m.decoy; audio.load(); } catch {}
+        continue;
+      }
+      m = { ...m, id: 'bazar', name: 'Le Grand Bazar (de secours)' };
+    }
     if (m.blocked) {
       area.insertAdjacentHTML('beforeend', `<div class="fx blocked"><span class="em">🛡️</span><div>Ton bouclier a bloqué « ${esc(m.name)} » de ${m.fromAvatar} ${esc(m.from)}</div></div>`);
       continue;
@@ -564,6 +673,20 @@ function applyEffects(fx) {
         fxTimers.push(iv);
       });
     }
+    if (m.id === 'moustique') at(startIn, () => mosquito(dur));
+    if (m.id === 'coupures') {
+      for (let i = 0; i < 4; i++) {
+        const t0 = startIn + 1500 + Math.random() * (dur - 4000);
+        at(t0, () => { audio.muted = true; document.body.classList.add('blackout'); sfx('wrong', .4); });
+        at(t0 + 1800 + Math.random() * 900, () => { audio.muted = false; document.body.classList.remove('blackout'); });
+      }
+    }
+    if (m.id === 'scratch') at(startIn + 800, () => {
+      const iv = setInterval(() => {
+        if (Math.random() < .55) { try { audio.currentTime = Math.max(0, audio.currentTime - (0.8 + Math.random() * 1.6)); } catch {} sfx('scratch'); }
+      }, 1300);
+      fxTimers.push(iv);
+    });
     if (m.id === 'yoyo') at(startIn, () => {
       let up = false;
       yoyoTimer = setInterval(() => { up = !up; audio.volume = up ? baseVolume : Math.min(baseVolume, 0.04 + Math.random() * 0.1); }, 900 + Math.random() * 600);
@@ -600,6 +723,13 @@ function sfx(name, vol = 1) {
   }
   if (name === 'boing') { const o = osc('sine', 140, 0, .6, 1); o.frequency.exponentialRampToValueAtTime(700, t0 + .25); o.frequency.exponentialRampToValueAtTime(160, t0 + .6); }
   if (name === 'siren') { const o = osc('triangle', 650, 0, 1.6, .9); for (let i = 0; i < 4; i++) o.frequency.linearRampToValueAtTime(i % 2 ? 650 : 1250, t0 + .4 * (i + 1)); }
+  if (name === 'scratch') {
+    const len = actx.sampleRate * .25, buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const src = actx.createBufferSource(), f = actx.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.setValueAtTime(3000, t0); f.frequency.exponentialRampToValueAtTime(600, t0 + .25);
+    src.buffer = buf; src.connect(f); f.connect(out); src.start(t0);
+  }
   if (name === 'legend') { [523, 659, 784, 1047].forEach((f, i) => osc('triangle', f, i * .09, i * .09 + .5, .7)); }
   if (name === 'pop') { const o = osc('sine', 500, 0, .12, .8); o.frequency.exponentialRampToValueAtTime(1100, t0 + .1); }
 }
@@ -639,4 +769,55 @@ function whisper(text) {
   } catch {
     toast('🗣️ Psst… c\'est « ' + text + ' »');
   }
+}
+
+
+// 🎉 Effet de victoire (pluie d'emojis choisie dans la boutique)
+function burst(fxId, n = 16) {
+  const fx = SHOP.winFx.find(x => x.id === fxId) || SHOP.winFx[0];
+  const em = [...fx.emojis];
+  for (let i = 0; i < n; i++) {
+    const el = document.createElement('div');
+    el.className = 'flying';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.fontSize = (1.2 + Math.random() * 1.6) + 'rem';
+    el.style.animationDelay = Math.random() * .5 + 's';
+    el.textContent = em[i % em.length];
+    $('#reactions-layer').appendChild(el);
+    setTimeout(() => el.remove(), 3300);
+  }
+}
+
+
+// 🦟 Moustique : bzzzz aigu continu
+function mosquito(ms) {
+  if (!actx) return;
+  try {
+    const o = actx.createOscillator(), g = actx.createGain(), lfo = actx.createOscillator(), lg = actx.createGain();
+    o.type = 'sawtooth'; o.frequency.value = 1900;
+    lfo.frequency.value = 9; lg.gain.value = 140; lfo.connect(lg); lg.connect(o.frequency);
+    g.gain.value = Math.max(0.15, baseVolume) * 0.07;
+    o.connect(g); g.connect(actx.destination);
+    o.start(); lfo.start();
+    o.stop(actx.currentTime + ms / 1000); lfo.stop(actx.currentTime + ms / 1000);
+    mosquitoNode = { stop: () => { try { o.stop(); lfo.stop(); } catch {} } };
+  } catch {}
+}
+
+// ✍️ La Plume Magique : la réponse s'écrit toute seule
+async function autoType(answers) {
+  const input = $('#guess');
+  for (const ans of answers) {
+    if (!state || state.phase !== 'playing') return;
+    input.disabled = false; input.value = ''; input.classList.add('magic');
+    for (const ch of ans) {
+      if (!state || state.phase !== 'playing') return;
+      input.value += ch;
+      await new Promise(r => setTimeout(r, 70 + Math.random() * 60));
+    }
+    await new Promise(r => setTimeout(r, 300));
+    $('#guess-form').requestSubmit();
+    await new Promise(r => setTimeout(r, 700));
+  }
+  input.classList.remove('magic');
 }
