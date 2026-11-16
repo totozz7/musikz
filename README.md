@@ -31,18 +31,15 @@ dans les autres, l'**artiste** et le **titre**.
 ## Jouer
 
 ### 🪙 Progression, pièces et boutique
-- Chaque partie rapporte des pièces : **15 de participation + 8 par bonne réponse + bonus de podium (60 / 35 / 20)**.
-  On démarre avec 300 🪙.
-- Bouton **🎨 Personnaliser & Boutique** à l'accueil : icônes, couleur, cadres (RGB gamer, néon clignotant, glitch,
-  galaxie, électrique, diamant…), effets de pseudo (RGB qui bouge, néon clignotant, glitch, or brillant…), titres,
-  effets de victoire (ce qui pleut quand tu trouves une réponse).
+- Chaque partie rapporte : **10 🪙 de participation + 4 🪙 par bonne réponse + podium 30 / 15 / 8 🪙**
+  (une bonne partie ≈ 40 à 80 🪙). On démarre avec 100 🪙. Barème modifiable en haut de `shop.js` (`earn`).
+- Prix : **Commun** < 300 🪙 · **◆ Rare** 300–1 200 · **✦ Épique** 1 200–2 500 · **★ Légendaire** 2 500 à 6 000 🪙.
+- Boutique (🎨 à l'accueil, dans le salon et en fin de partie — on peut changer de look à tout moment, même pendant une manche) :
+  icônes (dont animées : dragon, planète, comète, space invader, trophée…), **couleurs animées** (coucher de soleil, océan,
+  toxique, vaporwave, or massif, arc-en-ciel), cadres (jusqu'à Flammes vivantes, Hacker, Roi, Arc-en-ciel stroboscope),
+  effets de pseudo (jusqu'à Inferno, Hacker, Royal, Stroboscope), titres, effets de victoire.
 - La progression est enregistrée **dans le navigateur** (le serveur gratuit de Render oublie tout quand il s'endort).
   Onglet **💾 Sauvegarde** : un code à copier pour la retrouver sur un autre appareil.
-
-
-1. Ouvre le site, choisis un pseudo et un avatar, clique **Créer un salon**.
-2. Clique sur le code du salon en haut (🔗 *Copier le lien*) et envoie le lien à tes potes.
-3. Choisis les catégories et les options, puis **Lancer la partie**.
 
 ### 🃏 Mode Zizanie (option)
 Avant chaque extrait, chaque joueur tire 2 cartes (1 bonus + 1 malus, 10 s pour choisir) et en joue une (ou aucune).

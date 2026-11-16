@@ -5,10 +5,11 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<'
 const store = { get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
 
 const REACTS = ['🔥', '😂', '😱', '👏', '💀', '🎉', '😭', '🤯', '❤️', '🐐'];
-const COLORS = ['#ff2e4d', '#ff7a1a', '#ffc21a', '#c0ff00', '#4cd964', '#30d5c8', '#00e5ff', '#2fa9ff', '#7c5cff', '#e0b0ff', '#ff4fa3', '#ff9ecf', '#ffd59e', '#ffffff'];
+const COLORS = SHOP.colors.filter(c => !c.price).map(c => c.id);
 // Icône avec son cadre, et pseudo avec son effet (utilisés partout : joueurs, podium, chat…)
-const avatarHTML = (p, size = 36) => `<span class="avf fr-${esc(p.frame || 'none')}" style="--s:${size}px;--c:${esc(p.color || '#ffc21a')}"><span class="avi">${esc(p.avatar || '🙂')}</span></span>`;
-const nameHTML = (p, extra = '') => `<span class="pname nfx-${esc(p.nameFx || 'none')}" style="--c:${esc(p.color || '#fff')}" data-t="${esc(p.name)}">${esc(p.name)}</span>${extra}`;
+const colClass = (c) => String(c || '').startsWith('anim:') ? 'col-' + String(c).slice(5) : '';
+const avatarHTML = (p, size = 36) => `<span class="avf fr-${esc(p.frame || 'none')} ${colClass(p.color)}" style="--s:${size}px;--c:${esc(SHOP.colorBase(p.color))}"><span class="avi ${SHOP.iconAnim(p.avatar) ? 'ia-' + SHOP.iconAnim(p.avatar) : ''}">${esc(p.avatar || '🙂')}</span></span>`;
+const nameHTML = (p, extra = '') => `<span class="pname nfx-${esc(p.nameFx || 'none')} ${colClass(p.color)}" style="--c:${esc(SHOP.colorBase(p.color))}" data-t="${esc(p.name)}">${esc(p.name)}</span>${extra}`;
 
 // ───────────── Sauvegarde (dans le navigateur) ─────────────
 // Le serveur gratuit oublie tout quand il s'endort, donc la progression vit dans le navigateur de chaque joueur.
@@ -24,8 +25,8 @@ save = { ...defaultSave(), ...save, look: { ...defaultSave().look, ...(save.look
 const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch {} };
 const owns = (kind, id) => (SHOP[kind].find(x => x.id === id)?.price || 0) === 0 || save.owned.includes(kind + ':' + id);
 // un cosmétique équipé mais pas possédé (ancienne version) revient au gratuit
-for (const [k, d] of [['icons', null], ['frames', 'classic'], ['nameFx', 'none'], ['titles', 'debutant'], ['winFx', 'party']]) {
-  const key = k === 'icons' ? 'avatar' : k === 'frames' ? 'frame' : k === 'titles' ? 'title' : k;
+for (const [k, d] of [['icons', null], ['colors', '#ffc21a'], ['frames', 'classic'], ['nameFx', 'none'], ['titles', 'debutant'], ['winFx', 'party']]) {
+  const key = k === 'icons' ? 'avatar' : k === 'colors' ? 'color' : k === 'frames' ? 'frame' : k === 'titles' ? 'title' : k;
   if (!owns(k, save.look[key])) save.look[key] = d || SHOP.icons[0].id;
 }
 persist();
@@ -55,34 +56,41 @@ function renderProfile() {
     $(nm).innerHTML = nameHTML(m);
     $(tt).textContent = m.titleName ? '« ' + m.titleName + ' »' : '';
   }
-  $('#coins').textContent = save.coins; $('#coins2').textContent = save.coins;
+  $$('.coins-n').forEach(e => e.textContent = save.coins);
 }
 renderProfile();
 $('#name').addEventListener('input', renderProfile);
 
 // ───────────── Boutique ─────────────
 let shopTab = 'icons';
-$('#btn-shop').onclick = () => { $('#shop').classList.remove('hidden'); renderShop(); };
+const openShop = () => { $('#shop').classList.remove('hidden'); renderProfile(); renderShop(); };
+[$('#btn-shop'), $('#btn-shop2'), ...$$('.open-shop')].forEach(b => b.onclick = openShop);
 $('#shop-close').onclick = () => $('#shop').classList.add('hidden');
 $('#shop').onclick = (e) => { if (e.target.id === 'shop') $('#shop').classList.add('hidden'); };
 $$('#shop-tabs button').forEach(b => b.onclick = () => { shopTab = b.dataset.tab; renderShop(); });
 
+const LOOK_KEY = { icons: 'avatar', colors: 'color', frames: 'frame', nameFx: 'nameFx', titles: 'title', winFx: 'winFx' };
+const RARITY_LABEL = { common: 'Commun', rare: '◆ Rare', epic: '✦ Épique', legendary: '★ Légendaire' };
+function itemPreview(kind, it, m, big = false) {
+  const s = big ? 84 : 52;
+  if (kind === 'icons') return avatarHTML({ ...m, avatar: it.id }, s);
+  if (kind === 'colors') return `<div class="nprev">${nameHTML({ ...m, nameFx: 'none', color: it.id })}</div>`;
+  if (kind === 'frames') return avatarHTML({ ...m, frame: it.id }, s);
+  if (kind === 'nameFx') return `<div class="nprev">${nameHTML({ ...m, nameFx: it.id })}</div>`;
+  if (kind === 'titles') return `<div class="tprev">${it.id === 'none' ? '—' : '« ' + esc(it.name) + ' »'}</div>`;
+  if (kind === 'winFx') return `<div class="wprev">${it.emojis}</div>`;
+  return '';
+}
 function renderShop() {
   $$('#shop-tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === shopTab));
   const body = $('#shop-body'); const m = me();
-  const lookKey = { icons: 'avatar', frames: 'frame', nameFx: 'nameFx', titles: 'title', winFx: 'winFx' }[shopTab];
-  if (shopTab === 'color') {
-    body.innerHTML = `<div class="colors big">${COLORS.map(c => `<button class="sw ${c === save.look.color ? 'sel' : ''}" style="--c:${c}" data-c="${c}"></button>`).join('')}</div>
-      <p class="muted small">Couleur de ton pseudo et de ton cadre classique/néon (gratuit).</p>`;
-    $$('#shop-body .sw').forEach(b => b.onclick = () => { save.look.color = b.dataset.c; persist(); renderProfile(); renderShop(); });
-    return;
-  }
   if (shopTab === 'save') {
     body.innerHTML = `
       <div class="stats"><div><b>${save.games}</b><small>parties</small></div><div><b>${save.wins}</b><small>victoires</small></div>
       <div><b>${save.good}</b><small>bonnes réponses</small></div><div><b>${save.owned.length}</b><small>objets</small></div></div>
       <p>Ta progression est enregistrée <b>dans ce navigateur</b>. Pour la garder sur un autre appareil (ou si tu vides ton historique),
       copie ton code de sauvegarde et colle-le de l'autre côté.</p>
+      <p class="muted small">Gains par partie : ${SHOP.earn.base} 🪙 + ${SHOP.earn.perGood} 🪙 par bonne réponse + podium ${SHOP.earn.podium.join(' / ')} 🪙.</p>
       <button id="sv-copy" class="btn btn-yellow">📋 Copier mon code de sauvegarde</button>
       <textarea id="sv-code" class="input" rows="3" placeholder="Colle ici un code de sauvegarde…"></textarea>
       <button id="sv-load" class="btn btn-ghost">♻️ Restaurer ce code</button>`;
@@ -95,38 +103,41 @@ function renderShop() {
         const raw = $('#sv-code').value.trim().replace(/^MZ1\./, '');
         const data = JSON.parse(decodeURIComponent(escape(atob(raw))));
         if (typeof data.coins !== 'number' || !Array.isArray(data.owned)) throw 0;
-        save = { ...defaultSave(), ...data, look: { ...defaultSave().look, ...data.look } }; persist(); renderProfile(); renderShop();
+        save = { ...defaultSave(), ...data, look: { ...defaultSave().look, ...data.look } }; persist(); renderProfile(); renderShop(); pushLook();
         toast('♻️ Sauvegarde restaurée !');
       } catch { toast('Code invalide 😕', 'error'); }
     };
     return;
   }
-  const items = SHOP[shopTab];
-  body.innerHTML = `<div class="shop-grid ${shopTab}">${items.map(it => {
-    const own = owns(shopTab, it.id), eq = save.look[lookKey] === it.id;
-    let prev = '';
-    if (shopTab === 'icons') prev = avatarHTML({ ...m, avatar: it.id }, 52);
-    if (shopTab === 'frames') prev = avatarHTML({ ...m, frame: it.id }, 52);
-    if (shopTab === 'nameFx') prev = `<div class="nprev">${nameHTML({ ...m, nameFx: it.id })}</div>`;
-    if (shopTab === 'titles') prev = `<div class="tprev">${it.id === 'none' ? '—' : '« ' + esc(it.name) + ' »'}</div>`;
-    if (shopTab === 'winFx') prev = `<div class="wprev">${it.emojis}</div>`;
-    const label = shopTab === 'icons' ? '' : `<small>${esc(it.name)}</small>`;
+  const kind = shopTab, items = SHOP[kind], lookKey = LOOK_KEY[kind];
+  // ⭐ À la une : l'objet légendaire le plus cher pas encore possédé
+  const star = [...items].filter(it => it.price && !owns(kind, it.id)).sort((a, b) => b.price - a.price)[0];
+  const feat = star ? `<div class="featured r-${SHOP.rarity(star.price)}">
+      <div class="f-prev">${itemPreview(kind, star, m, true)}</div>
+      <div class="f-txt"><span class="f-tag">⭐ À LA UNE · ${RARITY_LABEL[SHOP.rarity(star.price)]}</span><b>${esc(star.name || star.id)}</b>
+      <span class="f-price">🪙 ${star.price}</span>${save.coins < star.price ? `<small>Encore ${star.price - save.coins} 🪙 à gagner</small>` : '<small>Tu peux te l\'offrir !</small>'}</div></div>` : '';
+  body.innerHTML = feat + `<div class="shop-grid ${kind}">${items.map(it => {
+    const own = owns(kind, it.id), eq = save.look[lookKey] === it.id, rar = it.price ? SHOP.rarity(it.price) : 'free';
+    const label = kind === 'icons' && !it.name ? '' : `<small>${esc(it.name || '')}</small>`;
     const btn = eq ? '<span class="state eq">✔ Équipé</span>' : own ? '<span class="state">Équiper</span>' : `<span class="state price ${save.coins >= it.price ? '' : 'poor'}">🪙 ${it.price}</span>`;
-    return `<button class="item ${eq ? 'eq' : ''} ${own ? '' : 'locked'}" data-id="${esc(it.id)}">${prev}${label}${btn}</button>`;
+    return `<button class="item r-${rar} ${eq ? 'eq' : ''} ${own ? '' : 'locked'}" data-id="${esc(it.id)}">${rar !== 'free' && rar !== 'common' ? `<span class="rtag">${RARITY_LABEL[rar]}</span>` : ''}${itemPreview(kind, it, m)}${label}${btn}</button>`;
   }).join('')}</div>`;
-  $$('#shop-body .item').forEach(b => b.onclick = () => {
-    const it = items.find(x => x.id === b.dataset.id);
-    if (!owns(shopTab, it.id)) {
-      if (save.coins < it.price) return toast(`Il te manque ${it.price - save.coins} 🪙`, 'error');
-      save.coins -= it.price; save.owned.push(shopTab + ':' + it.id);
-      toast(`🛍️ Acheté ! (-${it.price} 🪙)`); sfx('legend');
+  $$('#shop-body .item, #shop-body .featured').forEach(b => b.onclick = () => {
+    const it = b.classList.contains('featured') ? star : items.find(x => x.id === b.dataset.id);
+    if (!owns(kind, it.id)) {
+      if (save.coins < it.price) { b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 300); return toast(`Il te manque ${it.price - save.coins} 🪙`, 'error'); }
+      save.coins -= it.price; save.owned.push(kind + ':' + it.id);
+      const rar = SHOP.rarity(it.price);
+      toast(`🛍️ ${rar === 'legendary' ? '★ LÉGENDAIRE ★ ' : ''}Acheté ! (-${it.price} 🪙)`);
+      sfx('legend'); if (rar === 'legendary' || rar === 'epic') setTimeout(() => sfx('legend'), 300);
+      burst(rar === 'legendary' ? 'galaxy' : rar === 'epic' ? 'money' : 'party', rar === 'legendary' ? 40 : 18);
     }
-    save.look[lookKey] = it.id; persist(); renderProfile(); renderShop();
-    if (shopTab === 'winFx') burst(it.id);
-    // déjà dans un salon : on met à jour son look pour les autres
-    if (joinedCode) socket.emit('join', { code: joinedCode, name: store.get('mz_name'), pid, ...save.look }, () => {});
+    save.look[lookKey] = it.id; persist(); renderProfile(); renderShop(); pushLook();
+    if (kind === 'winFx') burst(it.id);
   });
 }
+// déjà dans un salon : on met à jour son look pour les autres, sans recharger la partie
+function pushLook() { if (joinedCode) socket.emit('look', save.look); }
 
 const urlCode = (location.pathname.match(/^\/r\/([A-Za-z0-9]{5})/) || [])[1] || new URLSearchParams(location.search).get('room');
 if (urlCode) { $('#code').value = urlCode.toUpperCase(); $('#btn-join').textContent = 'Rejoindre ' + urlCode.toUpperCase(); }

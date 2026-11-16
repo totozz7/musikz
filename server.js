@@ -323,7 +323,7 @@ const AVATARS = ['🦊', '🐼', '🐸', '🦁', '🐙', '🦄', '🐯', '🐵',
 const COLORS = ['#ff2e4d', '#ffc21a', '#ff7a1a', '#ff4fa3', '#30d5c8', '#7c5cff', '#4cd964', '#2fa9ff', '#ff9ecf', '#b5e655', '#e0b0ff', '#ffd59e'];
 const MAX_PLAYERS = 12;
 const pick = (list, v, d) => (list.includes(v) ? v : d);
-const validColor = (c) => /^#[0-9a-fA-F]{6}$/.test(String(c || '')) ? c : null;
+const validColor = (c) => /^#[0-9a-fA-F]{6}$/.test(String(c || '')) || SHOP.ids('colors').includes(c) ? c : null;
 
 function makeCode() {
   const L = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -702,13 +702,14 @@ function endGame(room) {
   clearTimeout(room.timer);
   room.phase = 'end';
   broadcast(room);
-  // 🪙 pièces : 15 de participation + 8 par bonne réponse + bonus de podium (si au moins 2 joueurs)
+  // 🪙 pièces : participation + par bonne réponse + bonus de podium (si au moins 2 joueurs) — barème dans shop.js
   const ranking = [...room.players.values()].sort((a, b) => b.score - a.score);
   const multi = ranking.length >= 2;
   const coins = {};
   ranking.forEach((p, i) => {
-    const podium = multi ? [60, 35, 20][i] || 0 : 0;
-    coins[p.id] = { coins: 15 + 8 * (p.good || 0) + podium, good: p.good || 0, rank: i + 1, win: multi && i === 0 };
+    const E = SHOP.earn;
+    const podium = multi ? E.podium[i] || 0 : 0;
+    coins[p.id] = { coins: E.base + E.perGood * (p.good || 0) + podium, good: p.good || 0, rank: i + 1, win: multi && i === 0 };
   });
   io.to(room.code).emit('end', { history: room.history, coins, gameId: room.gameId });
   const top = [...room.players.values()].sort((a, b) => b.score - a.score)[0];
@@ -762,6 +763,18 @@ io.on('connection', (socket) => {
   }
 
   const isHost = () => room && me && room.hostId === me.id;
+
+  // changement de look depuis la boutique, à tout moment (sans quitter le salon)
+  socket.on('look', (look = {}) => {
+    if (!room || !me) return;
+    me.avatar = pick(SHOP.ids('icons'), look.avatar, me.avatar);
+    me.frame = pick(SHOP.ids('frames'), look.frame, me.frame);
+    me.nameFx = pick(SHOP.ids('nameFx'), look.nameFx, me.nameFx);
+    me.title = pick(SHOP.ids('titles'), look.title, me.title);
+    me.winFx = pick(SHOP.ids('winFx'), look.winFx, me.winFx);
+    me.color = validColor(look.color) || me.color;
+    broadcast(room);
+  });
 
   socket.on('settings', (patch) => {
     if (!isHost() || room.phase !== 'lobby') return;

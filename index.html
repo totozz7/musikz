@@ -33,7 +33,7 @@
           <div id="pv-name" class="pv-name">Ton pseudo</div>
           <div id="pv-title" class="pv-title"></div>
         </div>
-        <div class="wallet" title="Tes pièces"><span>🪙</span><b id="coins">0</b></div>
+        <div class="wallet" title="Tes pièces"><span>🪙</span><b class="coins-n">0</b></div>
       </div>
       <label class="lbl">Ton pseudo</label>
       <input id="name" class="input" maxlength="18" placeholder="Ex. Thomas" autocomplete="off">
@@ -58,6 +58,7 @@
       <span class="muted">Salon</span> <b id="room-code">-----</b> <span class="copy">🔗 Copier le lien</span>
     </div>
     <div class="top-actions">
+      <button class="btn btn-shop btn-sm" id="btn-shop2" title="Boutique et personnalisation">🎨 <span class="hide-sm">Boutique</span> <b>🪙 <span class="coins-n">0</span></b></button>
       <div class="vol"><span>🔊</span><input type="range" id="volume" min="0" max="100" value="80"></div>
       <button class="btn btn-ghost btn-sm" id="btn-chat-toggle">💬</button>
       <button class="btn btn-ghost btn-sm" id="btn-leave">Quitter</button>
@@ -162,6 +163,7 @@
         <div class="lobby-foot">
           <button id="btn-start" class="btn btn-primary btn-xl">▶ Lancer la partie</button>
           <p id="wait-host" class="muted">En attente que l'hôte lance la partie…</p>
+          <button class="btn btn-shop open-shop" type="button">🎨 Personnaliser mon avatar en attendant</button>
         </div>
       </div>
 
@@ -251,6 +253,7 @@
           <button id="btn-replay" class="btn btn-primary host-only">🔁 Rejouer</button>
           <button id="btn-lobby" class="btn btn-yellow host-only">⚙️ Changer les réglages</button>
           <p class="muted guest-only">L'hôte peut relancer une partie.</p>
+          <button class="btn btn-shop open-shop" type="button">🛍️ Dépenser mes pièces</button>
         </div>
       </div>
     </main>
@@ -271,8 +274,8 @@
 <div id="shop" class="modal hidden">
   <div class="modal-box">
     <div class="modal-head">
-      <h2>🎨 Personnalisation</h2>
-      <div class="wallet big"><span>🪙</span><b id="coins2">0</b></div>
+      <h2>🛍️ <span class="shop-title">BOUTIQUE</span></h2>
+      <div class="wallet big"><span>🪙</span><b class="coins-n">0</b></div>
       <button id="shop-close" class="btn btn-ghost btn-sm">✕</button>
     </div>
     <div class="shop-preview">
@@ -281,7 +284,7 @@
     </div>
     <div class="tabs" id="shop-tabs">
       <button data-tab="icons" class="on">Icônes</button>
-      <button data-tab="color">Couleur</button>
+      <button data-tab="colors">Couleurs</button>
       <button data-tab="frames">Cadres</button>
       <button data-tab="nameFx">Effets de pseudo</button>
       <button data-tab="titles">Titres</button>

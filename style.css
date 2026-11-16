@@ -477,3 +477,98 @@ body.blackout .stage{filter:brightness(0);transition:filter .1s}
 body.blackout .stage:after{content:"🔌 Coupure de courant…";position:fixed;left:50%;top:45%;transform:translateX(-50%);color:#555;font-family:var(--display)}
 #guess.magic{border-color:#ff4fa3;box-shadow:0 0 0 4px #ff4fa355,0 0 30px #ffe60088;background:linear-gradient(90deg,#3a0d5e,#5a1426);font-style:italic}
 .qcm button.magic{border-color:#ffe600;box-shadow:0 0 30px #ffe600aa}
+
+/* ═════════ Boutique qui en jette ═════════ */
+.shop-title{background:linear-gradient(90deg,#ffc21a,#ff4fa3,#7c5cff,#00e5ff,#ffc21a);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:rbtext 4s linear infinite;letter-spacing:.06em}
+.modal-box{position:relative}
+.modal-box:before{content:"";position:absolute;inset:0;border-radius:22px;pointer-events:none;padding:2px;
+  background:conic-gradient(from var(--ang),#ff2e4d,#ffc21a,#7c5cff,#00e5ff,#ff2e4d);animation:spin-ang 6s linear infinite;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.hide-sm{display:inline}
+#btn-shop2 b{background:#0005;border-radius:99px;padding:.05rem .45rem;margin-left:.2rem}
+.lobby-foot .open-shop{margin-top:.8rem}
+.featured{position:relative;overflow:hidden;display:flex;align-items:center;gap:1.2rem;border-radius:18px;padding:1rem 1.2rem;margin-bottom:1rem;cursor:pointer;border:3px solid transparent}
+.featured .f-prev{flex-shrink:0;display:grid;place-items:center;min-width:100px}
+.featured .f-prev .nprev{font-size:1.8rem}
+.featured .f-txt{display:flex;flex-direction:column;gap:.15rem}
+.featured .f-tag{font-size:.72rem;font-weight:800;letter-spacing:.1em}
+.featured b{font-size:1.35rem}
+.featured .f-price{font-family:var(--display);color:var(--yellow);font-size:1.2rem}
+.featured small{color:var(--muted)}
+.featured:before{content:"";position:absolute;inset:-60%;pointer-events:none;background:linear-gradient(115deg,transparent 44%,#ffffff40 50%,transparent 56%);animation:shine 2.6s linear infinite}
+.featured.r-legendary,.item.r-legendary{background:linear-gradient(160deg,#2b0d3d,#120318) padding-box,conic-gradient(from var(--ang),#ff004c,#ff8a00,#ffe600,#3dff6e,#00e5ff,#4d6bff,#c13cff,#ff004c) border-box;border:3px solid transparent;animation:spin-ang 2.4s linear infinite,legglow 2.4s linear infinite}
+.featured.r-epic,.item.r-epic{background:linear-gradient(160deg,#3a0d5e,#1b0530);border:3px solid #c13cff;animation:epicpulse 1.6s ease-in-out infinite}
+.featured.r-rare,.item.r-rare{background:linear-gradient(160deg,#10284d,#081630) padding-box,linear-gradient(var(--ang),#2fa9ff,#8cd8ff,#1f5bff,#2fa9ff) border-box;border:2px solid transparent;animation:spin-ang 3s linear infinite}
+.featured .f-tag{color:#fff}
+.featured.r-legendary .f-tag{background:linear-gradient(90deg,#ff004c,#ffe600,#3dff6e,#00e5ff,#c13cff,#ff004c);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rbtext 1.5s linear infinite}
+.featured.r-epic .f-tag{color:#f1c4ff}.featured.r-rare .f-tag{color:#8cd8ff}
+.item{overflow:hidden}
+.item .rtag{position:absolute;top:4px;left:50%;transform:translateX(-50%);font-size:.58rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.item.r-rare .rtag{color:#8cd8ff}.item.r-epic .rtag{color:#f1c4ff}
+.item.r-legendary .rtag{background:linear-gradient(90deg,#ff004c,#ffe600,#3dff6e,#00e5ff,#c13cff,#ff004c);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rbtext 1.5s linear infinite}
+.item.r-rare,.item.r-epic,.item.r-legendary{padding-top:1.1rem}
+.shop-grid.frames .item{padding-top:1.7rem}
+.item .rtag{z-index:2;background-color:#000a;border-radius:99px;padding:0 .4rem}
+.item.r-legendary .rtag{background-color:transparent;text-shadow:none}
+.item.eq{box-shadow:0 0 0 3px var(--ok)!important}
+.item:hover{transform:translateY(-3px)}
+.item{transition:transform .15s}
+.shop-grid.colors{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+
+/* ═════════ Couleurs animées ═════════ */
+@keyframes c-sunset{0%,100%{color:#ff4f4f}33%{color:#ff9a1a}66%{color:#ffd23f}}
+@keyframes c-ocean{0%,100%{color:#00e5ff}50%{color:#1f5bff}}
+@keyframes c-toxic{0%,100%{color:#7dff2e;text-shadow:0 0 8px #7dff2e}50%{color:#d4ff00;text-shadow:0 0 16px #b6ff00}}
+@keyframes c-vapor{0%,100%{color:#ff71ce}33%{color:#01cdfe}66%{color:#b967ff}}
+@keyframes c-rainbow{0%{color:#ff004c}17%{color:#ff8a00}33%{color:#ffe600}50%{color:#3dff6e}67%{color:#00e5ff}83%{color:#c13cff}100%{color:#ff004c}}
+.pname.col-sunset{animation:c-sunset 3s linear infinite}
+.pname.col-ocean{animation:c-ocean 3s ease-in-out infinite}
+.pname.col-toxic{animation:c-toxic 1.4s ease-in-out infinite}
+.pname.col-vapor{animation:c-vapor 3s linear infinite}
+.pname.col-gold{background:linear-gradient(110deg,#b8860b 20%,#fff3b0 40%,#ffc21a 50%,#b8860b 70%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shinetxt 2s linear infinite}
+.pname.col-rainbow{animation:c-rainbow 2s linear infinite}
+/* une couleur animée ne doit pas écraser un effet de pseudo qui gère déjà la couleur */
+.pname[class*="nfx-"]:not(.nfx-none).col-sunset,.pname[class*="nfx-"]:not(.nfx-none).col-ocean,.pname[class*="nfx-"]:not(.nfx-none).col-vapor,.pname[class*="nfx-"]:not(.nfx-none).col-rainbow,.pname[class*="nfx-"]:not(.nfx-none).col-toxic{animation-name:none}
+
+/* ═════════ Icônes animées ═════════ */
+.ia-float{animation:ia-float 2s ease-in-out infinite}
+@keyframes ia-float{50%{transform:translateY(-12%)}}
+.ia-spin{animation:ia-spin 4s linear infinite}
+@keyframes ia-spin{to{transform:rotate(360deg)}}
+.ia-comet{animation:ia-comet 1.2s ease-in-out infinite}
+@keyframes ia-comet{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(8%,-8%) rotate(-12deg)}}
+.ia-glitch{animation:ia-glitch 1.3s steps(1) infinite}
+@keyframes ia-glitch{0%,100%{transform:none;filter:none}30%{transform:translate(6%,-3%);filter:drop-shadow(-2px 0 #ff004c) drop-shadow(2px 0 #00e5ff)}60%{transform:translate(-5%,3%) skewX(-10deg);filter:drop-shadow(2px 0 #ff004c)}}
+.ia-shine{animation:ia-shine 1.6s ease-in-out infinite}
+@keyframes ia-shine{50%{transform:scale(1.15);filter:drop-shadow(0 0 6px #ffe680) drop-shadow(0 0 12px #ffc21a)}}
+
+/* ═════════ Cadres légendaires ═════════ */
+.fr-inferno{background:conic-gradient(from var(--ang),#ff2e00,#ffb300,#ff5a00,#fff2a8,#ff2e00);animation:spin-ang .9s linear infinite,inferno .18s ease-in-out infinite alternate}
+@keyframes inferno{from{box-shadow:0 -4px 10px #ff5a00,0 -10px 18px #ff2e0088,0 0 6px #ffb300}to{box-shadow:0 -8px 16px #ffb300,0 -16px 26px #ff2e0066,0 0 10px #fff2a8}}
+.fr-inferno:after{content:"🔥";position:absolute;bottom:calc(var(--s) * -.22);left:50%;transform:translateX(-50%);font-size:calc(var(--s) * .4);animation:flame .3s ease-in-out infinite alternate}
+@keyframes flame{to{transform:translateX(-50%) scale(1.25,1.1) translateY(-6%)}}
+.fr-hacker{border-radius:10px;background:repeating-linear-gradient(0deg,#00ff6a 0 2px,#002b0f 2px 5px);background-size:100% 20px;animation:matrix .6s linear infinite,hackglow 1.8s steps(1) infinite}
+.fr-hacker .avi{border-radius:7px;background:#000;box-shadow:inset 0 0 10px #00ff6a55}
+@keyframes matrix{to{background-position:0 20px}}
+@keyframes hackglow{0%,100%{box-shadow:0 0 8px #00ff6a,0 0 16px #00ff6a66}47%{box-shadow:0 0 2px #00ff6a}50%{box-shadow:0 0 12px #00ff6a,0 0 26px #00ff6a}}
+.fr-hacker:after{content:"</>";position:absolute;bottom:calc(var(--s) * -.28);left:50%;transform:translateX(-50%);font:700 calc(var(--s) * .22) monospace;color:#00ff6a;text-shadow:0 0 6px #00ff6a;background:#000;padding:0 3px;border-radius:3px}
+.fr-king{background:conic-gradient(from var(--ang),#b8860b,#fff3b0,#ffc21a,#ff004c,#ffc21a,#fff3b0,#2fa9ff,#ffc21a,#b8860b);animation:spin-ang 3s linear infinite,kingglow 1.6s ease-in-out infinite}
+@keyframes kingglow{0%,100%{box-shadow:0 0 10px #ffc21a,0 0 22px #ffc21a66}50%{box-shadow:0 0 18px #fff3b0,0 0 40px #ffc21aaa}}
+.fr-king:after{content:"👑";position:absolute;top:calc(var(--s) * -.46);left:50%;font-size:calc(var(--s) * .5);transform:translateX(-50%);filter:drop-shadow(0 0 6px #ffe680);animation:kingcrown 1.6s ease-in-out infinite}
+@keyframes kingcrown{50%{transform:translateX(-50%) translateY(-8%) rotate(-6deg) scale(1.08)}}
+.fr-king:before{content:"✨";position:absolute;bottom:calc(var(--s) * -.1);right:calc(var(--s) * -.16);font-size:calc(var(--s) * .32);animation:twinkle 1.2s ease-in-out infinite}
+.fr-strobe{background:conic-gradient(from var(--ang),#ff004c,#ff8a00,#ffe600,#3dff6e,#00e5ff,#4d6bff,#c13cff,#ff004c);animation:spin-ang .8s linear infinite,strobe .5s steps(1) infinite}
+@keyframes strobe{0%{filter:hue-rotate(0) brightness(1.3);box-shadow:0 0 18px #ff004c}25%{filter:hue-rotate(90deg) brightness(.7);box-shadow:none}50%{filter:hue-rotate(180deg) brightness(1.4);box-shadow:0 0 18px #00e5ff}75%{filter:hue-rotate(270deg) brightness(.8);box-shadow:none}}
+
+/* ═════════ Effets de pseudo légendaires ═════════ */
+.nfx-inferno{background:linear-gradient(0deg,#ff2e00,#ff8a00,#ffe14d,#fff,#ff2e00);background-size:100% 300%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:infernotxt .7s linear infinite;filter:drop-shadow(0 -2px 4px #ff5a00) drop-shadow(0 0 8px #ff2e0088)}
+@keyframes infernotxt{to{background-position:0 -300%}}
+.nfx-hacker{font-family:ui-monospace,Menlo,Consolas,monospace;color:#00ff6a;text-shadow:0 0 6px #00ff6a,0 0 12px #00ff6a88;animation:hacktxt 2s steps(1) infinite}
+.nfx-hacker:after{content:"_";animation:caret .8s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+@keyframes hacktxt{0%,100%{transform:none}48%{transform:translateX(1px) skewX(-8deg);text-shadow:2px 0 #ff004c,-2px 0 #00e5ff}52%{transform:none}}
+.nfx-royal{background:linear-gradient(110deg,#b8860b 20%,#fff3b0 40%,#ffc21a 50%,#b8860b 70%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shinetxt 1.8s linear infinite;filter:drop-shadow(0 0 6px #ffc21a99)}
+.nfx-royal:before{content:"👑 ";-webkit-text-fill-color:initial;color:initial}
+.nfx-strobe{background:linear-gradient(90deg,#ff004c,#ff8a00,#ffe600,#3dff6e,#00e5ff,#4d6bff,#c13cff,#ff004c);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rbtext .9s linear infinite,strobetxt .45s steps(1) infinite}
+@keyframes strobetxt{0%{filter:brightness(1.5) drop-shadow(0 0 6px #fff)}50%{filter:brightness(.8)}}
+@media (max-width:760px){ .hide-sm{display:none} .featured{flex-direction:column;text-align:center} }
