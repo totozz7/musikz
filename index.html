@@ -72,7 +72,7 @@
         <div id="settings" class="settings">
           <div class="set-block">
             <h4>Catégories <span class="muted" id="cat-count"></span></h4>
-            <p class="muted small hint">📺 Écrans : on devine le nom du dessin animé, du film, de la série… Les autres : artiste et titre.</p>
+            <p class="muted small hint">📺 Écrans, émissions et comédies musicales : on devine le nom de l'œuvre. Les autres : artiste et titre.</p>
             <div class="cat-tools">
               <button class="chip-btn" data-catsel="all">Tout</button>
               <button class="chip-btn" data-catsel="none">Rien</button>
@@ -197,12 +197,16 @@
             <h2 id="rv-title"></h2>
             <h3 id="rv-artist"></h3>
             <div id="rv-sub" class="rv-sub"></div>
+            <div id="rv-note" class="rv-note"></div>
             <a id="rv-link" target="_blank" rel="noopener" class="muted small">Écouter sur Deezer ↗</a>
           </div>
         </div>
         <ul id="rv-results" class="rv-results"></ul>
         <div class="next-bar" id="next-wrap"><div id="next-bar"></div></div>
-        <button id="btn-next" class="btn btn-primary hidden">Suivant ▶</button>
+        <div class="rv-actions">
+          <button id="btn-next" class="btn btn-primary hidden">Suivant ▶</button>
+          <button id="btn-ban" class="btn btn-ghost btn-sm host-only" title="Reprise, version piano, mauvais morceau…">🚫 Mauvaise version</button>
+        </div>
         <p id="wait-next" class="muted hidden">L'hôte passe au morceau suivant quand tout le monde est prêt…</p>
       </div>
 

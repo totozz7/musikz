@@ -1,8 +1,12 @@
 # 🎵 MUSIKZ — le blind test entre potes
 
-Blind test multijoueur en temps réel (jusqu'à 12 joueurs), extraits Deezer de 30 s, 34 catégories
-choisies à la main (~900 morceaux) : Dessins animés 2000-2010, Disney VF, films, séries, animés, jeux vidéo,
-rap FR, variété, décennies, genres, monde…
+Blind test multijoueur en temps réel (jusqu'à 12 joueurs), extraits Deezer de 30 s, 43 catégories
+choisies à la main (~1 100 morceaux) : Dessins animés 2000-2010, Disney VF, films, séries, animés, jeux vidéo,
+rap FR, variété, décennies, genres, monde, et des catégories fun (tubes de soirée,
+tubes de l'été, hymnes de stade, Noël, Disney Channel, comédies musicales, émissions télé, musiques de pub)…
+
+Seules les **versions originales** sont gardées : les reprises piano/guitare, karaoké, live, remix… sont filtrées,
+et parmi les versions restantes on prend la plus écoutée.
 
 Dans les catégories « Écrans » on devine le **nom de l'œuvre** (dessin animé, film, série…) ;
 dans les autres, l'**artiste** et le **titre**.
@@ -40,6 +44,8 @@ dans les autres, l'**artiste** et le **titre**.
   Pour Spotify, les morceaux sont retrouvés sur Deezer pour avoir l'extrait audio (quelques-uns peuvent manquer).
   La playlist Spotify doit être publique.
 - **Chat + réactions emoji** pendant la partie (les bonnes réponses sont bloquées dans le chat 🤫)
+- **🚫 Mauvaise version** (hôte, pendant la révélation) : bannit cet extrait, une autre version sera cherchée la prochaine fois
+  (la liste des bannis repart à zéro quand Render redémarre ; les extraits bannis apparaissent dans les Logs de Render).
 - L'hôte peut passer un extrait, arrêter la partie, exclure un joueur. Si l'hôte part, un autre joueur prend la main.
 
 ## Tester sur ton ordinateur

@@ -822,7 +822,7 @@ Nat King Cole — L-O-V-E
 Ray Charles — Georgia on My Mind
 `});
 
-cat({ id: 'classique', name: 'Classique', emoji: '🎻', group: 'Genres', items: `
+cat({ id: 'classique', name: 'Classique', emoji: '🎻', group: 'Genres', allowCovers: true, items: `
 Beethoven — Symphonie n°5 :: Beethoven Symphony No. 5 Allegro con brio
 Beethoven — Lettre à Élise :: Beethoven Für Elise
 Mozart — Une petite musique de nuit :: Mozart Eine kleine Nachtmusik
@@ -1032,6 +1032,259 @@ Balti — Ya Lili
 Sting — Desert Rose
 `});
 
+
+// ═════════════════════ FUN ═════════════════════
+cat({ id: 'soiree-fr', name: 'Tubes de soirée', emoji: '🥳', group: 'Fun', star: true, items: `
+Images — Les démons de minuit
+Cookie Dingler — Femme libérée
+Gilbert Montagné — Les sunlights des tropiques
+Vanessa Paradis — Joe le taxi
+Partenaire Particulier — Partenaire particulier
+Début de Soirée — Nuit de folie
+Jean-Pierre Mader — Macumba
+Thierry Hazard — Le jerk
+Niagara — Tchiki boum
+Licence IV — Viens boire un p'tit coup à la maison
+La Compagnie Créole — C'est bon pour le moral
+La Compagnie Créole — Ça fait rire les oiseaux
+Annie Cordy — Tata Yoyo
+La Bande à Basile — La chenille
+J.J. Lionel — La danse des canards
+Patrick Sébastien — Les sardines
+Patrick Sébastien — Pourvu qu'elles soient douces
+Yannick — Ces soirées-là
+Gold — Capitaine abandonné
+Images — Le coeur en exil
+France Gall — Il jouait du piano debout
+Jean-Jacques Goldman — Je te donne
+Les Forbans — Chante
+Zouk Machine — Maldòn (La musique dans la peau)
+Kassav' — Zouk la sé sèl médikaman nou ni
+Magic System — Magic in the Air
+Collectif Métissé — Laisse-moi kiffer
+Desireless — Voyage voyage
+Ottawan — D.I.S.C.O.
+Ottawan — T'es OK
+Boney M. — Rasputin
+Village People — Y.M.C.A.
+Las Ketchup — The Ketchup Song (Aserejé)
+`});
+
+cat({ id: 'ete', name: "Tubes de l'été", emoji: '🏖️', group: 'Fun', items: `
+Kaoma — Lambada
+Los del Rio — Macarena
+O-Zone — Dragostea Din Tei
+Lou Bega — Mambo No. 5 (A Little Bit of...)
+Mr. President — Coco Jambo
+DJ BoBo — Chihuahua
+Phénoménal Club — Il est vraiment phénoménal
+Carrapicho — Tic Tic Tac
+Yannick Noah — Saga Africa
+Don Omar — Danza Kuduro
+Shakira — Waka Waka (This Time for Africa)
+K'NAAN — Wavin' Flag
+Jessy Matador — Allez Ola Olé
+Tragédie — Hey Oh
+Shy'm — Femme de couleur
+Magic System — Premier Gaou
+Bob Sinclar — Love Generation
+Major Lazer — Lean On
+Luis Fonsi — Despacito
+Master KG — Jerusalema
+Rema — Calm Down
+Ilona Mitrecey — Un monde parfait
+Alizée — Moi… Lolita
+Lorie — Toute seule
+Matt Houston — Positif
+Willy William — Ego
+Kungs — This Girl
+Lost Frequencies — Are You With Me
+Mr. Probz — Waves
+Sean Paul — Temperature
+`});
+
+cat({ id: 'stade', name: 'Hymnes de stade', emoji: '🏟️', group: 'Fun', items: `
+The White Stripes — Seven Nation Army
+Queen — We Will Rock You
+Queen — We Are the Champions
+Gala — Freed from Desire
+Kernkraft 400 — Zombie Nation
+Opus — Live Is Life
+Europe — The Final Countdown
+Survivor — Eye of the Tiger
+AC/DC — Thunderstruck
+Van Halen — Jump
+Blur — Song 2
+The Black Eyed Peas — Pump It
+The Fratellis — Chelsea Dagger
+Neil Diamond — Sweet Caroline
+Pet Shop Boys — Go West
+Bellini — Samba de Janeiro
+Gloria Gaynor — I Will Survive
+Ricky Martin — La Copa de la Vida
+Shakira — Waka Waka (This Time for Africa)
+Magic System — Magic in the Air
+Gary Glitter — Rock and Roll Part 2
+Joe Esposito — You're the Best
+Gigi D'Agostino — L'Amour Toujours
+Darude — Sandstorm
+Imagine Dragons — Believer
+Vangelis — Conquest of Paradise
+`});
+
+cat({ id: 'noel', name: 'Chansons de Noël', emoji: '🎄', group: 'Fun', items: `
+Mariah Carey — All I Want for Christmas Is You
+Wham! — Last Christmas
+Tino Rossi — Petit papa Noël
+Bobby Helms — Jingle Bell Rock
+José Feliciano — Feliz Navidad
+Dean Martin — Let It Snow! Let It Snow! Let It Snow!
+Brenda Lee — Rockin' Around the Christmas Tree
+Ariana Grande — Santa Tell Me
+Michael Bublé — It's Beginning to Look a Lot Like Christmas
+Chris Rea — Driving Home for Christmas
+Band Aid — Do They Know It's Christmas?
+Shakin' Stevens — Merry Christmas Everyone
+John Lennon — Happy Xmas (War Is Over)
+Kelly Clarkson — Underneath the Tree
+Justin Bieber — Mistletoe
+Darlene Love — Christmas (Baby Please Come Home)
+Bing Crosby — White Christmas
+Eartha Kitt — Santa Baby
+Frank Sinatra — Jingle Bells
+The Pogues — Fairytale of New York
+Paul McCartney — Wonderful Christmastime
+Michael Bublé — Holly Jolly Christmas
+Elvis Presley — Blue Christmas
+Melanie Thornton — Wonderful Dream (Holidays Are Coming)
+Sia — Snowman
+Mariah Carey — Santa Claus Is Comin' to Town
+`});
+
+cat({ id: 'disney-channel', name: 'Années Disney Channel', emoji: '✨', group: 'Fun', items: `
+Hannah Montana — The Best of Both Worlds
+Hannah Montana — Nobody's Perfect
+Miley Cyrus — Party in the U.S.A.
+Miley Cyrus — The Climb
+Troy & Gabriella — Breaking Free
+High School Musical Cast — We're All in This Together
+Zac Efron — Bet On It
+Demi Lovato — This Is Me
+Jonas Brothers — Burnin' Up
+Selena Gomez & The Scene — Naturally
+Selena Gomez — Magic
+Aly & AJ — Potential Breakup Song
+Vanessa Hudgens — Say OK
+Ashley Tisdale — He Said She Said
+Hilary Duff — So Yesterday
+Raven-Symoné — That's So Raven
+Demi Lovato — Skyscraper
+Bridgit Mendler — Ready or Not
+Zendaya — Replay
+Olivia Rodrigo — drivers license
+Dove Cameron — Rotten to the Core
+Sabrina Carpenter — Thumbs
+`});
+
+cat({ id: 'comedies-musicales', name: 'Comédies musicales', emoji: '🎭', group: 'Fun', kind: 'work', label: 'Nom de la comédie musicale', items: `
+Notre-Dame de Paris :: Belle Garou Daniel Lavoie Patrick Fiori
+Notre-Dame de Paris :: Le temps des cathédrales Bruno Pelletier
+Les Dix Commandements|10 commandements :: L'envie d'aimer Daniel Lévi
+Le Roi Soleil :: Être à la hauteur Emmanuel Moire
+Le Roi Soleil :: Je fais de toi mon essentiel Emmanuel Moire
+Mozart, l'opéra rock|Mozart :: Tatoue-moi Mikelangelo Loconte
+Mozart, l'opéra rock|Mozart :: Vivre à en crever Mozart opéra rock
+Roméo et Juliette :: Les rois du monde Roméo et Juliette
+Roméo et Juliette :: Aimer Roméo et Juliette
+Starmania :: Le blues du businessman Claude Dubois
+Starmania :: Les uns contre les autres Fabienne Thibeault
+1789, les amants de la Bastille|1789 :: Pour la peine 1789 les amants de la Bastille
+Cats :: Memory Elaine Paige
+Le Fantôme de l'Opéra|Phantom of the Opera :: The Phantom of the Opera Sarah Brightman Michael Crawford
+Les Misérables|Miserables :: I Dreamed a Dream Les Misérables
+Mamma Mia! :: Mamma Mia ABBA
+Hamilton :: My Shot Hamilton
+Grease :: Summer Nights Grease
+Le Roi Lion|Roi Lion :: Circle of Life Elton John
+The Greatest Showman :: The Greatest Show Hugh Jackman
+`});
+
+cat({ id: 'emissions', name: 'Émissions télé', emoji: '📡', group: 'Fun', kind: 'work', label: 'Nom de l\'émission', items: `
+Koh-Lanta|Koh Lanta :: Koh-Lanta générique
+Fort Boyard :: Fort Boyard générique Paul Koulak
+Questions pour un champion :: Questions pour un champion générique
+Qui veut gagner des millions ?|Qui veut gagner des millions :: Qui veut gagner des millions main theme
+Le Juste Prix|Juste prix :: Le Juste Prix générique
+Des chiffres et des lettres :: Des chiffres et des lettres générique
+Téléfoot :: Téléfoot générique
+Thalassa :: Thalassa générique
+Ushuaïa|Ushuaia :: Ushuaïa générique
+Intervilles :: Intervilles générique
+Star Academy :: Star Academy générique
+Secret Story :: Secret Story générique
+Top Chef :: Top Chef générique
+Les Guignols de l'info|Les Guignols :: Les Guignols de l'info générique
+Burger Quiz :: Burger Quiz générique
+Motus :: Motus générique
+Le Maillon faible|Maillon faible :: Le maillon faible générique
+C'est pas sorcier :: C'est pas sorcier générique
+N'oubliez pas les paroles :: N'oubliez pas les paroles générique
+Tout le monde veut prendre sa place :: Tout le monde veut prendre sa place générique
+Club Dorothée :: Club Dorothée générique
+Les Feux de l'amour|Feux de l'amour :: Nadia's Theme Feux de l'amour
+Télématin :: Télématin générique
+`});
+
+cat({ id: 'pubs', name: 'Musiques de pub', emoji: '📣', group: 'Fun', items: `
+Melanie Thornton — Wonderful Dream (Holidays Are Coming) ## Pub Coca-Cola (Noël)
+Mr. Oizo — Flat Beat ## Pub Levi's (Flat Eric)
+Stiltskin — Inside ## Pub Levi's
+Babylon Zoo — Spaceman ## Pub Levi's
+The Black Eyed Peas — Hey Mama ## Pub Apple iPod
+Jet — Are You Gonna Be My Girl ## Pub Apple iPod
+Feist — 1234 ## Pub Apple iPod nano
+The Ting Tings — Shut Up and Let Me Go ## Pub Apple iPod
+Yael Naim — New Soul ## Pub Apple MacBook Air
+CSS — Music Is My Hot Hot Sex ## Pub Apple iPod touch
+José González — Heartbeats ## Pub Sony Bravia
+The Rolling Stones — Start Me Up ## Pub Windows 95
+Nina Simone — My Baby Just Cares for Me ## Pub Chanel N°5
+Les Rythmes Digitales — Jacques Your Body (Make Me Sweat) ## Pub Citroën C4
+Pérez Prado — Guaglione ## Pub Guinness
+Mint Royale — Singin' in the Rain ## Pub Volkswagen Golf
+`});
+
+cat({ id: '2020s', name: 'Années 2020 / TikTok', emoji: '📲', group: 'Décennies', items: `
+The Weeknd — Blinding Lights
+Dua Lipa — Levitating
+Harry Styles — As It Was
+Glass Animals — Heat Waves
+Olivia Rodrigo — drivers license
+Miley Cyrus — Flowers
+Sabrina Carpenter — Espresso
+Benson Boone — Beautiful Things
+Kate Bush — Running Up That Hill (A Deal With God)
+Lady Gaga — Bloody Mary
+Doja Cat — Paint The Town Red
+FIFTY FIFTY — Cupid
+Sophie Ellis-Bextor — Murder on the Dancefloor
+Tommy Richman — MILLION DOLLAR BABY
+Billie Eilish — BIRDS OF A FEATHER
+Chappell Roan — Good Luck, Babe!
+Lady Gaga — Die With A Smile
+Teddy Swims — Lose Control
+Shakira — Bzrp Music Sessions, Vol. 53
+Stromae — L'enfer
+Aya Nakamura — Djadja
+Tiakola — Meuda
+Gazo — Die
+Santa — Popcorn salé
+Pierre Garnier — Ceux qu'on était
+Måneskin — Beggin'
+Jason Derulo — Savage Love (Laxed - Siren Beat)
+Lil Nas X — MONTERO (Call Me By Your Name)
+`});
+
 // ───────── parsing ─────────
 function parse(c) {
   if (!c.items) return { ...c, list: [] };
@@ -1039,15 +1292,17 @@ function parse(c) {
   for (let line of c.items.split('\n')) {
     line = line.trim();
     if (!line || line.startsWith('#')) continue;
+    let note = '';
+    if (line.includes('##')) { [line, note] = line.split('##').map(s => s.trim()); }
     let [main, q] = line.split('::').map(s => s && s.trim());
     if (c.kind === 'work') {
       const names = main.split('|').map(s => s.trim()).filter(Boolean);
-      list.push({ key: c.id + ':' + names[0] + ':' + (q || ''), work: names[0], alts: names.slice(1), q: q || names[0] + ' générique', cat: c.id });
+      list.push({ key: c.id + ':' + names[0] + ':' + (q || ''), work: names[0], alts: names.slice(1), q: q || names[0] + ' générique', cat: c.id, note, allowCovers: !!c.allowCovers });
     } else {
       const m = main.split(/\s+—\s+/);
       if (m.length < 2) continue;
       const artist = m[0].trim(), title = m.slice(1).join(' — ').trim();
-      list.push({ key: 'm:' + artist + '|' + title, artist, title, q: q || null, cat: c.id });
+      list.push({ key: 'm:' + artist + '|' + title, artist, title, q: q || null, cat: c.id, note, allowCovers: !!c.allowCovers });
     }
   }
   return { ...c, list };

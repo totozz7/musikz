@@ -86,8 +86,39 @@ function titleOk(dzTitle, wanted) {
   const a = norm(dzTitle), w = norm(wanted);
   return !!a && !!w && (a.includes(w) || w.includes(a) || match(dzTitle, wanted) === 'ok');
 }
-// évite karaoké, reprises "in the style of", versions instrumentales quand on veut l'original
-const BAD = /karaoke|karaok|in the style of|made famous|instrumental version|tribute|8-bit|lullaby|berceuse|piano version/i;
+// ── Filtre anti-reprises : on ne veut QUE les versions originales ──
+// Mots qui trahissent une reprise / version alternative (dans le titre ou le nom de l'artiste).
+// Un mot est ignoré s'il fait partie de la réponse attendue (ex. « Live Is Life », « Piano Man »).
+const COVER_WORDS = [
+  'karaoke', 'karaoké', 'in the style of', 'made famous', 'as made famous', 'originally performed', 'tribute', 'hommage',
+  'cover', 'covers', 'reprise', 'piano', 'guitar', 'guitare', 'acoustic', 'acoustique', 'unplugged', 'instrumental',
+  '8 bit', '8bit', 'chiptune', 'lullaby', 'lullabies', 'berceuse', 'music box', 'boite a musique', 'orchestral version',
+  'epic version', 'epic', 'lofi', 'lo fi', 'chill version', 'sped up', 'slowed', 'nightcore', 'remix', 'rmx', 'medley',
+  'mashup', 'live', 'en direct', 'en concert', 'unplugged', 're recorded', 'rerecorded', 'ringtone', 'sonnerie',
+  'for kids', 'pour enfants', 'kids', 'enfants', 'cello', 'violin', 'violon', 'string quartet', 'strings', 'ukulele',
+  'harp', 'harpe', 'flute', 'jazz version', 'bossa', 'reggae version', 'parody', 'parodie', 'performed by', 'versión',
+  'sound alike', 'soundalike', 'workout', 'fitness', 'cardio', 'party mix', 'dj mix', 'extended mix', 'club mix',
+  'radio version', 'demo', 'rehearsal', 'theme songs', 'tv themes', 'tv theme', 'players', 'orchestre de', 'cinematic',
+  // « usines à reprises » bien connues sur les plateformes
+  'city of prague', 'hollywood studio', 'sounds unlimited', 'wonder band', 'hit crew', 'studio all stars', 'all stars',
+  'kidz bop', 'vitamin string', 'piano guys', 'brooklyn duo', 'anime kei', 'the soundtrack orchestra', 'starlite',
+  'party hits', 'hits all stars', 'chorus', 'versions', 'interpretation',
+];
+const COVER_RE = new RegExp('(?:^| )(' + COVER_WORDS.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')(?= |$)', 'g');
+const flat = (x) => String(x || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+
+function isCoverish(t, wanted, strict = true) {
+  if (!strict) return /karaok/i.test(t.title + ' ' + (t.artist?.name || ''));
+  const want = ' ' + flat(wanted) + ' ';
+  const hay = flat(`${t.title} ${t.artist?.name || ''}`);
+  for (const m of hay.matchAll(COVER_RE)) if (!want.includes(' ' + m[1] + ' ')) return true;
+  // l'album aussi, mais seulement pour les mots les plus parlants
+  const alb = flat(t.album?.title || '');
+  return /(^| )(karaoke|tribute|cover|covers|piano|lullab|berceuse|music box|8 bit|instrumental)( |$)/.test(alb) && !/(^| )(piano|instrumental)( |$)/.test(want);
+}
+const banned = new Set(); // ids Deezer signalés « mauvaise version » par un hôte
+const playable = (t) => t && t.preview && t.readable !== false && !banned.has(t.id);
+const byRank = (a, b) => (b.rank || 0) - (a.rank || 0);
 
 async function resolveItem(item) {
   const c = resolved.get(item.key);
@@ -101,41 +132,48 @@ async function resolveItem(item) {
 }
 
 async function resolveSong(item) {
-  const searches = [];
+  const strict = !item.allowCovers;
+  const wanted = `${item.artist} ${item.title}`;
   const firstArtist = String(item.artist).split(/,| feat\.? | & /i)[0].trim();
+  const searches = [];
   if (item.q) searches.push(item.q);
   searches.push(`artist:"${firstArtist}" track:"${item.title.replace(/"/g, '')}"`);
   searches.push(`${firstArtist} ${item.title}`);
   for (const q of searches) {
-    const data = (await dz(`/search?q=${encodeURIComponent(q)}&limit=15`)).data || [];
-    const ok = data.filter(t => t.preview && t.readable !== false && !BAD.test(t.title + ' ' + (t.album?.title || '')));
-    const best = ok.find(t => artistOk(t.artist?.name, item.artist) && titleOk(t.title, item.title))
-      || ok.find(t => artistOk(t.artist?.name, item.artist) && titleOk(t.title_short || t.title, item.title.split('(')[0]))
-      || (item.q && q === item.q ? bestByWords(ok, item.q) : null);
-    if (best) return fromDeezer(best, { title: item.title, artist: item.artist, cat: item.cat });
+    const data = (await dz(`/search?q=${encodeURIComponent(q)}&limit=25`)).data || [];
+    const ok = data.filter(t => playable(t) && !isCoverish(t, wanted, strict));
+    // 1) bon artiste + titre identique, 2) bon artiste + titre proche — à chaque fois la version la plus écoutée
+    const exact = ok.filter(t => artistOk(t.artist?.name, item.artist) && flat(t.title_short || t.title) === flat(item.title)).sort(byRank);
+    const close = ok.filter(t => artistOk(t.artist?.name, item.artist) && (titleOk(t.title, item.title) || titleOk(t.title_short || t.title, item.title.split('(')[0]))).sort(byRank);
+    const best = exact[0] || close[0] || (item.q && q === item.q ? bestByWords(ok, item.q) : null);
+    if (best) return fromDeezer(best, { title: item.title, artist: item.artist, cat: item.cat, note: item.note, key: item.key });
   }
   return null;
 }
 
-// normalisation "large" (garde le contenu des parenthèses) pour comparer à une recherche
-const flat = (x) => String(x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+// Résultat le plus proche d'une recherche libre (nombre de mots en commun, puis popularité)
 function bestByWords(list, q) {
-  const words = flat(q).split(' ').filter(w => w.length >= 3);
+  const words = flat(q).split(' ').filter(w => w.length >= 3 && !['generique', 'theme', 'main', 'title', 'the', 'and', 'les', 'des'].includes(w));
+  if (!words.length) return list.sort(byRank)[0] || null;
   const score = (t) => {
     const hay = ' ' + flat(`${t.title} ${t.artist?.name} ${t.album?.title}`) + ' ';
     return words.reduce((s, w) => s + (hay.includes(' ' + w) ? 1 : 0), 0);
   };
   let best = null, bs = -1;
-  for (const t of list) { const sc = score(t); if (sc > bs) { best = t; bs = sc; } }
+  for (const t of list) {
+    const sc = score(t);
+    if (sc > bs || (sc === bs && (t.rank || 0) > (best.rank || 0))) { best = t; bs = sc; }
+  }
   return bs >= Math.min(2, words.length) ? best : null; // trop éloigné : on préfère sauter
 }
 
 async function resolveWork(item) {
-  const data = (await dz(`/search?q=${encodeURIComponent(item.q)}&limit=15`)).data || [];
-  const ok = data.filter(t => t.preview && t.readable !== false && !/karaoke|karaok/i.test(t.title));
+  const data = (await dz(`/search?q=${encodeURIComponent(item.q)}&limit=25`)).data || [];
+  const wanted = item.q + ' ' + item.work + ' ' + (item.alts || []).join(' ');
+  const ok = data.filter(t => playable(t) && !isCoverish(t, wanted, !item.allowCovers));
   const best = bestByWords(ok, item.q);
   if (!best) return null;
-  return fromDeezer(best, { title: item.work, alts: item.alts, artist: '', work: true, cat: item.cat });
+  return fromDeezer(best, { title: item.work, alts: item.alts, artist: '', work: true, cat: item.cat, note: item.note, key: item.key });
 }
 
 function mockResolve(item) {
@@ -143,7 +181,7 @@ function mockResolve(item) {
   return {
     id: 'mock-' + Buffer.from(item.key).toString('base64').slice(0, 16), preview: '', cover: '', cat: item.cat,
     title: item.work || item.title, alts: item.alts, artist: item.work ? '' : item.artist, work: !!item.work,
-    dzTitle: item.work ? 'Générique' : item.title, dzArtist: item.work ? 'Interprète' : item.artist,
+    dzTitle: item.work ? 'Générique' : item.title, dzArtist: item.work ? 'Interprète' : item.artist, note: item.note, key: item.key,
   };
 }
 
@@ -468,7 +506,7 @@ function revealRound(room) {
   room.history.push({ title: t.title, artist: t.work ? sub : t.artist });
   broadcast(room);
   io.to(room.code).emit('reveal', {
-    track: { title: t.title, artist: t.work ? '' : t.artist, sub, work: !!t.work, cover: t.cover, link: typeof t.id === 'number' ? `https://www.deezer.com/track/${t.id}` : '' },
+    track: { title: t.title, artist: t.work ? '' : t.artist, sub, note: t.note || '', work: !!t.work, cover: t.cover, link: typeof t.id === 'number' ? `https://www.deezer.com/track/${t.id}` : '' },
     results, index: room.roundIndex, total: room.queue.length, pause: s.pause,
   });
   if (s.pause > 0) room.timer = setTimeout(() => nextRound(room), s.pause * 1000);
@@ -553,6 +591,16 @@ io.on('connection', (socket) => {
   });
 
   socket.on('skip', () => { if (isHost() && room.phase === 'playing') revealRound(room); });
+  // l'hôte signale une mauvaise version : on la bannit et on cherchera une autre version la prochaine fois
+  socket.on('ban', () => {
+    if (!isHost() || room.phase !== 'reveal' || !room.round) return;
+    const t = room.round.track;
+    if (typeof t.id === 'number') banned.add(t.id);
+    if (t.key) resolved.delete(t.key);
+    for (const c of liveCache.values()) c.tracks = c.tracks.filter(x => x.id !== t.id);
+    console.log(`🚫 BANNI : ${t.key || t.title} → Deezer ${t.id} « ${t.dzTitle} » par ${t.dzArtist}`);
+    socket.emit('toast', { text: '🚫 Version bannie : une autre sera cherchée la prochaine fois' });
+  });
   socket.on('next', () => { if (isHost() && room.phase === 'reveal') nextRound(room); });
   socket.on('stop', () => {
     if (isHost() && room.phase !== 'lobby') {

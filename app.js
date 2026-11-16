@@ -150,6 +150,7 @@ $('#btn-start').onclick = () => socket.emit('start');
 $('#btn-replay').onclick = () => socket.emit('start');
 $('#btn-lobby').onclick = () => socket.emit('backToLobby');
 $('#btn-skip').onclick = () => socket.emit('skip');
+$('#btn-ban').onclick = () => { socket.emit('ban'); $('#btn-ban').disabled = true; $('#btn-ban').textContent = '🚫 Signalé'; };
 $('#btn-next').onclick = () => { $('#btn-next').classList.add('hidden'); socket.emit('next'); };
 $('#btn-stop').onclick = () => socket.emit('stop');
 
@@ -298,6 +299,8 @@ socket.on('reveal', (rv) => {
   $('#rv-artist').textContent = rv.track.artist;
   $('#rv-artist').style.display = rv.track.artist ? '' : 'none';
   $('#rv-sub').textContent = rv.track.sub ? '🎵 ' + rv.track.sub : '';
+  $('#rv-note').textContent = rv.track.note ? '📺 ' + rv.track.note : '';
+  $('#btn-ban').disabled = false; $('#btn-ban').textContent = '🚫 Mauvaise version';
   $('#rv-link').href = rv.track.link || '#';
   $('#rv-link').style.display = rv.track.link ? '' : 'none';
   const byId = Object.fromEntries(state.players.map(p => [p.id, p]));
