@@ -4,7 +4,16 @@ const $$ = (s) => [...document.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const store = { get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
 
-const AVATARS = ['🦊', '🐼', '🐸', '🦁', '🐙', '🦄', '🐯', '🐵', '🐧', '🦉', '🐺', '🐲', '🐝', '🦖', '🐨', '🐷'];
+const AVATARS = ['🦊', '🐼', '🐸', '🦁', '🐙', '🦄', '🐯', '🐵', '🐧', '🦉', '🐺', '🐲', '🐝', '🦖', '🐨', '🐷', '🐶', '🐱', '🦈', '🦩',
+  '👽', '🤖', '👻', '💀', '🤡', '🎃', '😎', '🥸', '🤠', '🥷', '🧛', '🧙', '🦸', '🧜', '👑', '🫠',
+  '🍕', '🍔', '🌮', '🍩', '🥑', '🌶️', '🥖', '🧀', '🎸', '🎧', '🎤', '🥁', '🎷', '🚀', '⚡', '🔥', '🌈', '💎'];
+const COLORS = ['#ff2e4d', '#ff7a1a', '#ffc21a', '#c0ff00', '#4cd964', '#30d5c8', '#00e5ff', '#2fa9ff', '#7c5cff', '#e0b0ff', '#ff4fa3', '#ff9ecf', '#ffd59e', '#ffffff'];
+const FRAMES = [
+  ['none', 'Aucun'], ['classic', 'Classique'], ['gold', 'Or'], ['rainbow', 'Arc-en-ciel'], ['neon', 'Néon'],
+  ['fire', 'Feu'], ['ice', 'Glace'], ['crown', 'Couronne'], ['stars', 'Étoiles'], ['pixel', 'Pixel'],
+];
+// Icône avec son cadre (utilisée partout : joueurs, podium, chat…)
+const avatarHTML = (p, size = 36) => `<span class="avf fr-${esc(p.frame || 'none')}" style="--s:${size}px;--c:${esc(p.color || '#ffc21a')}"><span class="avi">${esc(p.avatar || '🙂')}</span></span>`;
 const REACTS = ['🔥', '😂', '😱', '👏', '💀', '🎉', '😭', '🤯', '❤️', '🐐'];
 
 let pid = store.get('mz_pid');
@@ -21,14 +30,25 @@ let categories = [];
 let round = null;       // manche en cours
 let tick = null;
 let myAvatar = store.get('mz_avatar', AVATARS[Math.floor(Math.random() * AVATARS.length)]);
+let myColor = store.get('mz_color', COLORS[Math.floor(Math.random() * 8)]);
+let myFrame = store.get('mz_frame', 'classic');
 
 // ───────────── Accueil ─────────────
 $('#name').value = store.get('mz_name', '');
 function renderAvatars() {
   $('#avatars').innerHTML = AVATARS.map(a => `<button type="button" class="${a === myAvatar ? 'sel' : ''}">${a}</button>`).join('');
   $$('#avatars button').forEach(b => b.onclick = () => { myAvatar = b.textContent; store.set('mz_avatar', myAvatar); renderAvatars(); });
+  $('#colors').innerHTML = COLORS.map(c => `<button type="button" class="sw ${c === myColor ? 'sel' : ''}" style="--c:${c}" data-c="${c}"></button>`).join('');
+  $$('#colors button').forEach(b => b.onclick = () => { myColor = b.dataset.c; store.set('mz_color', myColor); renderAvatars(); });
+  const me = { avatar: myAvatar, color: myColor };
+  $('#frames').innerHTML = FRAMES.map(([id, label]) => `<button type="button" class="${id === myFrame ? 'sel' : ''}" data-f="${id}">${avatarHTML({ ...me, frame: id }, 40)}<small>${label}</small></button>`).join('');
+  $$('#frames button').forEach(b => b.onclick = () => { myFrame = b.dataset.f; store.set('mz_frame', myFrame); renderAvatars(); });
+  $('#pv-avatar').innerHTML = avatarHTML({ ...me, frame: myFrame }, 76);
+  $('#pv-name').textContent = $('#name').value.trim() || 'Ton pseudo';
+  $('#pv-name').style.color = myColor;
 }
 renderAvatars();
+$('#name').addEventListener('input', () => { $('#pv-name').textContent = $('#name').value.trim() || 'Ton pseudo'; });
 
 const urlCode = (location.pathname.match(/^\/r\/([A-Za-z0-9]{5})/) || [])[1] || new URLSearchParams(location.search).get('room');
 if (urlCode) { $('#code').value = urlCode.toUpperCase(); $('#btn-join').textContent = 'Rejoindre ' + urlCode.toUpperCase(); }
@@ -38,7 +58,7 @@ function identity() {
   if (!name) { $('#home-err').textContent = 'Choisis un pseudo d\'abord 😉'; $('#name').focus(); return null; }
   store.set('mz_name', name);
   unlockAudio();
-  return { name, avatar: myAvatar, pid };
+  return { name, avatar: myAvatar, pid, color: myColor, frame: myFrame };
 }
 function unlockAudio() {
   // les navigateurs exigent un clic avant de jouer du son : on "débloque" l'élément audio ici
@@ -71,7 +91,7 @@ function onJoined(res) {
 }
 // reconnexion automatique (ex. téléphone en veille)
 socket.on('connect', () => {
-  if (joinedCode) socket.emit('join', { code: joinedCode, name: store.get('mz_name'), avatar: myAvatar, pid }, (r) => {
+  if (joinedCode) socket.emit('join', { code: joinedCode, name: store.get('mz_name'), avatar: myAvatar, pid, color: myColor, frame: myFrame }, (r) => {
     if (r.error) { toast(r.error, 'error'); leave(); } else { $('#chat').innerHTML = ''; r.chat.forEach(addChat); }
   });
 });
@@ -185,8 +205,8 @@ function renderPlayers() {
     const done = state.phase === 'playing' && (state.settings.mode === 'qcm' ? p.answered : (p.foundArtist || p.foundTitle));
     return `<li style="--c:${p.color}" class="${p.online ? '' : 'off'} ${done ? 'done' : ''}">
       ${inGame || state.phase === 'end' ? `<span class="rank">${i + 1}</span>` : ''}
-      <span class="av">${p.avatar}</span>
-      <span class="nm">${esc(p.name)}${p.host ? ' 👑' : ''}${p.id === pid ? ' <small>(toi)</small>' : ''}${p.streak >= 3 ? ` <small>🔥 série de ${p.streak}</small>` : ''}</span>
+      ${avatarHTML(p, 38)}
+      <span class="nm" style="color:${esc(p.color)}">${esc(p.name)}${p.host ? ' 👑' : ''}${p.id === pid ? ' <small>(toi)</small>' : ''}${p.streak >= 3 ? ` <small>🔥 série de ${p.streak}</small>` : ''}</span>
       <span class="marks">${marks}</span>
       <span class="sc">${p.score}</span>
       ${isHost() && p.id !== pid && state.phase === 'lobby' ? `<button class="kick" data-kick="${p.id}" title="Exclure">✕</button>` : ''}
@@ -245,7 +265,7 @@ socket.on('round', (r) => {
       started = true;
       if (text) setTimeout(() => $('#guess').focus(), 50);
       if (r.preview) {
-        try { audio.currentTime = Math.min(25, Math.max(0, -toStart / 1000)); } catch {}
+        if (!round.early) try { audio.currentTime = Math.min(25, Math.max(0, -toStart / 1000)); } catch {}
         audio.play().then(() => $('#eq').classList.remove('paused')).catch(() => $('#btn-unmute').classList.remove('hidden'));
       }
     }
@@ -286,7 +306,7 @@ $('#guess-form').onsubmit = (e) => {
     } else {
       fb.textContent = '❌ Raté, essaie encore'; fb.className = 'feedback bad';
       $('#guess').classList.add('shake'); setTimeout(() => $('#guess').classList.remove('shake'), 300);
-      $('#guess').select();
+      $('#guess').value = '';
     }
   });
 };
@@ -317,7 +337,7 @@ socket.on('reveal', (rv) => {
   $('#rv-results').innerHTML = rows.map(r => {
     const p = byId[r.id];
     const what = state.settings.mode === 'qcm' ? (r.correct ? '✅' : '❌') : `${r.artist ? '🎤' : ''}${r.title ? '🎵' : ''}${!r.artist && !r.title ? '❌' : ''}`;
-    return `<li class="${r.gained ? 'win' : ''}">${p.avatar} ${esc(p.name)} ${what} ${r.gained ? `<b>+${r.gained}</b>` : ''}${r.time && r.gained ? ` <span class="muted small">${r.time.toFixed(1)} s</span>` : ''}</li>`;
+    return `<li class="${r.gained ? 'win' : ''}">${avatarHTML(p, 26)} <span style="color:${esc(p.color)}">${esc(p.name)}</span> ${what} ${r.gained ? `<b>+${r.gained}</b>` : ''}${r.time && r.gained ? ` <span class="muted small">${r.time.toFixed(1)} s</span>` : ''}</li>`;
   }).join('');
   const manual = !rv.pause;
   $('#next-wrap').classList.toggle('hidden', manual);
@@ -341,9 +361,9 @@ function renderEnd() {
   const ps = [...state.players].sort((a, b) => b.score - a.score);
   const order = [ps[1], ps[0], ps[2]];
   $('#podium').innerHTML = order.map((p, i) => p ? `<div class="step p${[2, 1, 3][i]}">
-    <span class="av">${p.avatar}</span><span class="nm">${esc(p.name)}</span><span class="pts">${p.score} pts</span>
+    ${avatarHTML(p, 70)}<span class="nm" style="color:${esc(p.color)}">${esc(p.name)}</span><span class="pts">${p.score} pts</span>
     <div class="block">${[2, 1, 3][i]}</div></div>` : '').join('');
-  $('#final-list').innerHTML = ps.slice(3).map((p, i) => `<li value="${i + 4}">${p.avatar} ${esc(p.name)} — ${p.score} pts</li>`).join('');
+  $('#final-list').innerHTML = ps.slice(3).map((p, i) => `<li value="${i + 4}">${avatarHTML(p, 28)} <span style="color:${esc(p.color)}">${esc(p.name)}</span> — ${p.score} pts</li>`).join('');
   if (ps[0]?.id === pid) confetti(60); else confetti(20);
 }
 
@@ -352,7 +372,7 @@ function addChat(m) {
   const li = document.createElement('li');
   if (m.sys) { li.className = 'sys'; li.textContent = m.text; }
   else if (m.found) { li.className = 'found'; li.textContent = m.text; }
-  else { li.style.setProperty('--c', m.color); li.innerHTML = `${m.avatar} <b>${esc(m.name)}</b> ${esc(m.text)}`; }
+  else { li.style.setProperty('--c', m.color); li.innerHTML = `${avatarHTML(m, 22)} <b>${esc(m.name)}</b> ${esc(m.text)}`; }
   const ul = $('#chat'); ul.appendChild(li);
   while (ul.children.length > 150) ul.firstChild.remove();
   ul.scrollTop = ul.scrollHeight;
@@ -409,11 +429,13 @@ socket.on('powers', (p) => {
   $('#pw-targets').classList.add('hidden');
   $('#pw-cards').className = 'pw-cards';
   $('#pw-cards').innerHTML = p.offers.map(o => `
-    <button class="pw-card ${o.type}" data-id="${o.id}">
+    <button class="pw-card ${o.type} ${o.rarity}" data-id="${o.id}">
       <span class="tag">${o.type === 'bonus' ? '🎁 Bonus' : '😈 Malus'}</span>
+      <span class="rar">${{ common: 'Commune', rare: '◆ Rare', legendary: '★ LÉGENDAIRE ★' }[o.rarity] || ''}</span>
       <span class="em">${o.emoji}</span><b>${esc(o.name)}</b><small>${esc(o.desc)}</small>
     </button>`).join('');
   $$('#pw-cards .pw-card').forEach(c => c.onclick = () => pickCard(c));
+  if (p.offers.some(o => o.rarity === 'legendary')) { sfx('legend'); toast('🌟 Carte LÉGENDAIRE dans ta main !'); }
   $('#btn-pw-none').classList.remove('hidden');
   $('#pw-status').textContent = p.offers.some(o => o.type === 'malus') ? 'Un bonus pour toi, ou un malus pour embêter quelqu\'un ?' : 'Choisis un bonus !';
   if (p.chosen) lockCards(p.chosen.id);
@@ -435,7 +457,7 @@ function pickCard(card) {
   const others = state.players.filter(p => p.id !== pid && p.online);
   $('#pw-targets').classList.remove('hidden');
   $('#pw-targets').innerHTML = `<div class="lbl2">${offer.emoji} Sur qui ?</div>` +
-    others.map(p => `<button data-t="${p.id}">${p.avatar} ${esc(p.name)}</button>`).join('');
+    others.map(p => `<button data-t="${p.id}">${avatarHTML(p, 30)} <span style="color:${esc(p.color)}">${esc(p.name)}</span></button>`).join('');
   $$('#pw-targets [data-t]').forEach(b => b.onclick = () => sendPower(id, b.dataset.t));
 }
 
@@ -466,13 +488,15 @@ function renderPowerStatus() {
 }
 
 // ───── effets pendant l'écoute ─────
-let fxTimers = [], yoyoTimer = null, frozenUntil = 0;
+let fxTimers = [], yoyoTimer = null, frozenUntil = 0, crazyKeys = false, rainTimer = null;
 
 function resetEffects() {
   fxTimers.forEach(clearTimeout); fxTimers = [];
   clearInterval(yoyoTimer); yoyoTimer = null;
   frozenUntil = 0;
   document.body.classList.remove('flipped', 'blind');
+  crazyKeys = false; clearInterval(rainTimer); rainTimer = null;
+  try { speechSynthesis.cancel(); } catch {}
   $('#freeze-layer').classList.add('hidden');
   $('#fx-area').innerHTML = '';
   try { audio.playbackRate = 1; audio.preservesPitch = true; audio.mozPreservesPitch = true; audio.loop = false; audio.volume = baseVolume; } catch {}
@@ -487,9 +511,15 @@ function applyEffects(fx) {
   const dur = round.duration * 1000;
   if (fx.bonus) {
     const b = fx.bonus;
-    area.insertAdjacentHTML('beforeend', `<div class="fx bonus">
+    area.insertAdjacentHTML('beforeend', `<div class="fx bonus ${b.rarity || ''}">
       ${b.image ? `<div class="fx-img"><img src="${esc(b.image)}" alt=""></div>` : `<span class="em">${b.emoji}</span>`}
-      <div><div>${b.emoji} ${esc(b.name)}</div>${b.hint ? `<div class="hint">${esc(b.hint)}</div>` : ''}${b.id === 'double' ? '<div class="hint">×2 sur cet extrait !</div>' : ''}${b.id === 'shield' ? '<div class="hint">Protégé !</div>' : ''}</div></div>`);
+      <div><div>${b.emoji} ${esc(b.name)}</div>${b.hint ? `<div class="hint">${esc(b.hint)}</div>` : ''}${b.id === 'double' ? '<div class="hint">×2 sur cet extrait !</div>' : ''}${b.id === 'triple' ? '<div class="hint">×3 sur cet extrait !!</div>' : ''}${b.id === 'souffleur' ? '<div class="small">🎧 Monte le son, la voix arrive dans 4 s…</div>' : ''}${b.id === 'shield' ? '<div class="hint">Protégé !</div>' : ''}</div></div>`);
+    if (b.id === 'early' && round.preview) {
+      round.early = true;
+      area.lastElementChild.querySelector('div:last-child').insertAdjacentHTML('beforeend', '<div class="hint">Écoute… 🤫</div>');
+      at(startIn - 3000, () => { try { audio.currentTime = 0; } catch {} audio.play().then(() => $('#eq').classList.remove('paused')).catch(() => {}); });
+    }
+    if (b.whisper) at(startIn + 4000, () => whisper(b.whisper));
     if (b.remove) at(startIn, () => b.remove.forEach(id => { const el = $(`#qcm-answer [data-id="${CSS.escape(id)}"]`); if (el) el.style.visibility = 'hidden'; }));
   }
   if (fx.sent) toast(fx.sent.blocked ? `🛡️ ${fx.sent.target} avait un bouclier… raté !` : `${fx.sent.emoji} ${fx.sent.name} envoyé à ${fx.sent.target} 😈`);
@@ -498,15 +528,25 @@ function applyEffects(fx) {
       area.insertAdjacentHTML('beforeend', `<div class="fx blocked"><span class="em">🛡️</span><div>Ton bouclier a bloqué « ${esc(m.name)} » de ${m.fromAvatar} ${esc(m.from)}</div></div>`);
       continue;
     }
-    area.insertAdjacentHTML('beforeend', `<div class="fx malus"><span class="em">${m.emoji}</span><div>${m.fromAvatar} ${esc(m.from)} t'a envoyé <b>${esc(m.name)}</b> !</div></div>`);
+    area.insertAdjacentHTML('beforeend', `<div class="fx malus ${m.rarity || ''}"><span class="em">${m.emoji}</span><div>${m.fromAvatar} ${esc(m.from)} t'a envoyé <b>${esc(m.name)}</b> !</div></div>`);
     toast(`${m.emoji} ${m.from} t'a envoyé « ${m.name} » !`, 'error');
     sfx('buzzer', .5);
-    if (m.id === 'buzzer') {
+    const bazar = m.id === 'bazar';
+    if (bazar) { sfx('legend'); toast('🎪 LE GRAND BAZAR !!! 🎪', 'error'); }
+    if (m.id === 'buzzer' || bazar) {
       const n = 6 + Math.floor(Math.random() * 3);
       for (let i = 0; i < n; i++) at(startIn + 600 + Math.random() * (dur - 1500), () => { sfx(randomSfx()); document.querySelector('.stage').classList.add('shake-hard'); setTimeout(() => document.querySelector('.stage').classList.remove('shake-hard'), 400); });
     }
     if (m.id === 'flip') { at(startIn, () => document.body.classList.add('flipped')); at(startIn + 12000, () => document.body.classList.remove('flipped')); }
-    if (m.id === 'chipmunk') {
+    if (bazar) at(startIn, () => document.body.classList.add('flipped'));
+    if (m.id === 'rain' || bazar) at(startIn, () => { rainTimer = setInterval(emojiDrop, bazar ? 260 : 180); });
+    if (m.id === 'crazykeys') at(startIn, () => { crazyKeys = true; });
+    if (m.id === 'slowmo') {
+      try { audio.preservesPitch = false; audio.mozPreservesPitch = false; audio.loop = true; } catch {}
+      at(startIn, () => { try { audio.playbackRate = 0.72; } catch {} });
+      at(startIn + 300, () => { try { audio.playbackRate = 0.72; } catch {} });
+    }
+    if (m.id === 'chipmunk' || bazar) {
       try { audio.preservesPitch = false; audio.mozPreservesPitch = false; audio.loop = true; } catch {}
       at(startIn, () => { try { audio.playbackRate = 1.35; } catch {} });
       // la lecture démarre au même moment que pour les autres : on réapplique la vitesse
@@ -560,5 +600,43 @@ function sfx(name, vol = 1) {
   }
   if (name === 'boing') { const o = osc('sine', 140, 0, .6, 1); o.frequency.exponentialRampToValueAtTime(700, t0 + .25); o.frequency.exponentialRampToValueAtTime(160, t0 + .6); }
   if (name === 'siren') { const o = osc('triangle', 650, 0, 1.6, .9); for (let i = 0; i < 4; i++) o.frequency.linearRampToValueAtTime(i % 2 ? 650 : 1250, t0 + .4 * (i + 1)); }
+  if (name === 'legend') { [523, 659, 784, 1047].forEach((f, i) => osc('triangle', f, i * .09, i * .09 + .5, .7)); }
   if (name === 'pop') { const o = osc('sine', 500, 0, .12, .8); o.frequency.exponentialRampToValueAtTime(1100, t0 + .1); }
+}
+
+
+// 💩 Pluie d'emojis
+function emojiDrop() {
+  const E = ['💩', '🤡', '🦆', '🍌', '🥖', '🐸', '🧀', '🦄', '🍆', '🐔', '🎺', '🌭'];
+  const el = document.createElement('div');
+  el.className = 'rain-drop';
+  el.textContent = E[Math.floor(Math.random() * E.length)];
+  el.style.left = (Math.random() * 92) + 'vw';
+  el.style.fontSize = (3.5 + Math.random() * 4) + 'rem';
+  el.style.animationDuration = (2.2 + Math.random() * 1.8) + 's';
+  $('#reactions-layer').appendChild(el);
+  setTimeout(() => el.remove(), 4200);
+}
+
+// ⌨️ Clavier fou : une lettre sur trois se transforme
+$('#guess').addEventListener('input', (e) => {
+  if (!crazyKeys || e.inputType !== 'insertText' || Math.random() > 0.35) return;
+  const v = $('#guess').value; if (!v) return;
+  const L = 'azertyuiopqsdfghjklmwxcvbn';
+  $('#guess').value = v.slice(0, -1) + L[Math.floor(Math.random() * L.length)];
+});
+
+// 🗣️ Le Souffleur : voix de robot qui chuchote la réponse
+function whisper(text) {
+  try {
+    const u = new SpeechSynthesisUtterance('Psst… la réponse, c\'est… ' + text);
+    u.lang = 'fr-FR'; u.rate = 0.85; u.pitch = 1.7; u.volume = 1;
+    const v = speechSynthesis.getVoices().find(v => /^fr/i.test(v.lang));
+    if (v) u.voice = v;
+    audio.volume = Math.min(baseVolume, 0.25); // on baisse la musique pour bien entendre
+    u.onend = () => { audio.volume = baseVolume; };
+    speechSynthesis.speak(u);
+  } catch {
+    toast('🗣️ Psst… c\'est « ' + text + ' »');
+  }
 }

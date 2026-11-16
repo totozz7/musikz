@@ -321,6 +321,8 @@ const rooms = new Map();
 const AVATARS = ['🦊', '🐼', '🐸', '🦁', '🐙', '🦄', '🐯', '🐵', '🐧', '🦉', '🐺', '🐲', '🐝', '🦖', '🐨', '🐷'];
 const COLORS = ['#ff2e4d', '#ffc21a', '#ff7a1a', '#ff4fa3', '#30d5c8', '#7c5cff', '#4cd964', '#2fa9ff', '#ff9ecf', '#b5e655', '#e0b0ff', '#ffd59e'];
 const MAX_PLAYERS = 12;
+const FRAMES = ['none', 'classic', 'gold', 'rainbow', 'neon', 'fire', 'ice', 'crown', 'stars', 'pixel'];
+const validColor = (c) => /^#[0-9a-fA-F]{6}$/.test(String(c || '')) ? c : null;
 
 function makeCode() {
   const L = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -347,7 +349,7 @@ function publicPlayers(room) {
   return [...room.players.values()].map(p => {
     const f = room.round?.found.get(p.id) || {};
     return {
-      id: p.id, name: p.name, avatar: p.avatar, color: p.color, score: p.score,
+      id: p.id, name: p.name, avatar: p.avatar, color: p.color, frame: p.frame || 'none', score: p.score,
       online: p.online, host: p.id === room.hostId,
       foundArtist: !!f.artist, foundTitle: !!f.title, answered: !!f.answered, streak: p.streak || 0,
       powered: room.phase === 'powers' && !!room.round?.powers?.has(p.id),
@@ -451,33 +453,60 @@ function makeChoices(room, track) {
 
 // ───────────────────────── Mode Zizanie : bonus & malus ─────────────────────────
 const POWERS = {
-  // bonus (pour soi)
-  letter:  { type: 'bonus', emoji: '🔤', name: 'Première lettre', desc: 'Tu vois par quelle lettre commence la réponse' },
-  pattern: { type: 'bonus', emoji: '🧩', name: 'Pendu', desc: 'Tu vois le nombre de lettres de chaque mot' },
-  cover:   { type: 'bonus', emoji: '🖼️', name: 'Pochette floue', desc: 'Tu vois la pochette… très floue' },
-  year:    { type: 'bonus', emoji: '📅', name: 'Année', desc: "Tu connais l'année de sortie" },
-  double:  { type: 'bonus', emoji: '💰', name: 'Points doublés', desc: 'Tes points comptent double sur cet extrait' },
-  shield:  { type: 'bonus', emoji: '🛡️', name: 'Bouclier', desc: 'Tu es protégé de tous les malus' },
-  fifty:   { type: 'bonus', emoji: '✂️', name: '50/50', desc: 'Deux mauvaises réponses disparaissent', qcm: true },
-  // malus (sur un adversaire)
-  buzzer:   { type: 'malus', emoji: '📢', name: 'Soundboard', desc: 'Buzzers, klaxons et canards pendant toute l\'écoute' },
-  flip:     { type: 'malus', emoji: '🙃', name: 'Tête en bas', desc: 'Son écran se retourne pendant 12 s' },
-  chipmunk: { type: 'malus', emoji: '🐿️', name: 'Voix de chipmunk', desc: 'La musique est accélérée et suraiguë' },
-  freeze:   { type: 'malus', emoji: '🧊', name: 'Gel', desc: 'Il ne peut pas répondre pendant 7 s' },
-  yoyo:     { type: 'malus', emoji: '🎚️', name: 'Volume yo-yo', desc: 'Le son monte et descend sans arrêt' },
-  blind:    { type: 'malus', emoji: '🕶️', name: 'Lunettes noires', desc: 'Il ne voit plus ce qu\'il tape' },
+  // ── BONUS (pour soi) ──
+  letter:   { type: 'bonus', rarity: 'common', emoji: '🔤', name: 'Première lettre', desc: 'Tu vois par quelle lettre commence la réponse' },
+  pattern:  { type: 'bonus', rarity: 'common', emoji: '🧩', name: 'Pendu', desc: 'Tu vois le nombre de lettres de chaque mot' },
+  cover:    { type: 'bonus', rarity: 'common', emoji: '🖼️', name: 'Pochette floue', desc: 'Tu vois la pochette… très floue' },
+  year:     { type: 'bonus', rarity: 'common', emoji: '📅', name: 'Année', desc: "Tu connais l'année de sortie" },
+  double:   { type: 'bonus', rarity: 'common', emoji: '💰', name: 'Points doublés', desc: 'Tes points comptent double sur cet extrait' },
+  early:    { type: 'bonus', rarity: 'common', emoji: '👂', name: 'Avant-première', desc: "Tu entends l'extrait 3 s avant tout le monde" },
+  fifty:    { type: 'bonus', rarity: 'common', emoji: '✂️', name: '50/50', desc: 'Deux mauvaises réponses disparaissent', qcm: true },
+  triple:   { type: 'bonus', rarity: 'rare', emoji: '💎', name: 'Points triplés', desc: 'Tes points comptent TRIPLE sur cet extrait' },
+  shield:   { type: 'bonus', rarity: 'rare', emoji: '🛡️', name: 'Bouclier', desc: 'Tu es protégé de tous les malus (même légendaires)' },
+  anagram:  { type: 'bonus', rarity: 'rare', emoji: '🔀', name: 'Anagramme', desc: 'Tu vois toutes les lettres de la réponse… mélangées' },
+  souffleur:{ type: 'bonus', rarity: 'legendary', emoji: '🗣️', name: 'Le Souffleur', desc: 'Une voix de robot te chuchote la réponse à l\'oreille. Ne le dis à personne.' },
+  // ── MALUS (sur un adversaire) ──
+  buzzer:   { type: 'malus', rarity: 'common', emoji: '📢', name: 'Soundboard', desc: 'Buzzers, klaxons et canards pendant toute l\'écoute' },
+  flip:     { type: 'malus', rarity: 'common', emoji: '🙃', name: 'Tête en bas', desc: 'Son écran se retourne pendant 12 s' },
+  freeze:   { type: 'malus', rarity: 'common', emoji: '🧊', name: 'Gel', desc: 'Il ne peut pas répondre pendant 7 s' },
+  yoyo:     { type: 'malus', rarity: 'common', emoji: '🎚️', name: 'Volume yo-yo', desc: 'Le son monte et descend sans arrêt' },
+  blind:    { type: 'malus', rarity: 'common', emoji: '🕶️', name: 'Lunettes noires', desc: 'Il ne voit plus ce qu\'il tape' },
+  rain:     { type: 'malus', rarity: 'common', emoji: '💩', name: "Pluie d'emojis", desc: 'Des emojis géants envahissent son écran' },
+  chipmunk: { type: 'malus', rarity: 'rare', emoji: '🐿️', name: 'Voix de chipmunk', desc: 'La musique est accélérée et suraiguë' },
+  slowmo:   { type: 'malus', rarity: 'rare', emoji: '🐢', name: 'Ralenti', desc: 'La musique est ralentie, voix de géant' },
+  crazykeys:{ type: 'malus', rarity: 'rare', emoji: '⌨️', name: 'Clavier fou', desc: 'Une lettre sur trois qu\'il tape se transforme' },
+  bazar:    { type: 'malus', rarity: 'legendary', emoji: '🎪', name: 'LE GRAND BAZAR', desc: 'Écran à l\'envers + chipmunk + soundboard + pluie d\'emojis. Tout. En même temps.' },
 };
 const POWER_SECONDS = 10;
+const RARITY_WEIGHTS = { common: 74, rare: 22, legendary: 4 }; // en %
+
+function drawCard(type, qcm, exclude) {
+  const roll = Math.random() * 100;
+  const order = roll < RARITY_WEIGHTS.legendary ? ['legendary', 'rare', 'common']
+    : roll < RARITY_WEIGHTS.legendary + RARITY_WEIGHTS.rare ? ['rare', 'common'] : ['common', 'rare'];
+  for (const rarity of order) {
+    const pool = Object.keys(POWERS).filter(k => POWERS[k].type === type && POWERS[k].rarity === rarity && (!POWERS[k].qcm || qcm) && !exclude.includes(k));
+    if (pool.length) return pool[Math.floor(Math.random() * pool.length)];
+  }
+  return null;
+}
 
 function drawOffers(room) {
   const qcm = room.settings.mode === 'qcm';
-  const bonus = Object.keys(POWERS).filter(k => POWERS[k].type === 'bonus' && (!POWERS[k].qcm || qcm));
-  const malus = Object.keys(POWERS).filter(k => POWERS[k].type === 'malus');
   const solo = [...room.players.values()].filter(p => p.online).length < 2;
-  return solo ? shuffle([...bonus]).slice(0, 3) : [...shuffle([...bonus]).slice(0, 2), ...shuffle([...malus]).slice(0, 2)];
+  const plan = solo ? ['bonus', 'bonus'] : ['bonus', 'malus']; // 2 cartes : 1 bonus + 1 malus
+  const out = [];
+  for (const type of plan) { const c = drawCard(type, qcm, out); if (c) out.push(c); }
+  return out;
 }
 
 const firstLetter = (x) => (String(x).replace(/^(the|le|la|les|l')\s*/i, '').match(/[\p{L}\p{N}]/u) || ['?'])[0].toUpperCase();
+const anagram = (x) => String(x).split(/\s+/).map(w => {
+  const l = [...w.replace(/[^\p{L}\p{N}]/gu, '').toUpperCase()];
+  for (let i = 0; i < 6 && l.length > 1 && l.join('') === w.toUpperCase().replace(/[^\p{L}\p{N}]/gu, ''); i++) shuffle(l);
+  return l.join('');
+}).filter(Boolean).join('  ');
+const halfMask = (x) => String(x).split(' ').map(w => { let i = 0; return w.replace(/[\p{L}\p{N}]/gu, (c) => (i++ % 2 === 0 ? c.toUpperCase() : '_')); }).join(' ');
 const hangman = (x) => String(x).replace(/[\p{L}\p{N}]/gu, '_');
 
 // Ce que chaque joueur reçoit pour la manche : son bonus (avec l'indice) et les malus qu'on lui a lancés
@@ -492,6 +521,11 @@ function effectsFor(room, pid) {
     if (mine.id === 'pattern') b.hint = t.work || need.includes('title') ? hangman(t.title) : hangman(t.artist);
     if (mine.id === 'cover') { b.image = t.cover || ''; if (!t.cover) b.hint = 'Pas de pochette pour celui-là… 😅 Première lettre : ' + firstLetter(t.title); }
     if (mine.id === 'year') b.hint = r.year ? String(r.year) : 'Inconnue… mais ça commence par « ' + firstLetter(t.title) + ' »';
+    if (mine.id === 'anagram') b.hint = anagram(t.work || need.includes('title') ? t.title : t.artist);
+    if (mine.id === 'souffleur') {
+      const ans = t.work ? t.title : need.map(k => t[k]).join(', ');
+      b.hint = halfMask(ans); b.whisper = ans;
+    }
     if (mine.id === 'fifty' && r.choices) b.remove = r.choices.filter(c => c.id !== String(t.id)).slice(0, 2).map(c => c.id);
     fx.bonus = b;
   }
@@ -509,6 +543,8 @@ function effectsFor(room, pid) {
   }
   return fx;
 }
+
+const powerMultiplier = (r, pid) => ({ double: 2, triple: 3 })[r.powers?.get(pid)?.id] || 1;
 
 const needed = (room, track) => track.work ? ['title'] : room.settings.answer === 'both' ? ['artist', 'title'] : [room.settings.answer];
 
@@ -569,11 +605,13 @@ function startPlaying(room) {
     for (const [from, pw] of r.powers) {
       const P = POWERS[pw.id], who = room.players.get(from)?.name;
       if (!P || !who) continue;
+      const leg = P.rarity === 'legendary' ? '🌟 LÉGENDAIRE ' : '';
       if (P.type === 'malus') {
         const tg = room.players.get(pw.target);
         const blocked = r.powers.get(pw.target)?.id === 'shield';
-        lines.push(`${P.emoji} ${who} → ${tg?.name || '?'}${blocked ? ' (🛡️ bloqué !)' : ''}`);
-      } else lines.push(`${P.emoji} ${who} prend « ${P.name} »`);
+        lines.push(`${leg}${P.emoji} ${who} → ${tg?.name || '?'}${blocked ? ' (🛡️ bloqué !)' : ''}`);
+      } else if (P.rarity === 'legendary') lines.push(`${leg}${P.emoji} ${who} a joué une carte secrète…`);
+      else lines.push(`${P.emoji} ${who} prend « ${P.name} »`);
     }
     if (lines.length) sysMsg(room, '🃏 ' + lines.join(' · '));
   }
@@ -640,27 +678,30 @@ function endGame(room) {
 io.on('connection', (socket) => {
   let room = null, me = null;
 
-  socket.on('create', ({ name, avatar, pid }, cb) => {
+  socket.on('create', ({ name, avatar, pid, color, frame }, cb) => {
     const code = makeCode();
     room = { code, players: new Map(), hostId: pid, phase: 'lobby', settings: defaultSettings(), chat: [], history: [] };
     rooms.set(code, room);
-    join(room, { name, avatar, pid }, cb);
+    join(room, { name, avatar, pid, color, frame }, cb);
   });
 
-  socket.on('join', ({ code, name, avatar, pid }, cb) => {
+  socket.on('join', ({ code, name, avatar, pid, color, frame }, cb) => {
     const r = rooms.get(String(code || '').toUpperCase().trim());
     if (!r) return cb?.({ error: 'Salon introuvable. Vérifie le code !' });
     if (!r.players.has(pid) && r.players.size >= MAX_PLAYERS) return cb?.({ error: 'Salon complet (12 joueurs max).' });
-    room = r; join(r, { name, avatar, pid }, cb);
+    room = r; join(r, { name, avatar, pid, color, frame }, cb);
   });
 
-  function join(r, { name, avatar, pid }, cb) {
+  function join(r, { name, avatar, pid, color, frame }, cb) {
     name = String(name || 'Joueur').trim().slice(0, 18) || 'Joueur';
+    avatar = String(avatar || '').slice(0, 8);
+    frame = FRAMES.includes(frame) ? frame : 'none';
+    color = validColor(color);
     let p = r.players.get(pid);
-    if (p) { p.online = true; p.name = name; p.avatar = avatar || p.avatar; p.socketId = socket.id; }
+    if (p) { p.online = true; p.name = name; p.avatar = avatar || p.avatar; p.socketId = socket.id; p.frame = frame; if (color) p.color = color; }
     else {
       const used = [...r.players.values()].map(x => x.color);
-      p = { id: pid, name, avatar: avatar || AVATARS[r.players.size % AVATARS.length], color: COLORS.find(c => !used.includes(c)) || COLORS[r.players.size % COLORS.length], score: 0, streak: 0, online: true, socketId: socket.id };
+      p = { id: pid, name, avatar: avatar || AVATARS[r.players.size % AVATARS.length], frame, color: color || COLORS.find(c => !used.includes(c)) || COLORS[r.players.size % COLORS.length], score: 0, streak: 0, online: true, socketId: socket.id };
       r.players.set(pid, p);
       sysMsg(r, `👋 ${name} a rejoint le salon`);
     }
@@ -772,7 +813,7 @@ io.on('connection', (socket) => {
         let pts = pointsFor(room, now);
         const fk = k === 'artist' ? 'firstArtist' : 'firstTitle';
         if (s.firstBonus && !r[fk]) { r[fk] = me.id; pts += 20; gained.push({ type: 'first', k }); }
-        if (r.powers?.get(me.id)?.id === 'double') pts *= 2;
+        pts *= powerMultiplier(r, me.id);
         f.points += pts; me.score += pts; gained.push({ type: k, pts });
         if (s.comboBonus && need.length === 2 && f.artist && f.title) { f.points += 50; me.score += 50; gained.push({ type: 'combo', pts: 50 }); }
       }
@@ -798,7 +839,7 @@ io.on('connection', (socket) => {
     if (f.correct) {
       let pts = pointsFor(room, now);
       if (room.settings.firstBonus && !r.firstAnswer) { r.firstAnswer = me.id; pts += 20; }
-      if (r.powers?.get(me.id)?.id === 'double') pts *= 2;
+      pts *= powerMultiplier(r, me.id);
       f.points = pts; me.score += pts; f.artist = f.title = true;
     }
     r.found.set(me.id, f);
@@ -815,7 +856,7 @@ io.on('connection', (socket) => {
       const res = checkGuess(text, room.round.track);
       if (res.artist || res.title) return socket.emit('toast', { type: 'warn', text: '🤫 Pas de réponse dans le chat ! Tape-la dans le champ de réponse.' });
     }
-    const m = { id: Date.now() + Math.random(), from: me.id, name: me.name, avatar: me.avatar, color: me.color, text, at: Date.now() };
+    const m = { id: Date.now() + Math.random(), from: me.id, name: me.name, avatar: me.avatar, color: me.color, frame: me.frame, text, at: Date.now() };
     room.chat.push(m); room.chat = room.chat.slice(-100);
     io.to(room.code).emit('chat', m);
   });

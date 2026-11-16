@@ -30,16 +30,23 @@ dans les autres, l'**artiste** et le **titre**.
 
 ## Jouer
 
+À l'accueil, chacun personnalise son profil : **icône** (une cinquantaine), **couleur du pseudo** et **cadre**
+(classique, or, arc-en-ciel, néon, feu, glace, couronne, étoiles, pixel). C'est mémorisé dans le navigateur.
+
+
 1. Ouvre le site, choisis un pseudo et un avatar, clique **Créer un salon**.
 2. Clique sur le code du salon en haut (🔗 *Copier le lien*) et envoie le lien à tes potes.
 3. Choisis les catégories et les options, puis **Lancer la partie**.
 
 ### 🃏 Mode Zizanie (option)
-Avant chaque extrait, chaque joueur tire 4 cartes (10 s pour choisir) et en joue une :
-- **Bonus pour soi** : 🔤 première lettre, 🧩 pendu (nombre de lettres), 🖼️ pochette floue, 📅 année, 💰 points doublés,
-  🛡️ bouclier (bloque tous les malus), ✂️ 50/50 (en QCM)
-- **Malus sur le joueur de son choix** : 📢 soundboard (buzzers, klaxons, canards…), 🙃 écran à l'envers, 🐿️ voix de chipmunk,
-  🧊 gel (impossible de répondre 7 s), 🎚️ volume yo-yo, 🕶️ lunettes noires (on ne voit plus ce qu'on tape)
+Avant chaque extrait, chaque joueur tire 2 cartes (1 bonus + 1 malus, 10 s pour choisir) et en joue une (ou aucune).
+Rareté de chaque carte : **Commune 74 %**, **Rare 22 %**, **Légendaire 4 %**.
+
+| | Bonus (pour soi) | Malus (sur le joueur de son choix) |
+|---|---|---|
+| Communes | 🔤 Première lettre · 🧩 Pendu · 🖼️ Pochette floue · 📅 Année · 💰 Points ×2 · 👂 Avant-première (3 s d'avance) · ✂️ 50/50 (QCM) | 📢 Soundboard · 🙃 Tête en bas · 🧊 Gel 7 s · 🎚️ Volume yo-yo · 🕶️ Lunettes noires · 💩 Pluie d'emojis |
+| Rares | 💎 Points ×3 · 🛡️ Bouclier · 🔀 Anagramme | 🐿️ Voix de chipmunk · 🐢 Ralenti · ⌨️ Clavier fou |
+| Légendaires | 🗣️ Le Souffleur (une voix robot te chuchote la réponse) | 🎪 LE GRAND BAZAR (tout en même temps) |
 
 ### Options de partie
 - **Mode** : saisie libre (tolérante aux fautes et aux accents) ou QCM 4 choix

@@ -27,10 +27,21 @@
     </div>
 
     <div class="card home-card">
+      <div class="profile-preview">
+        <span id="pv-avatar"></span>
+        <div>
+          <div id="pv-name" class="pv-name">Ton pseudo</div>
+          <div class="muted small">Voilà comment les autres te verront</div>
+        </div>
+      </div>
       <label class="lbl">Ton pseudo</label>
       <input id="name" class="input" maxlength="18" placeholder="Ex. Thomas" autocomplete="off">
-      <label class="lbl">Ton avatar</label>
+      <label class="lbl">Ton icône</label>
       <div id="avatars" class="avatars"></div>
+      <label class="lbl">Couleur du pseudo</label>
+      <div id="colors" class="colors"></div>
+      <label class="lbl">Cadre</label>
+      <div id="frames" class="frames"></div>
 
       <button id="btn-create" class="btn btn-primary btn-xl">🎤 Créer un salon</button>
       <div class="or"><span>ou rejoindre</span></div>
