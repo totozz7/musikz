@@ -204,12 +204,13 @@ const GAME_META = {
   blindtest: { emoji: '🎵', name: 'Blind test', desc: "Devine l'artiste, le titre, le dessin animé… 42 catégories, mode Zizanie avec bonus et malus.", cls: 'g-blind', lobby: 'Préparez vos oreilles 🎧' },
   undercover: { emoji: '🕵️', name: 'Undercover', desc: 'Un mot secret, un imposteur parmi vous. Donnez des indices, démasquez-le… sans vous faire avoir.', cls: 'g-uc', lobby: 'Qui est l\'undercover ? 🕵️' },
   word: { emoji: '🔤', name: 'Speed Word', desc: 'Des mots fléchés inédits à chaque partie, 4 niveaux. Seul contre la montre ou en course : le premier qui finit la grille gagne !', cls: 'g-word', lobby: 'À vos crayons… prêts ? ✏️' },
+  primo: { emoji: '🃏', name: 'PRIMO !', desc: 'Même couleur ou même chiffre, +2, +4, inversions… et un mode Pagaille plein de cartes vicieuses. Crie PRIMO à ta dernière carte !', cls: 'g-primo', lobby: 'Battez les cartes ! 🃏' },
   guess: { emoji: '🖼️', name: 'Guess Party', desc: 'Une image floutée, pixelisée ou zoomée : dessins animés, films, pochettes de rap… Trouve-la avant les autres !', cls: 'g-guess', lobby: 'Ouvrez grand les yeux ! 👀' },
   liar: { emoji: '🃏', name: 'Bar des Menteurs', desc: 'Pose tes cartes face cachée et bluffe… ou crie MENTEUR ! Le perdant tente sa chance au pistolet à bouchon.', cls: 'g-liar', lobby: 'Tout le monde au comptoir ! 🥃' },
   horses: { emoji: '🐎', name: 'Petits chevaux', desc: 'Le grand classique : lance le dé, sors tes chevaux, renvoie les autres à l\'écurie ! Choisis le skin de tes pions.', cls: 'g-horses', lobby: 'Tous en selle ! 🐎' },
   note: { emoji: '🔢', name: 'Jeu de la Note', desc: "Une note secrète sur 10, trois thèmes : réponds avec quelque chose qui « vaut » ta note. Les autres devinent !", cls: 'g-note', lobby: 'Sur une échelle de 1 à 10… 🔢' },
 };
-let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [];
+let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, primo: { min: 1, max: 8 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [];
 fetch('/api/guess-themes').then(r => r.json()).then(t => { GP_THEMES = t; if (state?.game === 'guess') renderGameLobby?.(); }).catch(() => {});
 const playersLabel = (g) => { const i = GAME_INFO[g]; return i.min === i.max ? `${i.min} joueurs` : `${i.min} à ${i.max} joueurs`; };
 function renderGames() {
@@ -337,7 +338,8 @@ function renderGameLobby() {
   $('#set-horses').classList.toggle('hidden', g !== 'horses');
   $('#set-liar').classList.toggle('hidden', g !== 'liar');
   $('#set-guess').classList.toggle('hidden', g !== 'guess');
-  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party' }[g]}`;
+  $('#set-primo').classList.toggle('hidden', g !== 'primo');
+  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO' }[g]}`;
   $('#btn-start').disabled = !ok;
   if (g === 'blindtest') return;
   const box = $('#set-' + g), gs = state.gs?.[g] || {};
@@ -579,6 +581,7 @@ socket.on('reward', grantCoins);
 const gAct = (type, data) => new Promise(r => socket.emit('g', { type, data }, (res) => { if (res?.error) toast(res.error, 'error'); r(res); }));
 socket.on('g:state', (v) => {
   if (v.game === 'undercover' && window.UC) { if (!$('#v-uc').classList.contains('active')) showView('v-uc'); window.UC.render(v); }
+  if (v.game === 'primo' && window.PRIMO) { if (!$('#v-primo').classList.contains('active')) showView('v-primo'); window.PRIMO.render(v); }
   if (v.game === 'guess' && window.GUESS) { if (!$('#v-guess').classList.contains('active')) showView('v-guess'); window.GUESS.render(v); }
   if (v.game === 'liar' && window.LIAR) { if (!$('#v-liar').classList.contains('active')) showView('v-liar'); window.LIAR.render(v); }
   if (v.game === 'horses' && window.HORSES) { if (!$('#v-horses').classList.contains('active')) showView('v-horses'); window.HORSES.render(v); }

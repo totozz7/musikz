@@ -148,6 +148,30 @@
         </div>
 
         <!-- réglages Petits chevaux -->
+        <div id="set-primo" class="settings gset hidden">
+          <div class="set-block">
+            <h4>🎴 Mode de jeu</h4>
+            <div class="seg gseg pm-modes" data-key="mode"><button data-v="classic">🃏 Classique</button><button data-v="chaos">🤪 Pagaille</button></div>
+            <p class="muted small hint2">Pagaille : en plus des cartes normales, le paquet contient 38 cartes vicieuses — 🔄 Échange de mains, 🌪️ Tornade, 🎁 Cadeau piégé, 💣 Bombe, 🎯 Sniper, 🧊 Congélo, 🪞 Miroir, 🍀 Trèfle, 🧨 Dynamite, 🧹 Grand ménage, 🎰 Roulette, 👁️ Espion, 🤲 Charité, 👑 Encore !, 🧤 Pickpocket et le terrible 🔥 +6.</p>
+          </div>
+          <div class="set-row">
+            <div class="set-block">
+              <h4>🤖 Robots</h4>
+              <div class="seg gseg" data-key="bots"><button data-v="0">Aucun</button><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="5">5</button></div>
+            </div>
+            <div class="set-block">
+              <h4>➕ Cumul des +2 / +4</h4>
+              <div class="seg gseg" data-key="stack"><button data-v="true">Oui</button><button data-v="false">Non</button></div>
+              <h4 style="margin-top:.8rem">⏱️ Temps par tour</h4>
+              <div class="seg gseg" data-key="time"><button data-v="15">15 s</button><button data-v="25">25 s</button><button data-v="40">40 s</button></div>
+            </div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>Pose une carte de la <b>même couleur</b>, du <b>même chiffre</b> ou du <b>même symbole</b>. Sinon, pioche. ⊘ Passe, ⇄ Inversion, +2, Joker (choix de la couleur), Joker +4. Avec le cumul, on peut répondre à un +2/+4 par un autre +2/+4 : le suivant prend tout !
+            Quand il te reste <b>une carte</b>, clique <b>PRIMO !</b> — sinon un autre joueur peut te dénoncer et tu pioches 2. Le premier qui n'a plus de cartes gagne.</p>
+          </div>
+        </div>
         <div id="set-guess" class="settings gset hidden">
           <div class="set-block">
             <h4>🗂️ Thèmes <small class="muted">(plusieurs au choix)</small></h4>
@@ -352,6 +376,7 @@
       <div id="v-horses" class="view"></div>
       <div id="v-liar" class="view"></div>
       <div id="v-guess" class="view"></div>
+      <div id="v-primo" class="view"></div>
       <!-- SPEED WORD -->
       <div id="v-word" class="view"></div>
 
@@ -460,8 +485,8 @@
 
 <!-- ───────── CADEAU (10 min) & COFFRE (1 h) ───────── -->
 <div id="rewards" class="rewards">
-  <button class="rw rw-gift" id="rw-gift"><span class="rw-ico"><span class="mini-gift"><i></i></span></span><span class="rw-txt"><b>Cadeau</b><small id="rw-gift-t">…</small></span></button>
   <button class="rw rw-wheel" id="rw-wheel"><span class="rw-ico"><span class="mini-wheel"></span></span><span class="rw-txt"><b>Roue</b><small>🪙 200</small></span></button>
+  <button class="rw rw-gift" id="rw-gift"><span class="rw-ico"><span class="mini-gift"><i></i></span></span><span class="rw-txt"><b>Cadeau</b><small id="rw-gift-t">…</small></span></button>
   <button class="rw rw-chest" id="rw-chest"><span class="rw-ico"><span class="mini-chest"><i></i></span></span><span class="rw-txt"><b>Coffre</b><small id="rw-chest-t">…</small></span></button>
 </div>
 <div id="opener" class="opener hidden">
@@ -515,5 +540,6 @@
 <script src="/client-horses.js"></script>
 <script src="/client-liar.js"></script>
 <script src="/client-guess.js"></script>
+<script src="/client-primo.js"></script>
 </body>
 </html>

@@ -25,6 +25,11 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Pièces pour une grille finie : 15 / 25 / 35 / 50 selon le niveau, +25 au vainqueur d'une course ; les autres gagnent selon leur % de lettres justes.
 - Clavier : flèches pour se déplacer, Espace pour changer de sens, Entrée pour passer au mot suivant. Record solo enregistré dans le navigateur.
 
+### 🃏 PRIMO ! (1 à 8 joueurs, robots possibles)
+- Jeu de cartes de défausse : même couleur, même chiffre ou même symbole. ⊘ Passe, ⇄ Inversion, +2, Joker, Joker +4. Option cumul des +2/+4. À une carte, clique **PRIMO !** sinon on peut te dénoncer (+2).
+- Mode **🤪 Pagaille** : 38 cartes vicieuses en plus — Échange de mains, Tornade, Cadeau piégé, Bombe, Sniper, Congélo, Miroir, Trèfle, Dynamite, Grand ménage, Roulette, Espion, Charité, Encore !, Pickpocket, +6.
+- Pièces : 10 + 2 par carte posée (max 25) + podium (30/15/8).
+
 ### 🖼️ Guess Party (1 à 12 joueurs)
 - Une image apparaît brouillée : devine le dessin animé, le film, le pays… Pour les pochettes d'album : l'artiste ET l'album.
 - 12 thèmes (≈ 640 images) : dessins animés, Disney & Pixar, films, pochettes rap FR, rap US, pop & variété, animés japonais, séries, jeux vidéo, drapeaux, monuments, logos de clubs de foot. Plusieurs thèmes au choix.

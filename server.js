@@ -20,7 +20,7 @@ const io = new Server(server);
 const PUB = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : __dirname;
 const INDEX = path.join(PUB, 'index.html');
 const SHOP = require(path.join(PUB, 'shop.js'));
-for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
+for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
 app.get('/', (req, res) => res.sendFile(INDEX));
 app.get('/r/:code', (req, res) => res.sendFile(INDEX));
 app.get('/health', (req, res) => res.send('ok'));
@@ -387,6 +387,7 @@ const GAMES = {
   horses: require('./game-horses')(gameCtx),
   liar: require('./game-liar')(gameCtx),
   guess: require('./game-guess')(gameCtx),
+  primo: require('./game-primo')(gameCtx),
 };
 // infos affichées sur l'écran de choix (nombre de joueurs !)
 const GAME_INFO = {
@@ -397,6 +398,7 @@ const GAME_INFO = {
   horses: { min: GAMES.horses.min, max: GAMES.horses.max },
   liar: { min: 1, max: GAMES.liar.max },
   guess: { min: 1, max: GAMES.guess.max },
+  primo: { min: 1, max: GAMES.primo.max },
 };
 app.get('/api/guess-themes', (req, res) => res.json(GAMES.guess.themes));
 app.get('/api/games', (req, res) => res.json({ info: GAME_INFO, ucThemes: GAMES.undercover.themes() }));
@@ -758,7 +760,7 @@ io.on('connection', (socket) => {
   socket.on('create', ({ name, avatar, pid, game, ...look }, cb) => {
     const code = makeCode();
     room = { code, players: new Map(), hostId: pid, phase: 'lobby', settings: defaultSettings(), chat: [], history: [],
-      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults() }, gscores: {}, g: null };
+      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults() }, gscores: {}, g: null };
     rooms.set(code, room);
     join(room, { name, avatar, pid, ...look }, cb);
   });
@@ -847,7 +849,7 @@ io.on('connection', (socket) => {
   socket.on('setGame', (game) => {
     if (!isHost() || !['lobby', 'end'].includes(room.phase) || !GAME_INFO[game]) return;
     room.game = game; room.phase = 'lobby'; stopModuleGame(room);
-    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party' }[game]}`);
+    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🃏 PRIMO !' }[game]}`);
     broadcast(room);
   });
   socket.on('gsettings', (patch = {}) => {
