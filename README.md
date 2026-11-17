@@ -25,6 +25,12 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Pièces pour une grille finie : 15 / 25 / 35 / 50 selon le niveau, +25 au vainqueur d'une course ; les autres gagnent selon leur % de lettres justes.
 - Clavier : flèches pour se déplacer, Espace pour changer de sens, Entrée pour passer au mot suivant. Record solo enregistré dans le navigateur.
 
+### 🐎 Petits chevaux (1 à 4 joueurs)
+- Règles classiques, 100 % hasard : un **6 pour sortir** un cheval, un 6 fait rejouer, on **renvoie à l'écurie** le cheval adverse sur lequel on s'arrête, les cases ★ de départ sont protégées, arrivée au chiffre exact.
+- Les places vides sont prises par des **robots**. Options : nombre de chevaux (2/3/4), nombre de camps, mode *100 % hasard* (le cheval bouge tout seul) ou *Tu choisis ton cheval*.
+- **22 skins de pions** dans la boutique (onglet 🐎 Pions) : 2 gratuits, 6 communs, 5 rares, 5 épiques, 4 légendaires (Licorne arc-en-ciel, Destrier royal, Cavalier fantôme, Pégase cosmique).
+- Pièces : selon la durée de la partie (≈ 4 à 7 🪙/min), +2 par cheval rentré, +2 par capture, gros bonus au vainqueur.
+
 ### 🔢 Jeu de la Note
 - 70 thèmes avec leur échelle (« Un animal : 1 = inoffensif, 10 = terrifiant »…), dans `data-note.js`.
 - Le questionneur choisit 3 thèmes parmi 12 (2 relances), le répondeur répond, les autres devinent.

@@ -1,4 +1,4 @@
-// PLAYZUP — serveur de jeux entre potes : Blind test, Undercover, Jeu de la Note, Speed Word (Express + Socket.io)
+// PLAYZUP — serveur de jeux entre potes : Blind test, Undercover, Jeu de la Note, Speed Word, Petits chevaux (Express + Socket.io)
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
@@ -20,7 +20,7 @@ const io = new Server(server);
 const PUB = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : __dirname;
 const INDEX = path.join(PUB, 'index.html');
 const SHOP = require(path.join(PUB, 'shop.js'));
-for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
+for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
 app.get('/', (req, res) => res.sendFile(INDEX));
 app.get('/r/:code', (req, res) => res.sendFile(INDEX));
 app.get('/health', (req, res) => res.send('ok'));
@@ -384,6 +384,7 @@ const GAMES = {
   undercover: require('./game-undercover')(gameCtx),
   note: require('./game-note')(gameCtx),
   word: require('./game-word')(gameCtx),
+  horses: require('./game-horses')(gameCtx),
 };
 // infos affichées sur l'écran de choix (nombre de joueurs !)
 const GAME_INFO = {
@@ -391,6 +392,7 @@ const GAME_INFO = {
   undercover: { min: GAMES.undercover.min, max: GAMES.undercover.max },
   note: { min: GAMES.note.min, max: GAMES.note.max },
   word: { min: GAMES.word.min, max: GAMES.word.max },
+  horses: { min: GAMES.horses.min, max: GAMES.horses.max },
 };
 app.get('/api/games', (req, res) => res.json({ info: GAME_INFO, ucThemes: GAMES.undercover.themes() }));
 function stopModuleGame(room) { if (room.g) { clearTimeout(room.g.timer); room.g = null; } }
@@ -751,7 +753,7 @@ io.on('connection', (socket) => {
   socket.on('create', ({ name, avatar, pid, game, ...look }, cb) => {
     const code = makeCode();
     room = { code, players: new Map(), hostId: pid, phase: 'lobby', settings: defaultSettings(), chat: [], history: [],
-      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults() }, gscores: {}, g: null };
+      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults() }, gscores: {}, g: null };
     rooms.set(code, room);
     join(room, { name, avatar, pid, ...look }, cb);
   });
@@ -763,19 +765,20 @@ io.on('connection', (socket) => {
     room = r; join(r, { name, avatar, pid, ...look }, cb);
   });
 
-  function join(r, { name, avatar, pid, color, frame, nameFx, title, winFx }, cb) {
+  function join(r, { name, avatar, pid, color, frame, nameFx, title, winFx, pawn }, cb) {
     name = String(name || 'Joueur').trim().slice(0, 18) || 'Joueur';
     avatar = pick(SHOP.ids('icons'), avatar, '');
     frame = pick(SHOP.ids('frames'), frame, 'none');
     nameFx = pick(SHOP.ids('nameFx'), nameFx, 'none');
     title = pick(SHOP.ids('titles'), title, 'debutant');
     winFx = pick(SHOP.ids('winFx'), winFx, 'party');
+    pawn = pick(SHOP.ids('pawns'), pawn, 'classic');
     color = validColor(color);
     let p = r.players.get(pid);
-    if (p) { p.online = true; p.name = name; p.avatar = avatar || p.avatar; p.socketId = socket.id; Object.assign(p, { frame, nameFx, title, winFx }); if (color) p.color = color; }
+    if (p) { p.online = true; p.name = name; p.avatar = avatar || p.avatar; p.socketId = socket.id; Object.assign(p, { frame, nameFx, title, winFx, pawn }); if (color) p.color = color; }
     else {
       const used = [...r.players.values()].map(x => x.color);
-      p = { id: pid, name, avatar: avatar || AVATARS[r.players.size % AVATARS.length], frame, nameFx, title, winFx, good: 0, color: color || COLORS.find(c => !used.includes(c)) || COLORS[r.players.size % COLORS.length], score: 0, streak: 0, online: true, socketId: socket.id };
+      p = { id: pid, name, avatar: avatar || AVATARS[r.players.size % AVATARS.length], frame, nameFx, title, winFx, pawn, good: 0, color: color || COLORS.find(c => !used.includes(c)) || COLORS[r.players.size % COLORS.length], score: 0, streak: 0, online: true, socketId: socket.id };
       r.players.set(pid, p);
       sysMsg(r, `👋 ${name} a rejoint le salon`);
     }
@@ -802,6 +805,9 @@ io.on('connection', (socket) => {
     me.nameFx = pick(SHOP.ids('nameFx'), look.nameFx, me.nameFx);
     me.title = pick(SHOP.ids('titles'), look.title, me.title);
     me.winFx = pick(SHOP.ids('winFx'), look.winFx, me.winFx);
+    me.pawn = pick(SHOP.ids('pawns'), look.pawn, me.pawn || 'classic');
+    // en pleine partie de petits chevaux : le nouveau skin s'applique tout de suite
+    if (room.g?.game === 'horses') { const seat = room.g.seats.find(x => x.pid === me.id); if (seat) { seat.skin = me.pawn; pushState(room); } }
     me.color = validColor(look.color) || me.color;
     broadcast(room);
   });
@@ -834,7 +840,7 @@ io.on('connection', (socket) => {
   socket.on('setGame', (game) => {
     if (!isHost() || !['lobby', 'end'].includes(room.phase) || !GAME_INFO[game]) return;
     room.game = game; room.phase = 'lobby'; stopModuleGame(room);
-    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word' }[game]}`);
+    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux' }[game]}`);
     broadcast(room);
   });
   socket.on('gsettings', (patch = {}) => {

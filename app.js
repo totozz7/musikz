@@ -17,7 +17,7 @@ const SAVE_KEY = 'mz_save';
 function defaultSave() {
   return { v: 1, coins: SHOP.startCoins, owned: [], games: 0, wins: 0, good: 0, lastGame: '',
     look: { avatar: store.get('mz_avatar', SHOP.icons[Math.floor(Math.random() * 20)].id), color: store.get('mz_color', COLORS[Math.floor(Math.random() * 8)]),
-      frame: 'classic', nameFx: 'none', title: 'debutant', winFx: 'party' } };
+      frame: 'classic', nameFx: 'none', title: 'debutant', winFx: 'party', pawn: 'classic' } };
 }
 let save;
 try { save = JSON.parse(localStorage.getItem(SAVE_KEY)) || defaultSave(); } catch { save = defaultSave(); }
@@ -25,8 +25,8 @@ save = { ...defaultSave(), ...save, look: { ...defaultSave().look, ...(save.look
 const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch {} };
 const owns = (kind, id) => { const it = SHOP[kind].find(x => x.id === id); return !!it && (!it.price || save.owned.includes(kind + ':' + id)); };
 // un cosmétique équipé mais pas possédé (ancienne version) revient au gratuit
-for (const [k, d] of [['icons', null], ['colors', '#ffc21a'], ['frames', 'classic'], ['nameFx', 'none'], ['titles', 'debutant'], ['winFx', 'party']]) {
-  const key = k === 'icons' ? 'avatar' : k === 'colors' ? 'color' : k === 'frames' ? 'frame' : k === 'titles' ? 'title' : k;
+for (const [k, d] of [['icons', null], ['colors', '#ffc21a'], ['frames', 'classic'], ['nameFx', 'none'], ['titles', 'debutant'], ['winFx', 'party'], ['pawns', 'classic']]) {
+  const key = k === 'icons' ? 'avatar' : k === 'colors' ? 'color' : k === 'frames' ? 'frame' : k === 'titles' ? 'title' : k === 'pawns' ? 'pawn' : k;
   if (!owns(k, save.look[key])) save.look[key] = d || SHOP.icons[0].id;
 }
 persist();
@@ -69,7 +69,7 @@ $('#shop-close').onclick = () => $('#shop').classList.add('hidden');
 $('#shop').onclick = (e) => { if (e.target.id === 'shop') $('#shop').classList.add('hidden'); };
 $$('#shop-tabs button').forEach(b => b.onclick = () => { shopTab = b.dataset.tab; renderShop(); });
 
-const LOOK_KEY = { icons: 'avatar', colors: 'color', frames: 'frame', nameFx: 'nameFx', titles: 'title', winFx: 'winFx' };
+const LOOK_KEY = { icons: 'avatar', colors: 'color', frames: 'frame', nameFx: 'nameFx', titles: 'title', winFx: 'winFx', pawns: 'pawn' };
 const RARITY_LABEL = { common: 'Commun', rare: '◆ Rare', epic: '✦ Épique', legendary: '★ Légendaire' };
 function itemPreview(kind, it, m, big = false) {
   const s = big ? 84 : 52;
@@ -78,6 +78,7 @@ function itemPreview(kind, it, m, big = false) {
   if (kind === 'frames') return avatarHTML({ ...m, frame: it.id }, s);
   if (kind === 'nameFx') return `<div class="nprev">${nameHTML({ ...m, nameFx: it.id })}</div>`;
   if (kind === 'titles') return `<div class="tprev">${it.id === 'none' ? '—' : '« ' + esc(it.name) + ' »'}</div>`;
+  if (kind === 'pawns') { const k = big ? 70 : 50; return `<span class="pc-tok pc-preview sk-${it.id} ${it.fx ? 'fx-' + it.fx : ''} ${it.anim ? 'an-' + it.anim : ''}" style="--k:${SHOP.colorBase(m.color)};width:${k}px;height:${k}px"><span>${it.emoji}</span></span>`; }
   if (kind === 'winFx') return `<div class="wprev">${it.emojis}${it.kind ? '<small class="anim-tag">✨ animée</small>' : ''}</div>`;
   return '';
 }
@@ -164,17 +165,18 @@ const GAME_META = {
   blindtest: { emoji: '🎵', name: 'Blind test', desc: "Devine l'artiste, le titre, le dessin animé… 42 catégories, mode Zizanie avec bonus et malus.", cls: 'g-blind', lobby: 'Préparez vos oreilles 🎧' },
   undercover: { emoji: '🕵️', name: 'Undercover', desc: 'Un mot secret, un imposteur parmi vous. Donnez des indices, démasquez-le… sans vous faire avoir.', cls: 'g-uc', lobby: 'Qui est l\'undercover ? 🕵️' },
   word: { emoji: '🔤', name: 'Speed Word', desc: 'Des mots fléchés inédits à chaque partie, 4 niveaux. Seul contre la montre ou en course : le premier qui finit la grille gagne !', cls: 'g-word', lobby: 'À vos crayons… prêts ? ✏️' },
+  horses: { emoji: '🐎', name: 'Petits chevaux', desc: 'Le grand classique : lance le dé, sors tes chevaux, renvoie les autres à l\'écurie ! Choisis le skin de tes pions.', cls: 'g-horses', lobby: 'Tous en selle ! 🐎' },
   note: { emoji: '🔢', name: 'Jeu de la Note', desc: "Une note secrète sur 10, trois thèmes : réponds avec quelque chose qui « vaut » ta note. Les autres devinent !", cls: 'g-note', lobby: 'Sur une échelle de 1 à 10… 🔢' },
 };
-let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, note: { min: 2, max: 10 } }, UC_THEMES = [];
+let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, note: { min: 2, max: 10 } }, UC_THEMES = [];
 const playersLabel = (g) => { const i = GAME_INFO[g]; return i.min === i.max ? `${i.min} joueurs` : `${i.min} à ${i.max} joueurs`; };
 function renderGames() {
-  $('#games').innerHTML = Object.entries(GAME_META).map(([id, m]) => `
-    <button class="game-card ${m.cls}" data-game="${id}">
-      <span class="g-emoji">${m.emoji}</span>
-      <span class="g-body"><b>${m.name}</b><small>${m.desc}</small></span>
-      <span class="g-players">👥 ${playersLabel(id)}</span>
-      <span class="g-go">Créer un salon ▶</span>
+  $('#games').innerHTML = Object.entries(GAME_META).map(([id, m], i) => `
+    <button class="game-card ${m.cls}" data-game="${id}" style="--i:${i}">
+      <span class="g-bg"></span><span class="g-spark"></span>
+      <span class="g-top"><span class="g-emoji">${m.emoji}</span><span class="g-players">👥 ${playersLabel(id)}</span></span>
+      <span class="g-info"><b>${m.name}</b><small>${m.desc}</small></span>
+      <span class="g-go">Jouer ▶</span>
     </button>`).join('');
   $$('#games .game-card').forEach(b => b.onclick = () => {
     const id = identity(); if (!id) return;
@@ -290,7 +292,8 @@ function renderGameLobby() {
   $('#set-undercover').classList.toggle('hidden', g !== 'undercover');
   $('#set-note').classList.toggle('hidden', g !== 'note');
   $('#set-word').classList.toggle('hidden', g !== 'word');
-  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word' }[g]}`;
+  $('#set-horses').classList.toggle('hidden', g !== 'horses');
+  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux' }[g]}`;
   $('#btn-start').disabled = !ok;
   if (g === 'blindtest') return;
   const box = $('#set-' + g), gs = state.gs?.[g] || {};
@@ -521,6 +524,7 @@ socket.on('reward', grantCoins);
 const gAct = (type, data) => new Promise(r => socket.emit('g', { type, data }, (res) => { if (res?.error) toast(res.error, 'error'); r(res); }));
 socket.on('g:state', (v) => {
   if (v.game === 'undercover' && window.UC) { if (!$('#v-uc').classList.contains('active')) showView('v-uc'); window.UC.render(v); }
+  if (v.game === 'horses' && window.HORSES) { if (!$('#v-horses').classList.contains('active')) showView('v-horses'); window.HORSES.render(v); }
   if (v.game === 'word' && window.WORD) { if (!$('#v-word').classList.contains('active')) showView('v-word'); window.WORD.render(v); }
   if (v.game === 'note' && window.NOTE) { if (!$('#v-note').classList.contains('active')) showView('v-note'); window.NOTE.render(v); }
 });

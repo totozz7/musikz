@@ -147,6 +147,34 @@
           </div>
         </div>
 
+        <!-- réglages Petits chevaux -->
+        <div id="set-horses" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block">
+              <h4>Déplacements</h4>
+              <div class="seg gseg" data-key="mode"><button data-v="auto">🎲 100 % hasard</button><button data-v="choice">🧠 Je choisis mon cheval</button></div>
+              <p class="muted small hint2">100 % hasard : tu lances le dé, le jeu déplace un cheval au hasard. Sinon, tu choisis lequel avancer.</p>
+            </div>
+            <div class="set-block">
+              <h4>Chevaux par joueur</h4>
+              <div class="seg gseg" data-key="horses"><button data-v="2">2 · rapide</button><button data-v="3">3</button><button data-v="4">4 · classique</button></div>
+            </div>
+          </div>
+          <div class="set-block">
+            <h4>Camps sur le plateau</h4>
+            <div class="seg gseg" data-key="seats"><button data-v="0">Juste nous</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div>
+            <p class="muted small hint2">🤖 Les places vides sont prises par des robots. Seul, tu joues toujours contre au moins un robot.</p>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>Il faut un <b>6</b> pour sortir un cheval de l'écurie, et un 6 fait <b>rejouer</b>. Tomber sur un adversaire le <b>renvoie à l'écurie</b> 💥
+            (sauf sur les cases ★ de départ, protégées). Après un tour du plateau, on remonte le couloir de sa couleur : il faut le <b>chiffre exact</b> pour arriver au centre.
+            Le premier qui rentre tous ses chevaux gagne !</p>
+            <p class="muted small">🪙 Pièces selon la durée de la partie (≈ 4 à 7 par minute), +2 par cheval rentré et par capture, gros bonus au vainqueur.
+            Choisis le look de tes pions dans la boutique (onglet 🐎 Pions).</p>
+          </div>
+        </div>
+
         <!-- réglages Speed Word -->
         <div id="set-word" class="settings gset hidden">
           <div class="set-block">
@@ -265,6 +293,8 @@
       <!-- JEU DE LA NOTE -->
       <div id="v-note" class="view"></div>
 
+      <!-- PETITS CHEVAUX -->
+      <div id="v-horses" class="view"></div>
       <!-- SPEED WORD -->
       <div id="v-word" class="view"></div>
 
@@ -381,7 +411,7 @@
   <div class="op-stage">
     <p class="op-title" id="op-title">Touche pour ouvrir !</p>
     <div class="op-box" id="op-box">
-      <div class="gift3d"><div class="g-lid"><span class="g-bow">🎀</span></div><div class="g-body"></div></div>
+      <div class="gift3d"><div class="gf-lid"><span class="gf-bow">🎀</span></div><div class="gf-body"></div></div>
       <div class="chest3d"><div class="c-lid"></div><div class="c-body"><span class="c-lock"></span></div><div class="c-glow"></div></div>
     </div>
     <p class="op-amount" id="op-amount"></p>
@@ -408,6 +438,7 @@
       <button data-tab="nameFx">Effets de pseudo</button>
       <button data-tab="titles">Titres</button>
       <button data-tab="winFx">Effet de victoire</button>
+      <button data-tab="pawns">🐎 Pions</button>
       <button data-tab="save">💾 Sauvegarde</button>
     </div>
     <div id="shop-body" class="shop-body"></div>
@@ -420,5 +451,6 @@
 <script src="/client-undercover.js"></script>
 <script src="/client-note.js"></script>
 <script src="/client-word.js"></script>
+<script src="/client-horses.js"></script>
 </body>
 </html>
