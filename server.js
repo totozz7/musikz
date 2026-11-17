@@ -765,7 +765,7 @@ io.on('connection', (socket) => {
     room = r; join(r, { name, avatar, pid, ...look }, cb);
   });
 
-  function join(r, { name, avatar, pid, color, frame, nameFx, title, winFx, pawn }, cb) {
+  function join(r, { name, avatar, pid, color, frame, nameFx, title, winFx, pawn, pcfx }, cb) {
     name = String(name || 'Joueur').trim().slice(0, 18) || 'Joueur';
     avatar = pick(SHOP.ids('icons'), avatar, '');
     frame = pick(SHOP.ids('frames'), frame, 'none');
@@ -773,12 +773,13 @@ io.on('connection', (socket) => {
     title = pick(SHOP.ids('titles'), title, 'debutant');
     winFx = pick(SHOP.ids('winFx'), winFx, 'party');
     pawn = pick(SHOP.ids('pawns'), pawn, 'classic');
+    pcfx = pick(SHOP.ids('pcfx'), pcfx, 'basic');
     color = validColor(color);
     let p = r.players.get(pid);
-    if (p) { p.online = true; p.name = name; p.avatar = avatar || p.avatar; p.socketId = socket.id; Object.assign(p, { frame, nameFx, title, winFx, pawn }); if (color) p.color = color; }
+    if (p) { p.online = true; p.name = name; p.avatar = avatar || p.avatar; p.socketId = socket.id; Object.assign(p, { frame, nameFx, title, winFx, pawn, pcfx }); if (color) p.color = color; }
     else {
       const used = [...r.players.values()].map(x => x.color);
-      p = { id: pid, name, avatar: avatar || AVATARS[r.players.size % AVATARS.length], frame, nameFx, title, winFx, pawn, good: 0, color: color || COLORS.find(c => !used.includes(c)) || COLORS[r.players.size % COLORS.length], score: 0, streak: 0, online: true, socketId: socket.id };
+      p = { id: pid, name, avatar: avatar || AVATARS[r.players.size % AVATARS.length], frame, nameFx, title, winFx, pawn, pcfx, good: 0, color: color || COLORS.find(c => !used.includes(c)) || COLORS[r.players.size % COLORS.length], score: 0, streak: 0, online: true, socketId: socket.id };
       r.players.set(pid, p);
       sysMsg(r, `👋 ${name} a rejoint le salon`);
     }
@@ -806,8 +807,9 @@ io.on('connection', (socket) => {
     me.title = pick(SHOP.ids('titles'), look.title, me.title);
     me.winFx = pick(SHOP.ids('winFx'), look.winFx, me.winFx);
     me.pawn = pick(SHOP.ids('pawns'), look.pawn, me.pawn || 'classic');
-    // en pleine partie de petits chevaux : le nouveau skin s'applique tout de suite
-    if (room.g?.game === 'horses') { const seat = room.g.seats.find(x => x.pid === me.id); if (seat) { seat.skin = me.pawn; pushState(room); } }
+    me.pcfx = pick(SHOP.ids('pcfx'), look.pcfx, me.pcfx || 'basic');
+    // en pleine partie de petits chevaux : le nouveau skin / la nouvelle animation s'applique tout de suite
+    if (room.g?.game === 'horses') { const seat = room.g.seats.find(x => x.pid === me.id); if (seat) { seat.skin = me.pawn; seat.fx = me.pcfx; pushState(room); } }
     me.color = validColor(look.color) || me.color;
     broadcast(room);
   });

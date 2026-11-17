@@ -1,12 +1,16 @@
 // PlayZup — Petits chevaux (1 à 4 joueurs, places vides complétées par des robots)
 // Règles : un 6 pour sortir de l'écurie, un 6 fait rejouer, on capture en tombant sur un adversaire
 // (sauf sur une case de départ, protégée), arrivée au chiffre exact. Le premier à rentrer tous ses chevaux gagne.
+// Option « échelle » : on s'arrête pile au pied de son escalier, puis il faut faire 1, 2, 3, 4, 5, 6 pour monter
+// chaque marche, et encore un 6 pour rentrer au centre.
 module.exports = ({ sysMsg, broadcast, pushState, reward, shuffle }) => {
   const id = 'horses';
   const MIN = 1, MAX = 4;
   const TRACK = 52;            // cases du grand tour
   const LAST = 50;             // dernière case du tour avant le couloir d'arrivée
-  const FINISH = 56;           // 51..55 = couloir de sa couleur, 56 = arrivé au centre
+  // normal : 51..55 = couloir de sa couleur, 56 = arrivé au centre
+  // échelle : 51..56 = marches 1 à 6, 57 = arrivé au centre
+  const finishOf = (g) => g.ladder ? 57 : 56;
   const START = [0, 13, 26, 39];
   const SAFE = new Set(START);
   const COLORS = [
@@ -16,12 +20,13 @@ module.exports = ({ sysMsg, broadcast, pushState, reward, shuffle }) => {
   const SEAT_ORDER = { 2: [0, 2], 3: [0, 1, 2], 4: [0, 1, 2, 3] };
   const BOT_NAMES = ['Robo-Jockey', 'Turbo Bot', 'Bip Bop', 'Cyber Poney'];
 
-  const defaults = () => ({ mode: 'auto', horses: 4, seats: 4 });
+  const defaults = () => ({ mode: 'choice', horses: 4, seats: 4, ladder: false });
   function applySettings(room, p) {
     const s = room.gs.horses;
     if (['auto', 'choice'].includes(p.mode)) s.mode = p.mode;
     if ([2, 3, 4].includes(+p.horses)) s.horses = +p.horses;
     if ([0, 2, 3, 4].includes(+p.seats)) s.seats = +p.seats;
+    if (p.ladder !== undefined) s.ladder = p.ladder === true || p.ladder === 'on' || p.ladder === '1';
   }
 
   const clear = (g) => { clearTimeout(g.timer); g.timer = null; };
@@ -37,18 +42,18 @@ module.exports = ({ sysMsg, broadcast, pushState, reward, shuffle }) => {
     const colors = SEAT_ORDER[total];
     const seats = colors.map((color, i) => {
       const p = humans[i];
-      return p ? { pid: p.id, bot: false, name: p.name, avatar: p.avatar, skin: p.pawn || 'classic', color }
-        : { pid: 'bot' + i, bot: true, name: BOT_NAMES[i], avatar: '🤖', skin: 'classic', color };
+      return p ? { pid: p.id, bot: false, name: p.name, avatar: p.avatar, skin: p.pawn || 'classic', fx: p.pcfx || 'basic', color }
+        : { pid: 'bot' + i, bot: true, name: BOT_NAMES[i], avatar: '🤖', skin: 'classic', fx: 'basic', color };
     });
     room.g = {
-      game: id, stage: 'play', seats, nHorses: s.horses, mode: s.mode,
+      game: id, stage: 'play', seats, nHorses: s.horses, mode: s.mode, ladder: !!s.ladder,
       horses: seats.map(() => Array(s.horses).fill(-1)),
       turn: Math.floor(Math.random() * seats.length), phase: 'roll', dice: null, legal: [], sixes: 0,
       captures: seats.map(() => 0), last: null, log: [], winner: null, timer: null, deadline: 0, rolls: 0, startKey: Date.now(),
     };
     room.phase = 'game';
     const bots = seats.filter(x => x.bot).length;
-    sysMsg(room, `🐎 Petits chevaux — ${seats.length} camps, ${s.horses} chevaux chacun${bots ? ` (${bots} robot${bots > 1 ? 's' : ''})` : ''} · ${s.mode === 'auto' ? '100 % hasard' : 'tu choisis ton cheval'}`);
+    sysMsg(room, `🐎 Petits chevaux — ${seats.length} camps, ${s.horses} chevaux chacun${bots ? ` (${bots} robot${bots > 1 ? 's' : ''})` : ''} · ${s.mode === 'auto' ? '100 % hasard' : 'tu choisis ton cheval'}${s.ladder ? ' · 🪜 échelle 1→6' : ''}`);
     broadcast(room);
     beginTurn(room);
   }
@@ -64,11 +69,16 @@ module.exports = ({ sysMsg, broadcast, pushState, reward, shuffle }) => {
   }
 
   function legalMoves(g, si, d) {
-    const seat = g.seats[si], mine = g.horses[si], moves = [];
+    const seat = g.seats[si], mine = g.horses[si], moves = [], FINISH = finishOf(g);
     mine.forEach((pos, h) => {
       let to;
       if (pos === -1) { if (d !== 6) return; to = 0; }
       else if (pos === FINISH) return;
+      else if (g.ladder) {
+        if (pos < LAST) { to = pos + d; if (to > LAST) return; }       // il faut tomber pile au pied de l'escalier
+        else if (pos < 56) { if (d !== pos - LAST + 1) return; to = pos + 1; } // marche n → il faut faire n+1
+        else { if (d !== 6) return; to = FINISH; }                    // marche 6 → un 6 pour rentrer
+      }
       else { to = pos + d; if (to > FINISH) return; }
       // pas deux chevaux du même camp sur la même case (sauf à l'arrivée)
       if (to !== FINISH && mine.some((p, k) => k !== h && p === to)) return;
@@ -116,7 +126,7 @@ module.exports = ({ sysMsg, broadcast, pushState, reward, shuffle }) => {
   function move(room, mv) {
     const g = room.g; if (g.stage !== 'play' || !mv) return;
     clear(g);
-    const si = g.turn, seat = g.seats[si];
+    const si = g.turn, seat = g.seats[si], FINISH = finishOf(g);
     g.horses[si][mv.h] = mv.to;
     for (const c of mv.captures) { g.horses[c.seat][c.h] = -1; g.captures[si]++; }
     g.last = { type: 'move', seat: si, h: mv.h, from: mv.from, to: mv.to, captures: mv.captures, dice: g.dice, n: g.rolls };
@@ -125,13 +135,14 @@ module.exports = ({ sysMsg, broadcast, pushState, reward, shuffle }) => {
       g.log.unshift(`💥 ${seat.name} renvoie ${victims} à l'écurie !`);
     } else if (mv.from === -1) g.log.unshift(`🚪 ${seat.name} sort un cheval`);
     else if (mv.to === FINISH) g.log.unshift(`🏁 ${seat.name} rentre un cheval !`);
+    else if (g.ladder && mv.to > LAST) g.log.unshift(`🪜 ${seat.name} monte sur la marche ${mv.to - LAST}`);
     g.log = g.log.slice(0, 8);
     g.phase = 'wait';
     pushState(room);
-    if (g.horses[si].every(p => p === FINISH)) return later(room, 900, () => finish(room, si));
+    if (g.horses[si].every(p => p === FINISH)) return later(room, 1800, () => finish(room, si));
     // on laisse le temps à l'animation (un saut par case)
     const hops = mv.from === -1 ? 1 : mv.to - mv.from;
-    later(room, 350 + hops * 140 + (mv.captures.length ? 500 : 0), () => endTurn(room, g.dice === 6));
+    later(room, 350 + hops * 140 + (mv.captures.length ? 1500 : 0) + (mv.to === FINISH ? 1200 : 0), () => endTurn(room, g.dice === 6));
   }
 
   function endTurn(room, again) {
@@ -142,7 +153,7 @@ module.exports = ({ sysMsg, broadcast, pushState, reward, shuffle }) => {
 
   function finish(room, si) {
     const g = room.g; clear(g);
-    g.stage = 'over'; g.winner = si;
+    g.stage = 'over'; g.winner = si; const FINISH = finishOf(g);
     const progress = (k) => g.horses[k].reduce((s, p) => s + (p < 0 ? 0 : p + 1), 0);
     const order = g.seats.map((_, k) => k).sort((a, b) => (b === si) - (a === si) || progress(b) - progress(a));
     g.ranking = order;
@@ -181,7 +192,8 @@ module.exports = ({ sysMsg, broadcast, pushState, reward, shuffle }) => {
     const g = room.g;
     return {
       game: id, stage: g.stage, mode: g.mode, nHorses: g.nHorses, gameKey: g.startKey,
-      seats: g.seats.map((s, k) => ({ ...s, colorName: COLORS[s.color].name, hex: COLORS[s.color].hex, home: g.horses[k].filter(p => p === FINISH).length, captures: g.captures[k], online: s.bot || !!room.players.get(s.pid)?.online })),
+      ladder: g.ladder, finish: finishOf(g),
+      seats: g.seats.map((s, k) => ({ ...s, colorName: COLORS[s.color].name, hex: COLORS[s.color].hex, home: g.horses[k].filter(p => p === finishOf(g)).length, captures: g.captures[k], online: s.bot || !!room.players.get(s.pid)?.online })),
       horses: g.horses, turn: g.turn, phase: g.phase, dice: g.dice, legal: g.legal.map(m => m.h), last: g.last, log: g.log,
       me: mySeat(g, pid), winner: g.winner, ranking: g.ranking || null, coins: g.stage === 'over' ? g.coins?.[pid] || null : null,
       left: Math.max(0, (g.deadline || 0) - Date.now()),

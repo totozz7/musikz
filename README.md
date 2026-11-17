@@ -27,8 +27,9 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 
 ### 🐎 Petits chevaux (1 à 4 joueurs)
 - Règles classiques, 100 % hasard : un **6 pour sortir** un cheval, un 6 fait rejouer, on **renvoie à l'écurie** le cheval adverse sur lequel on s'arrête, les cases ★ de départ sont protégées, arrivée au chiffre exact.
-- Les places vides sont prises par des **robots**. Options : nombre de chevaux (2/3/4), nombre de camps, mode *100 % hasard* (le cheval bouge tout seul) ou *Tu choisis ton cheval*.
-- **22 skins de pions** dans la boutique (onglet 🐎 Pions) : 2 gratuits, 6 communs, 5 rares, 5 épiques, 4 légendaires (Licorne arc-en-ciel, Destrier royal, Cavalier fantôme, Pégase cosmique).
+- Les places vides sont prises par des **robots**. Options : nombre de chevaux (2/3/4), nombre de camps, *Tu choisis ton cheval* (par défaut) ou *100 % hasard*.
+- Option **🪜 Échelle** : on s'arrête pile au pied de son escalier, puis il faut faire 1, 2, 3, 4, 5, 6 pour monter chaque marche, et encore un 6 pour rentrer (≈ 7 min à 2 chevaux, 35 min à 4 chevaux/4 camps).
+- Boutique : **22 skins de pions** (🐎 Pions), **12 plateaux** (🎲 Plateaux : Bois verni gratuit → Prisme arc-en-ciel légendaire, chacun voit le plateau qu'il a équipé) et **12 animations** de capture / cheval rentré (💥 Animations chevaux, vues par tout le monde, aperçu en cliquant dans la boutique).
 - Pièces : selon la durée de la partie (≈ 4 à 7 🪙/min), +2 par cheval rentré, +2 par capture, gros bonus au vainqueur.
 
 ### 🔢 Jeu de la Note

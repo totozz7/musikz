@@ -17,7 +17,7 @@ const SAVE_KEY = 'mz_save';
 function defaultSave() {
   return { v: 1, coins: SHOP.startCoins, owned: [], games: 0, wins: 0, good: 0, lastGame: '',
     look: { avatar: store.get('mz_avatar', SHOP.icons[Math.floor(Math.random() * 20)].id), color: store.get('mz_color', COLORS[Math.floor(Math.random() * 8)]),
-      frame: 'classic', nameFx: 'none', title: 'debutant', winFx: 'party', pawn: 'classic' } };
+      frame: 'classic', nameFx: 'none', title: 'debutant', winFx: 'party', pawn: 'classic', board: 'bois', pcfx: 'basic' } };
 }
 let save;
 try { save = JSON.parse(localStorage.getItem(SAVE_KEY)) || defaultSave(); } catch { save = defaultSave(); }
@@ -25,8 +25,8 @@ save = { ...defaultSave(), ...save, look: { ...defaultSave().look, ...(save.look
 const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch {} };
 const owns = (kind, id) => { const it = SHOP[kind].find(x => x.id === id); return !!it && (!it.price || save.owned.includes(kind + ':' + id)); };
 // un cosmétique équipé mais pas possédé (ancienne version) revient au gratuit
-for (const [k, d] of [['icons', null], ['colors', '#ffc21a'], ['frames', 'classic'], ['nameFx', 'none'], ['titles', 'debutant'], ['winFx', 'party'], ['pawns', 'classic']]) {
-  const key = k === 'icons' ? 'avatar' : k === 'colors' ? 'color' : k === 'frames' ? 'frame' : k === 'titles' ? 'title' : k === 'pawns' ? 'pawn' : k;
+for (const [k, d] of [['icons', null], ['colors', '#ffc21a'], ['frames', 'classic'], ['nameFx', 'none'], ['titles', 'debutant'], ['winFx', 'party'], ['pawns', 'classic'], ['boards', 'bois'], ['pcfx', 'basic']]) {
+  const key = k === 'icons' ? 'avatar' : k === 'colors' ? 'color' : k === 'frames' ? 'frame' : k === 'titles' ? 'title' : k === 'pawns' ? 'pawn' : k === 'boards' ? 'board' : k;
   if (!owns(k, save.look[key])) save.look[key] = d || SHOP.icons[0].id;
 }
 persist();
@@ -69,7 +69,7 @@ $('#shop-close').onclick = () => $('#shop').classList.add('hidden');
 $('#shop').onclick = (e) => { if (e.target.id === 'shop') $('#shop').classList.add('hidden'); };
 $$('#shop-tabs button').forEach(b => b.onclick = () => { shopTab = b.dataset.tab; renderShop(); });
 
-const LOOK_KEY = { icons: 'avatar', colors: 'color', frames: 'frame', nameFx: 'nameFx', titles: 'title', winFx: 'winFx', pawns: 'pawn' };
+const LOOK_KEY = { icons: 'avatar', colors: 'color', frames: 'frame', nameFx: 'nameFx', titles: 'title', winFx: 'winFx', pawns: 'pawn', boards: 'board', pcfx: 'pcfx' };
 const RARITY_LABEL = { common: 'Commun', rare: '◆ Rare', epic: '✦ Épique', legendary: '★ Légendaire' };
 function itemPreview(kind, it, m, big = false) {
   const s = big ? 84 : 52;
@@ -79,6 +79,8 @@ function itemPreview(kind, it, m, big = false) {
   if (kind === 'nameFx') return `<div class="nprev">${nameHTML({ ...m, nameFx: it.id })}</div>`;
   if (kind === 'titles') return `<div class="tprev">${it.id === 'none' ? '—' : '« ' + esc(it.name) + ' »'}</div>`;
   if (kind === 'pawns') { const k = big ? 70 : 50; return `<span class="pc-tok pc-preview sk-${it.id} ${it.fx ? 'fx-' + it.fx : ''} ${it.anim ? 'an-' + it.anim : ''}" style="--k:${SHOP.colorBase(m.color)};width:${k}px;height:${k}px"><span>${it.emoji}</span></span>`; }
+  if (kind === 'boards') return `<div class="bd-prev pc-board bd-${it.id} ${big ? 'big' : ''}"><s class="q0"></s><s class="q1"></s><s class="q2"></s><s class="q3"></s><b></b><em></em><span>${it.emoji}</span></div>`;
+  if (kind === 'pcfx') return `<div class="pf-prev ${it.special ? 'sp' : ''}" style="--fc:${it.color}"><span>${it.emoji}</span><u></u><small>${esc(it.text)}</small></div>`;
   if (kind === 'winFx') return `<div class="wprev">${it.emojis}${it.kind ? '<small class="anim-tag">✨ animée</small>' : ''}</div>`;
   return '';
 }
@@ -138,6 +140,8 @@ function renderShop() {
     }
     save.look[lookKey] = it.id; persist(); renderProfile(); renderShop(); pushLook();
     if (kind === 'winFx') burst(it.id);
+    if (kind === 'pcfx') window.HORSES?.demo(it.id);
+    if (kind === 'boards') window.HORSES?.skinBoard();
   });
 }
 // déjà dans un salon : on met à jour son look pour les autres, sans recharger la partie

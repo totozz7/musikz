@@ -152,8 +152,8 @@
           <div class="set-row">
             <div class="set-block">
               <h4>Déplacements</h4>
-              <div class="seg gseg" data-key="mode"><button data-v="auto">🎲 100 % hasard</button><button data-v="choice">🧠 Je choisis mon cheval</button></div>
-              <p class="muted small hint2">100 % hasard : tu lances le dé, le jeu déplace un cheval au hasard. Sinon, tu choisis lequel avancer.</p>
+              <div class="seg gseg" data-key="mode"><button data-v="choice">🧠 Je choisis mon cheval</button><button data-v="auto">🎲 100 % hasard</button></div>
+              <p class="muted small hint2">Par défaut tu choisis quel cheval avancer. En 100 % hasard, le jeu le déplace tout seul.</p>
             </div>
             <div class="set-block">
               <h4>Chevaux par joueur</h4>
@@ -165,13 +165,18 @@
             <div class="seg gseg" data-key="seats"><button data-v="0">Juste nous</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div>
             <p class="muted small hint2">🤖 Les places vides sont prises par des robots. Seul, tu joues toujours contre au moins un robot.</p>
           </div>
+          <div class="set-block">
+            <h4>🪜 Rentrer au centre</h4>
+            <div class="seg gseg" data-key="ladder"><button data-v="false">🏁 Chiffre exact</button><button data-v="true">🪜 Échelle 1 → 6 puis 6</button></div>
+            <p class="muted small hint2">Échelle : tu t'arrêtes pile au pied de ton escalier, puis il faut faire <b>1</b>, puis <b>2</b>, <b>3</b>, <b>4</b>, <b>5</b>, <b>6</b> pour monter chaque marche, et encore un <b>6</b> pour rentrer. Plus long, plus de suspense (2 chevaux conseillés).</p>
+          </div>
           <div class="set-block rules">
             <h4>📜 Règles</h4>
             <p>Il faut un <b>6</b> pour sortir un cheval de l'écurie, et un 6 fait <b>rejouer</b>. Tomber sur un adversaire le <b>renvoie à l'écurie</b> 💥
             (sauf sur les cases ★ de départ, protégées). Après un tour du plateau, on remonte le couloir de sa couleur : il faut le <b>chiffre exact</b> pour arriver au centre.
             Le premier qui rentre tous ses chevaux gagne !</p>
             <p class="muted small">🪙 Pièces selon la durée de la partie (≈ 4 à 7 par minute), +2 par cheval rentré et par capture, gros bonus au vainqueur.
-            Choisis le look de tes pions dans la boutique (onglet 🐎 Pions).</p>
+            Pions, plateaux et animations de capture se trouvent dans la boutique.</p>
           </div>
         </div>
 
@@ -439,6 +444,8 @@
       <button data-tab="titles">Titres</button>
       <button data-tab="winFx">Effet de victoire</button>
       <button data-tab="pawns">🐎 Pions</button>
+      <button data-tab="boards">🎲 Plateaux</button>
+      <button data-tab="pcfx">💥 Animations chevaux</button>
       <button data-tab="save">💾 Sauvegarde</button>
     </div>
     <div id="shop-body" class="shop-body"></div>
