@@ -1,4 +1,4 @@
-// PLAYZUP — serveur de jeux entre potes : Blind test, Undercover, Jeu de la Note (Express + Socket.io)
+// PLAYZUP — serveur de jeux entre potes : Blind test, Undercover, Jeu de la Note, Speed Word (Express + Socket.io)
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
@@ -20,7 +20,7 @@ const io = new Server(server);
 const PUB = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : __dirname;
 const INDEX = path.join(PUB, 'index.html');
 const SHOP = require(path.join(PUB, 'shop.js'));
-for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
+for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
 app.get('/', (req, res) => res.sendFile(INDEX));
 app.get('/r/:code', (req, res) => res.sendFile(INDEX));
 app.get('/health', (req, res) => res.send('ok'));
@@ -378,16 +378,19 @@ function reward(room, coins) {
   room.gameId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   io.to(room.code).emit('reward', { coins, gameId: room.gameId });
 }
-const gameCtx = { sysMsg: (...a) => sysMsg(...a), broadcast: (r) => broadcast(r), pushState: (r) => pushState(r), shuffle, reward };
+const gameCtx = { sysMsg: (...a) => sysMsg(...a), broadcast: (r) => broadcast(r), pushState: (r) => pushState(r), shuffle, reward,
+  emit: (r, ev, data) => io.to(r.code).emit(ev, data) };
 const GAMES = {
   undercover: require('./game-undercover')(gameCtx),
   note: require('./game-note')(gameCtx),
+  word: require('./game-word')(gameCtx),
 };
 // infos affichées sur l'écran de choix (nombre de joueurs !)
 const GAME_INFO = {
   blindtest: { min: 1, max: 12 },
   undercover: { min: GAMES.undercover.min, max: GAMES.undercover.max },
   note: { min: GAMES.note.min, max: GAMES.note.max },
+  word: { min: GAMES.word.min, max: GAMES.word.max },
 };
 app.get('/api/games', (req, res) => res.json({ info: GAME_INFO, ucThemes: GAMES.undercover.themes() }));
 function stopModuleGame(room) { if (room.g) { clearTimeout(room.g.timer); room.g = null; } }
@@ -748,7 +751,7 @@ io.on('connection', (socket) => {
   socket.on('create', ({ name, avatar, pid, game, ...look }, cb) => {
     const code = makeCode();
     room = { code, players: new Map(), hostId: pid, phase: 'lobby', settings: defaultSettings(), chat: [], history: [],
-      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults() }, gscores: {}, g: null };
+      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults() }, gscores: {}, g: null };
     rooms.set(code, room);
     join(room, { name, avatar, pid, ...look }, cb);
   });
@@ -831,7 +834,7 @@ io.on('connection', (socket) => {
   socket.on('setGame', (game) => {
     if (!isHost() || !['lobby', 'end'].includes(room.phase) || !GAME_INFO[game]) return;
     room.game = game; room.phase = 'lobby'; stopModuleGame(room);
-    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note' }[game]}`);
+    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word' }[game]}`);
     broadcast(room);
   });
   socket.on('gsettings', (patch = {}) => {

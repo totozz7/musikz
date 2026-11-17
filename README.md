@@ -6,6 +6,7 @@ Un site à partager par lien : chacun crée son profil (icône, couleur, cadre, 
 |---|---|---|
 | 🎵 **Blind test** | 1 à 12 | Extraits de 30 s, 42 catégories, mode Zizanie avec bonus et malus |
 | 🕵️ **Undercover** | 3 à 12 | Les civils ont un mot, l'undercover un mot proche, Mr. White rien du tout. Indices puis vote |
+| 🔤 **Speed Word** | 1 à 12 | Mots fléchés inédits à chaque partie, 4 niveaux. Seul contre la montre, ou en course : le premier qui finit gagne |
 | 🔢 **Jeu de la Note** | 2 à 10 | Une note secrète sur 10, 3 thèmes : on répond avec quelque chose qui « vaut » sa note, les autres devinent |
 
 Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se reconnecter.
@@ -16,6 +17,13 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Réglages : nombre d'undercovers (1 à 3, ajusté au nombre de joueurs), Mr. White (dès 4 joueurs), indices écrits ou à l'oral,
   1 ou 2 tours d'indices avant le vote, temps par indice.
 - Points : civils 2 · undercover 10 · Mr. White 6. Mr. White éliminé peut gagner en devinant le mot des civils.
+
+### 🔤 Speed Word
+- Les grilles sont **générées automatiquement** à partir d'un dictionnaire maison de 400 mots (`data-words.js`, une ligne = `MOT | définition facile | définition difficile`) : chaque grille est nouvelle.
+- 4 niveaux : 🟢 Facile 9×9 · 🟡 Moyen 11×11 (définitions simples) · 🟠 Difficile 12×12 · 🔴 Expert 14×14 (définitions corsées).
+- **Avec indices** : les mots trouvés passent en vert, 3 lettres à révéler (−2 🪙 chacune). **Sans indices** : aucune aide jusqu'à la fin.
+- Pièces pour une grille finie : 15 / 25 / 35 / 50 selon le niveau, +25 au vainqueur d'une course ; les autres gagnent selon leur % de lettres justes.
+- Clavier : flèches pour se déplacer, Espace pour changer de sens, Entrée pour passer au mot suivant. Record solo enregistré dans le navigateur.
 
 ### 🔢 Jeu de la Note
 - 70 thèmes avec leur échelle (« Un animal : 1 = inoffensif, 10 = terrifiant »…), dans `data-note.js`.

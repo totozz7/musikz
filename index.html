@@ -147,6 +147,30 @@
           </div>
         </div>
 
+        <!-- réglages Speed Word -->
+        <div id="set-word" class="settings gset hidden">
+          <div class="set-block">
+            <h4>Difficulté</h4>
+            <div class="seg gseg wd-levels" data-key="level">
+              <button data-v="1">🟢 Facile<small>9×9 · définitions simples</small></button>
+              <button data-v="2">🟡 Moyen<small>11×11 · définitions simples</small></button>
+              <button data-v="3">🟠 Difficile<small>12×12 · définitions corsées</small></button>
+              <button data-v="4">🔴 Expert<small>14×14 · définitions corsées</small></button>
+            </div>
+          </div>
+          <div class="set-block">
+            <h4>Indices</h4>
+            <div class="seg gseg" data-key="hints"><button data-v="true">💡 Avec indices</button><button data-v="false">🚫 Sans indices</button></div>
+            <p class="muted small hint2">Avec indices : les mots trouvés passent en vert et chacun peut révéler 3 lettres (−2 🪙 chacune). Sans indices : aucune aide jusqu'à la fin.</p>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>Une grille de <b>mots fléchés inédite</b> à chaque partie. Lis la définition dans la case colorée, la flèche indique le sens du mot (▶ ou ▼).
+            <b>Seul</b>, bats ton record. <b>À plusieurs</b>, tout le monde a la même grille : <b>le premier qui la termine gagne</b> !</p>
+            <p class="muted small">🪙 Grille finie : Facile 15 · Moyen 25 · Difficile 35 · Expert 50, +25 pour le vainqueur d'une course. Les autres gagnent selon leur % de lettres justes.</p>
+          </div>
+        </div>
+
         <div id="settings" class="settings">
           <div class="set-block">
             <h4>Catégories <span class="muted" id="cat-count"></span></h4>
@@ -240,6 +264,9 @@
       <div id="v-uc" class="view"></div>
       <!-- JEU DE LA NOTE -->
       <div id="v-note" class="view"></div>
+
+      <!-- SPEED WORD -->
+      <div id="v-word" class="view"></div>
 
       <!-- CHARGEMENT -->
       <div id="v-loading" class="view center">
@@ -374,5 +401,6 @@
 <script src="/app.js"></script>
 <script src="/client-undercover.js"></script>
 <script src="/client-note.js"></script>
+<script src="/client-word.js"></script>
 </body>
 </html>

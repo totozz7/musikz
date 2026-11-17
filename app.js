@@ -160,9 +160,10 @@ let actx = null;
 const GAME_META = {
   blindtest: { emoji: '🎵', name: 'Blind test', desc: "Devine l'artiste, le titre, le dessin animé… 42 catégories, mode Zizanie avec bonus et malus.", cls: 'g-blind', lobby: 'Préparez vos oreilles 🎧' },
   undercover: { emoji: '🕵️', name: 'Undercover', desc: 'Un mot secret, un imposteur parmi vous. Donnez des indices, démasquez-le… sans vous faire avoir.', cls: 'g-uc', lobby: 'Qui est l\'undercover ? 🕵️' },
+  word: { emoji: '🔤', name: 'Speed Word', desc: 'Des mots fléchés inédits à chaque partie, 4 niveaux. Seul contre la montre ou en course : le premier qui finit la grille gagne !', cls: 'g-word', lobby: 'À vos crayons… prêts ? ✏️' },
   note: { emoji: '🔢', name: 'Jeu de la Note', desc: "Une note secrète sur 10, trois thèmes : réponds avec quelque chose qui « vaut » ta note. Les autres devinent !", cls: 'g-note', lobby: 'Sur une échelle de 1 à 10… 🔢' },
 };
-let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, note: { min: 2, max: 10 } }, UC_THEMES = [];
+let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, note: { min: 2, max: 10 } }, UC_THEMES = [];
 const playersLabel = (g) => { const i = GAME_INFO[g]; return i.min === i.max ? `${i.min} joueurs` : `${i.min} à ${i.max} joueurs`; };
 function renderGames() {
   $('#games').innerHTML = Object.entries(GAME_META).map(([id, m]) => `
@@ -285,7 +286,8 @@ function renderGameLobby() {
   $('#settings').classList.toggle('hidden', g !== 'blindtest');
   $('#set-undercover').classList.toggle('hidden', g !== 'undercover');
   $('#set-note').classList.toggle('hidden', g !== 'note');
-  $('#btn-start').textContent = `▶ Lancer ${m.name === 'Jeu de la Note' ? 'le Jeu de la Note' : m.name === 'Blind test' ? 'le Blind test' : "l'Undercover"}`;
+  $('#set-word').classList.toggle('hidden', g !== 'word');
+  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word' }[g]}`;
   $('#btn-start').disabled = !ok;
   if (g === 'blindtest') return;
   const box = $('#set-' + g), gs = state.gs?.[g] || {};
@@ -297,7 +299,7 @@ function renderGameLobby() {
   }
   box.querySelectorAll('.gseg').forEach(seg => seg.querySelectorAll('button').forEach(b => {
     b.classList.toggle('on', String(gs[seg.dataset.key]) === b.dataset.v);
-    b.onclick = () => socket.emit('gsettings', { [seg.dataset.key]: isNaN(+b.dataset.v) ? b.dataset.v : +b.dataset.v });
+    b.onclick = () => socket.emit('gsettings', { [seg.dataset.key]: b.dataset.v === 'true' ? true : b.dataset.v === 'false' ? false : isNaN(+b.dataset.v) ? b.dataset.v : +b.dataset.v });
   }));
   box.querySelectorAll('.gtog').forEach(i => { i.checked = !!gs[i.dataset.key]; i.onchange = () => socket.emit('gsettings', { [i.dataset.key]: i.checked }); });
 }
@@ -515,6 +517,7 @@ socket.on('reward', grantCoins);
 const gAct = (type, data) => new Promise(r => socket.emit('g', { type, data }, (res) => { if (res?.error) toast(res.error, 'error'); r(res); }));
 socket.on('g:state', (v) => {
   if (v.game === 'undercover' && window.UC) { if (!$('#v-uc').classList.contains('active')) showView('v-uc'); window.UC.render(v); }
+  if (v.game === 'word' && window.WORD) { if (!$('#v-word').classList.contains('active')) showView('v-word'); window.WORD.render(v); }
   if (v.game === 'note' && window.NOTE) { if (!$('#v-note').classList.contains('active')) showView('v-note'); window.NOTE.render(v); }
 });
 socket.on('end', (e) => {
