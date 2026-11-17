@@ -20,7 +20,7 @@ const io = new Server(server);
 const PUB = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : __dirname;
 const INDEX = path.join(PUB, 'index.html');
 const SHOP = require(path.join(PUB, 'shop.js'));
-for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
+for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js', 'client-draw.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
 app.get('/', (req, res) => res.sendFile(INDEX));
 app.get('/r/:code', (req, res) => res.sendFile(INDEX));
 app.get('/health', (req, res) => res.send('ok'));
@@ -388,6 +388,7 @@ const GAMES = {
   liar: require('./game-liar')(gameCtx),
   guess: require('./game-guess')(gameCtx),
   primo: require('./game-primo')(gameCtx),
+  draw: require('./game-draw')(gameCtx),
 };
 // infos affichées sur l'écran de choix (nombre de joueurs !)
 const GAME_INFO = {
@@ -399,6 +400,7 @@ const GAME_INFO = {
   liar: { min: 1, max: GAMES.liar.max },
   guess: { min: 1, max: GAMES.guess.max },
   primo: { min: 1, max: GAMES.primo.max },
+  draw: { min: 2, max: GAMES.draw.max },
 };
 app.get('/api/guess-themes', (req, res) => res.json(GAMES.guess.themes));
 app.get('/api/games', (req, res) => res.json({ info: GAME_INFO, ucThemes: GAMES.undercover.themes() }));
@@ -760,7 +762,7 @@ io.on('connection', (socket) => {
   socket.on('create', ({ name, avatar, pid, game, ...look }, cb) => {
     const code = makeCode();
     room = { code, players: new Map(), hostId: pid, phase: 'lobby', settings: defaultSettings(), chat: [], history: [],
-      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults() }, gscores: {}, g: null };
+      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults(), draw: GAMES.draw.defaults() }, gscores: {}, g: null };
     rooms.set(code, room);
     join(room, { name, avatar, pid, ...look }, cb);
   });
@@ -849,7 +851,7 @@ io.on('connection', (socket) => {
   socket.on('setGame', (game) => {
     if (!isHost() || !['lobby', 'end'].includes(room.phase) || !GAME_INFO[game]) return;
     room.game = game; room.phase = 'lobby'; stopModuleGame(room);
-    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🃏 PRIMO !' }[game]}`);
+    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time' }[game]}`);
     broadcast(room);
   });
   socket.on('gsettings', (patch = {}) => {
@@ -979,6 +981,28 @@ io.on('connection', (socket) => {
     if (allDone(room)) setTimeout(() => revealRound(room), 600);
   });
 
+  // DRAW TIME : traits en direct, relayés aux autres joueurs du salon
+  socket.on('gdraw', (d) => {
+    if (!room || !me || room.phase !== 'game' || room.g?.game !== 'draw') return;
+    const out = GAMES.draw.onDraw(room, me, d);
+    if (out) socket.to(room.code).emit('gdraw', out);
+  });
+  // 🛡️ mode modérateur : mot de passe dans la variable d'environnement ADMIN_KEY (Render → Environment)
+  socket.on('modo', ({ key } = {}, cb) => {
+    const K = process.env.ADMIN_KEY || '';
+    if (!K) return cb?.({ error: "Le mode modo n'est pas activé sur le serveur (variable ADMIN_KEY manquante sur Render)." });
+    if (String(key || '') !== K) { socket.data.modoTries = (socket.data.modoTries || 0) + 1; return cb?.({ error: 'Code modo incorrect' }); }
+    socket.data.modo = true; cb?.({ ok: true });
+  });
+  socket.on('modoGift', ({ to, coins } = {}, cb) => {
+    if (!socket.data.modo) return cb?.({ error: 'Pas autorisé' });
+    if (!room) return cb?.({ error: 'Rejoins un salon pour donner des pièces' });
+    const n = Math.max(1, Math.min(1000000, Math.round(+coins || 0)));
+    const targets = to === '*' ? [...room.players.values()].filter(p => p.online && p.id !== me?.id) : [room.players.get(to)].filter(Boolean);
+    if (!targets.length) return cb?.({ error: 'Joueur introuvable' });
+    targets.forEach(p => io.to(p.socketId).emit('modoGift', { coins: n }));
+    cb?.({ ok: true, n: targets.length });
+  });
   socket.on('chat', (text) => {
     if (!room || !me) return;
     text = String(text || '').trim().slice(0, 200); if (!text) return;

@@ -66,6 +66,7 @@
     <div class="top-actions">
       <button class="btn btn-shop btn-sm" id="btn-shop2" title="Boutique et personnalisation">🎨 <span class="hide-sm">Boutique</span> <b>🪙 <span class="coins-n">0</span></b></button>
       <div class="vol"><span>🔊</span><input type="range" id="volume" min="0" max="100" value="80"></div>
+      <button class="btn btn-sm btn-modo hidden" id="btn-modo" title="Mode modérateur">🛡️</button>
       <button class="btn btn-ghost btn-sm" id="btn-chat-toggle">💬</button>
       <button class="btn btn-ghost btn-sm" id="btn-leave">Quitter</button>
     </div>
@@ -148,6 +149,30 @@
         </div>
 
         <!-- réglages Petits chevaux -->
+        <div id="set-draw" class="settings gset hidden">
+          <div class="set-block">
+            <h4>💬 Les mots</h4>
+            <div class="seg gseg" data-key="words"><button data-v="classic">✏️ Classiques</button><button data-v="fun">😂 Marrants</button><button data-v="spicy">🌶️ Pimentés</button><button data-v="mix">🎲 Tout mélangé</button></div>
+            <p class="muted small hint2">Classiques : faciles à dessiner (chat, volcan…). Marrants : « slip sur la tête », « dragon enrhumé »… Pimentés : « ex toxique », « gueule de bois », « pet foireux »… 😇</p>
+          </div>
+          <div class="set-row">
+            <div class="set-block">
+              <h4>🔁 Manches</h4>
+              <div class="seg gseg" data-key="rounds"><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button></div>
+              <p class="muted small hint2">Chaque joueur dessine une fois par manche.</p>
+            </div>
+            <div class="set-block">
+              <h4>⏱️ Temps pour dessiner</h4>
+              <div class="seg gseg" data-key="time"><button data-v="60">60 s</button><button data-v="80">80 s</button><button data-v="100">100 s</button><button data-v="120">120 s</button></div>
+              <h4 style="margin-top:.8rem">💡 Lettres dévoilées</h4>
+              <div class="seg gseg" data-key="hints"><button data-v="0">0</button><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button></div>
+            </div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>À tour de rôle, un joueur choisit un mot parmi 3 et le <b>dessine</b>. Les autres tapent leurs propositions : plus tu trouves vite, plus tu marques (bonus au premier !). Le dessinateur gagne des points pour chaque joueur qui trouve. Interdit d'écrire le mot sur le dessin 😉</p>
+          </div>
+        </div>
         <div id="set-primo" class="settings gset hidden">
           <div class="set-block">
             <h4>🎴 Mode de jeu</h4>
@@ -377,6 +402,7 @@
       <div id="v-liar" class="view"></div>
       <div id="v-guess" class="view"></div>
       <div id="v-primo" class="view"></div>
+      <div id="v-draw" class="view"></div>
       <!-- SPEED WORD -->
       <div id="v-word" class="view"></div>
 
@@ -541,5 +567,6 @@
 <script src="/client-liar.js"></script>
 <script src="/client-guess.js"></script>
 <script src="/client-primo.js"></script>
+<script src="/client-draw.js"></script>
 </body>
 </html>

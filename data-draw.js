@@ -1,0 +1,42 @@
+// PlayZup — Draw Time : mots à dessiner.
+// classic = faciles à dessiner · fun = situations marrantes · spicy = un peu « problématiques » (mais ça reste entre potes 😇)
+module.exports = {
+  classic: [
+    'chat', 'chien', 'maison', 'soleil', 'voiture', 'avion', 'pizza', 'banane', 'arbre', 'fleur', 'poisson', 'éléphant', 'girafe', 'lunettes',
+    'chapeau', 'guitare', 'téléphone', 'ordinateur', 'vélo', 'bateau', 'fusée', 'étoile', 'lune', 'nuage', 'parapluie', 'pomme', 'fraise',
+    'gâteau', 'glace', 'hamburger', 'frites', 'oiseau', 'serpent', 'tortue', 'lapin', 'cochon', 'vache', 'mouton', 'cheval', 'papillon',
+    'araignée', 'abeille', 'escargot', 'requin', 'baleine', 'pieuvre', 'dinosaure', 'dragon', 'licorne', 'robot', 'fantôme', 'sorcière',
+    'pirate', 'château', 'pont', 'tour Eiffel', 'montagne', 'volcan', 'île déserte', 'plage', 'cactus', 'sapin de Noël', 'bonhomme de neige',
+    'pingouin', 'ours', 'lion', 'tigre', 'singe', 'crocodile', 'kangourou', 'hibou', 'ballon de foot', 'panier de basket', 'trophée',
+    'couronne', 'épée', 'clé', 'cadenas', 'lampe', 'bougie', 'horloge', 'réveil', 'lit', 'canapé', 'toilettes', 'douche', 'baignoire',
+    'brosse à dents', 'ciseaux', 'crayon', 'livre', 'cartable', 'valise', 'appareil photo', 'télévision', 'manette', 'casque', 'micro',
+    'batterie', 'piano', 'trompette', 'arc-en-ciel', 'éclair', 'tornade', 'feu', 'igloo', 'tente', 'feu de camp', 'camion', 'tracteur',
+    'train', 'hélicoptère', 'sous-marin', 'montgolfière', 'parachute', 'skateboard', 'trottinette', 'ski', 'bowling', 'fléchettes',
+    'sirène', 'pyramide', 'momie', 'squelette', 'citrouille', 'aimant', 'ampoule', 'loupe', 'boussole', 'trésor', 'carte au trésor',
+  ],
+  fun: [
+    'selfie raté', 'pigeon voleur', 'chat qui juge', 'dentier', 'moustache', 'monosourcil', 'chaussette trouée', 'slip sur la tête',
+    'peau de banane', 'poisson rouge', 'tongs', 'bouée canard', 'coup de soleil', 'mal de mer', 'coiffure ratée', 'barbecue', 'raclette',
+    'fondue', 'kebab', 'croissant', 'baguette', 'béret', 'doudou', 'tétine', 'câlin', 'danse du ventre', 'karaoké', 'air guitar', 'moonwalk',
+    'zombie', 'vampire', 'loup-garou', 'extraterrestre', 'soucoupe volante', 'ninja', 'sumo', 'catcheur', 'influenceur', 'youtubeur',
+    'téléréalité', 'coach sportif', 'facteur', 'pompier', 'dentiste', 'prof de maths', 'contrôleur de train', 'embouteillage', 'train en retard',
+    'lundi matin', 'grasse matinée', 'sieste', 'ronflement', 'somnambule', 'cauchemar', 'chatouilles', 'fou rire', 'hoquet', 'éternuement',
+    'tartine qui tombe', 'pizza à l\'ananas', 'chewing-gum sous la table', 'glace qui coule', 'wifi coupé', 'batterie à 1 %', 'emoji caca',
+    'chat sur un clavier', 'gamer en colère', 'rage quit', 'boss final', 'game over', 'trampoline', 'toboggan', 'auto-tamponneuse',
+    'grande roue', 'barbe à papa', 'pop-corn', 'ticket de loto', 'jackpot', 'tonton au barbecue', 'mamie sur Facebook', 'papy qui fait la sieste',
+    'chien qui fait le beau', 'poule mouillée', 'caméléon', 'ours en slip', 'licorne qui vomit un arc-en-ciel', 'requin végétarien',
+    'pirate en tongs', 'super-héros à la retraite', 'robot amoureux', 'fantôme timide', 'dragon enrhumé', 'vache qui fait du ski',
+  ],
+  spicy: [
+    'gueule de bois', 'lendemain de soirée', 'belle-mère', 'ex toxique', 'rupture par SMS', 'râteau', 'friendzone', 'plan foireux',
+    'pet foireux', 'prout', 'crotte de nez', 'aisselle qui pue', 'transpiration', 'slip troué', 'string', 'poignées d\'amour', 'calvitie',
+    'rot', 'pied qui pue', 'haleine du matin', 'bouton sur le nez', 'tatouage raté', 'crise de la quarantaine', 'beauf', 'darons',
+    'tonton bourré', 'apéro qui dérape', 'fuir l\'addition', 'arnaque', 'réunion qui aurait pu être un mail', 'patron', 'démission',
+    'stagiaire', 'vol de frite', 'dernière part de pizza', 'spoiler', 'complotiste', 'PV de stationnement', 'contrôle fiscal',
+    'découvert bancaire', 'radar', 'permis raté', 'antisèche', 'redoublement', 'bulletin catastrophique', 'convoqué chez le proviseur',
+    'mensonge', 'langue de vipère', 'commérage', 'dispute de couple', 'jalousie', 'voisin bruyant', 'toilettes bouchées',
+    'papier toilette fini', 'toilettes publiques', 'ronfleur', 'bronzage en marcel', 'chaussettes dans les sandales', 'ghosting',
+    'vu à 23h47', 'message vocal de 5 minutes', 'drague lourde', 'selfie dans la salle de bain', 'abdos en béton', 'régime raté',
+    'pantalon craqué', 'chute en public', 'clignotant oublié', 'karaoké de mariage', 'oncle relou', 'excuse bidon',
+  ],
+};

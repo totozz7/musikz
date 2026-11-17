@@ -204,13 +204,14 @@ const GAME_META = {
   blindtest: { emoji: '🎵', name: 'Blind test', desc: "Devine l'artiste, le titre, le dessin animé… 42 catégories, mode Zizanie avec bonus et malus.", cls: 'g-blind', lobby: 'Préparez vos oreilles 🎧' },
   undercover: { emoji: '🕵️', name: 'Undercover', desc: 'Un mot secret, un imposteur parmi vous. Donnez des indices, démasquez-le… sans vous faire avoir.', cls: 'g-uc', lobby: 'Qui est l\'undercover ? 🕵️' },
   word: { emoji: '🔤', name: 'Speed Word', desc: 'Des mots fléchés inédits à chaque partie, 4 niveaux. Seul contre la montre ou en course : le premier qui finit la grille gagne !', cls: 'g-word', lobby: 'À vos crayons… prêts ? ✏️' },
-  primo: { emoji: '🃏', name: 'PRIMO !', desc: 'Même couleur ou même chiffre, +2, +4, inversions… et un mode Pagaille plein de cartes vicieuses. Crie PRIMO à ta dernière carte !', cls: 'g-primo', lobby: 'Battez les cartes ! 🃏' },
+  draw: { emoji: '🎨', name: 'Draw Time', desc: "Un joueur dessine, les autres devinent ! Des mots classiques, marrants… ou un peu pimentés 🌶️", cls: 'g-draw', lobby: 'Sortez les crayons ! ✏️' },
+  primo: { emoji: '🎴', name: 'PRIMO !', desc: 'Même couleur ou même chiffre, +2, +4, inversions… et un mode Pagaille plein de cartes vicieuses. Crie PRIMO à ta dernière carte !', cls: 'g-primo', lobby: 'Battez les cartes ! 🃏' },
   guess: { emoji: '🖼️', name: 'Guess Party', desc: 'Une image floutée, pixelisée ou zoomée : dessins animés, films, pochettes de rap… Trouve-la avant les autres !', cls: 'g-guess', lobby: 'Ouvrez grand les yeux ! 👀' },
   liar: { emoji: '🃏', name: 'Bar des Menteurs', desc: 'Pose tes cartes face cachée et bluffe… ou crie MENTEUR ! Le perdant tente sa chance au pistolet à bouchon.', cls: 'g-liar', lobby: 'Tout le monde au comptoir ! 🥃' },
   horses: { emoji: '🐎', name: 'Petits chevaux', desc: 'Le grand classique : lance le dé, sors tes chevaux, renvoie les autres à l\'écurie ! Choisis le skin de tes pions.', cls: 'g-horses', lobby: 'Tous en selle ! 🐎' },
   note: { emoji: '🔢', name: 'Jeu de la Note', desc: "Une note secrète sur 10, trois thèmes : réponds avec quelque chose qui « vaut » ta note. Les autres devinent !", cls: 'g-note', lobby: 'Sur une échelle de 1 à 10… 🔢' },
 };
-let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, primo: { min: 1, max: 8 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [];
+let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, primo: { min: 1, max: 8 }, draw: { min: 2, max: 12 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [];
 fetch('/api/guess-themes').then(r => r.json()).then(t => { GP_THEMES = t; if (state?.game === 'guess') renderGameLobby?.(); }).catch(() => {});
 const playersLabel = (g) => { const i = GAME_INFO[g]; return i.min === i.max ? `${i.min} joueurs` : `${i.min} à ${i.max} joueurs`; };
 function renderGames() {
@@ -339,7 +340,8 @@ function renderGameLobby() {
   $('#set-liar').classList.toggle('hidden', g !== 'liar');
   $('#set-guess').classList.toggle('hidden', g !== 'guess');
   $('#set-primo').classList.toggle('hidden', g !== 'primo');
-  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO' }[g]}`;
+  $('#set-draw').classList.toggle('hidden', g !== 'draw');
+  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO', draw: 'Draw Time' }[g]}`;
   $('#btn-start').disabled = !ok;
   if (g === 'blindtest') return;
   const box = $('#set-' + g), gs = state.gs?.[g] || {};
@@ -581,6 +583,7 @@ socket.on('reward', grantCoins);
 const gAct = (type, data) => new Promise(r => socket.emit('g', { type, data }, (res) => { if (res?.error) toast(res.error, 'error'); r(res); }));
 socket.on('g:state', (v) => {
   if (v.game === 'undercover' && window.UC) { if (!$('#v-uc').classList.contains('active')) showView('v-uc'); window.UC.render(v); }
+  if (v.game === 'draw' && window.DRAW) { if (!$('#v-draw').classList.contains('active')) showView('v-draw'); window.DRAW.render(v); }
   if (v.game === 'primo' && window.PRIMO) { if (!$('#v-primo').classList.contains('active')) showView('v-primo'); window.PRIMO.render(v); }
   if (v.game === 'guess' && window.GUESS) { if (!$('#v-guess').classList.contains('active')) showView('v-guess'); window.GUESS.render(v); }
   if (v.game === 'liar' && window.LIAR) { if (!$('#v-liar').classList.contains('active')) showView('v-liar'); window.LIAR.render(v); }
@@ -623,8 +626,55 @@ socket.on('chat', addChat);
 $('#chat-form').onsubmit = (e) => {
   e.preventDefault();
   const v = $('#chat-input').value.trim(); if (!v) return;
-  socket.emit('chat', v); $('#chat-input').value = '';
+  $('#chat-input').value = '';
+  // commande secrète : /modo <code> (jamais envoyée dans le chat)
+  if (/^\/modo\b/i.test(v)) return MODO.login(v.replace(/^\/modo\s*/i, ''));
+  socket.emit('chat', v);
 };
+
+// ───────────── 🛡️ Mode modérateur (réservé au détenteur du code ADMIN_KEY) ─────────────
+const MODO = (() => {
+  let on = false;
+  const btn = () => $('#btn-modo');
+  function login(key, silent) {
+    if (!key) return silent || toast('Usage : /modo ton-code', 'error');
+    socket.emit('modo', { key }, (r) => {
+      if (r?.ok) { on = true; store.set('mz_modo', key); btn().classList.remove('hidden'); if (!silent) { toast('🛡️ Mode modo activé (visible par toi seul)'); sfx('legend'); } }
+      else { if (!silent) toast(r?.error || 'Refusé', 'error'); if (silent) store.set('mz_modo', ''); }
+    });
+  }
+  function panel() {
+    let m = $('#modo-panel');
+    if (!m) { m = document.createElement('div'); m.id = 'modo-panel'; m.className = 'modo-panel hidden'; document.body.appendChild(m); m.onclick = (e) => { if (e.target === m) m.classList.add('hidden'); }; }
+    const others = (state?.players || []).filter(p => p.id !== pid);
+    m.innerHTML = `<div class="modo-box"><button class="modo-x">✕</button>
+      <h3>🛡️ Mode modo</h3><p class="muted small">Visible par toi seul. Tes objets ne sont pas débloqués : à toi de les acheter 😉</p>
+      <h4>Mes pièces <b>🪙 ${save.coins.toLocaleString('fr-FR')}</b></h4>
+      <div class="modo-row">${[1000, 10000, 100000].map(n => `<button class="btn btn-yellow btn-sm" data-self="${n}">+${n.toLocaleString('fr-FR')}</button>`).join('')}<button class="btn btn-ghost btn-sm" data-self="max">♾️ 999 999</button></div>
+      <h4>Donner des pièces</h4>
+      ${others.length ? `<div class="modo-amt"><input class="input" id="modo-n" type="number" min="1" value="200"><button class="btn btn-primary btn-sm" data-to="*">🎁 À tout le monde</button></div>
+      <div class="modo-list">${others.map(p => `<div class="modo-pl">${avatarHTML(p, 30)}<b>${esc(p.name)}</b><button class="btn btn-sm btn-yellow" data-to="${p.id}">🎁 Donner</button></div>`).join('')}</div>` : '<p class="muted small">Personne d\'autre dans le salon pour l\'instant.</p>'}
+      <button class="btn btn-ghost btn-sm modo-off">Désactiver sur cet appareil</button></div>`;
+    m.querySelector('.modo-x').onclick = () => m.classList.add('hidden');
+    m.querySelectorAll('[data-self]').forEach(b => b.onclick = () => {
+      if (b.dataset.self === 'max') save.coins = 999999; else save.coins += +b.dataset.self;
+      persist(); renderProfile(); coinFountain(20); sfx('legend'); panel();
+    });
+    m.querySelectorAll('[data-to]').forEach(b => b.onclick = () => {
+      const n = Math.round(+$('#modo-n').value || 0); if (n <= 0) return toast('Montant invalide', 'error');
+      socket.emit('modoGift', { to: b.dataset.to, coins: n }, (r) => r?.ok ? toast(`🎁 ${n} 🪙 envoyées${r.n > 1 ? ` à ${r.n} joueurs` : ''} !`) : toast(r?.error || 'Erreur', 'error'));
+    });
+    m.querySelector('.modo-off').onclick = () => { store.set('mz_modo', ''); on = false; btn().classList.add('hidden'); m.classList.add('hidden'); toast('Mode modo désactivé sur cet appareil'); };
+    m.classList.remove('hidden');
+  }
+  btn().onclick = () => on && panel();
+  socket.on('connect', () => { const k = store.get('mz_modo', ''); if (k) login(k, true); });
+  socket.on('modoGift', ({ coins }) => {
+    save.coins += coins; persist(); renderProfile();
+    toast(`🎁 Cadeau surprise : +${coins} 🪙 !`); coinFountain(Math.min(60, 10 + Math.round(coins / 20))); sfx('legend');
+  });
+  return { login };
+})();
 $('#reacts').innerHTML = REACTS.map(r => `<button type="button">${r}</button>`).join('');
 $$('#reacts button').forEach(b => b.onclick = () => socket.emit('react', b.textContent));
 socket.on('react', ({ emoji, avatar, name }) => {

@@ -80,8 +80,9 @@
       const p = P(s.pid), pos = seatPos(v, k), cur = v.stage === 'play' && v.turn === k;
       const n = Math.min(s.n, 12);
       const fan = Array.from({ length: n }, (_, i) => `<i style="--i:${(i - (n - 1) / 2).toFixed(2)}"></i>`).join('');
-      return `<div class="pm-seat ${cur ? 'cur' : ''} ${k === v.me ? 'me' : ''} ${s.frozen ? 'frozen' : ''} ${s.n === 1 ? 'last' : ''} ${s.online ? '' : 'off'}" id="pm-seat-${k}" style="left:${pos.x}%;top:${pos.y}%">
-        <div class="pm-fan">${fan}</div>
+      const threat = v.pending && v.turn === k && ['turn', 'drawn'].includes(v.phase) && v.stage === 'play';
+      return `<div class="pm-seat ${cur ? 'cur' : ''} ${threat ? 'threat' : ''} ${k === v.me ? 'me' : ''} ${s.frozen ? 'frozen' : ''} ${s.n === 1 ? 'last' : ''} ${s.online ? '' : 'off'}" id="pm-seat-${k}" style="left:${pos.x}%;top:${pos.y}%">
+        ${threat ? `<div class="pm-threat">🎯 +${v.pending.n} ?</div>` : ''}<div class="pm-fan">${fan}</div>
         <div class="pm-av">${p ? avatarHTML(p, 50) : `<span class="pm-bot">🤖</span>`}${s.frozen ? `<span class="pm-ice">🧊<b>${s.frozen}</b></span>` : ''}</div>
         <div class="pm-nm">${p ? nameHTML(p) : esc(s.name)}</div>
         <div class="pm-n ${s.n <= 2 ? 'hot' : ''}">${s.n} carte${s.n > 1 ? 's' : ''}${s.primo ? ' · 📣' : ''}</div>
@@ -237,9 +238,16 @@
       }
       case 'skip': pop(e.seat, '<span class="pm-stamp">⊘ PASSE !</span>', 'stamp', 1500); sfx('stamp'); shake(seatEl(e.seat)); break;
       case 'rev': banner('<span class="pm-rev">⇄</span><small>Changement de sens !</small>', 'rev', 1500); sfx('spin', .7); break;
-      case 'stack': banner(`<span class="pm-plus">+${e.n}</span><small>${e.n > 4 ? 'ÇA MONTE !!' : 'qui va piocher ?'}</small>`, 'plus', 1300); sfx(e.n > 4 ? 'legend' : 'pop'); shake($('#pm-table')); break;
+      case 'stack': {
+        const nx = v.seats[e.next];
+        banner(`<span class="pm-plus">+${e.n}</span><small>${e.n > 4 ? 'ÇA MONTE !! ' : ''}${nx ? `<b>${esc(nx.name)}</b> : contre-attaque ou ramasse !` : ''}</small>`, 'plus', 1500);
+        sfx(e.n > 4 ? 'legend' : 'pop'); shake($('#pm-table'));
+        if (e.next !== undefined) { await wait(250); arrow(e.seat, e.next, `+${e.n}`); }
+        break;
+      }
       case 'draw': {
         if (!e.n) break;
+        if (e.big) { await bigDraw(e, v); break; }
         rain('deck', e.seat, Math.min(e.n, 10), e.n > 2 ? 60 : 0);
         sfx('card', .5);
         if (e.n >= 2) { pop(e.seat, `<span class="pm-hit">+${e.n}</span>`, 'hit', 1600); setTimeout(() => shake(seatEl(e.seat)), 300); if (e.n >= 4) sfx('buzzer', .5); }
@@ -259,6 +267,28 @@
     }
   }
 
+  // flèche « +N » de l'attaquant vers sa cible
+  function arrow(a, b, txt) {
+    const A = seatPos(V, a), B = seatPos(V, b), t = $('#pm-table'), W = t.clientWidth, H = t.clientHeight;
+    const dx = (B.x - A.x) * W / 100, dy = (B.y - A.y) * H / 100, len = Math.hypot(dx, dy), ang = Math.atan2(dy, dx) * 180 / Math.PI;
+    const el = document.createElement('div'); el.className = 'pm-arrow';
+    el.style.left = A.x + '%'; el.style.top = A.y + '%'; el.style.width = len + 'px'; el.style.transform = `rotate(${ang}deg)`;
+    el.innerHTML = `<b style="transform:rotate(${-ang}deg)">${txt}</b>`;
+    $('#pm-fx').appendChild(el); setTimeout(() => el.remove(), 1500);
+  }
+  // quelqu'un ramasse une pile de +N : projecteur sur lui, les cartes lui tombent dessus
+  async function bigDraw(e, v) {
+    const s = v.seats[e.seat], p = P(s.pid), seat = seatEl(e.seat);
+    seat?.classList.add('victim'); $('#pm-table').classList.add('spot');
+    banner(`<span class="pm-vic">${p ? avatarHTML(p, 70) : '<span class="pm-bot big">🤖</span>'}</span><b>${e.seat === v.me ? 'TU RAMASSES' : esc(s.name) + ' ramasse'}</b><span class="pm-plus">+${e.n}</span>`, 'plus vic', 2500);
+    sfx('drum', .6);
+    await wait(500);
+    rain('deck', e.seat, Math.min(e.n, 12), 90);
+    for (let i = 0; i < Math.min(e.n, 12); i++) setTimeout(() => sfx('card', .4), i * 90);
+    setTimeout(() => { shake(seatEl(e.seat)); sfx('buzzer', .5); pop(e.seat, `<span class="pm-hit">+${e.n}</span>`, 'hit', 1600); }, Math.min(e.n, 12) * 90 + 200);
+    await wait(Math.min(e.n, 12) * 90 + 900);
+    seatEl(e.seat)?.classList.remove('victim'); $('#pm-table').classList.remove('spot');
+  }
   async function special(e, v) {
     const sp = v.specials?.[e.kind]; if (!sp) return;
     const T = e.target, k = e.seat;

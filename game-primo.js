@@ -166,11 +166,11 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
     }
     else if (v in DRAW) {
       const n = DRAW[v];
-      if (g.stack) { g.pending = { n: (g.pending?.n || 0) + n, from: k }; ev(g, { type: 'stack', n: g.pending.n, seat: k }); wait = 1100; }
+      if (g.stack) { g.pending = { n: (g.pending?.n || 0) + n, from: k }; ev(g, { type: 'stack', n: g.pending.n, seat: k, next: next(g, k) }); wait = 1600; }
       else {
         const vic = next(g, k); drawCards(g, vic, n);
-        ev(g, { type: 'draw', seat: vic, n, reason: v }); log(g, `😱 ${nm(g, vic)} pioche ${n} et passe son tour`);
-        nextTurn = next(g, k, 2); wait = 1500;
+        ev(g, { type: 'draw', seat: vic, n, reason: v, big: true }); log(g, `😱 ${nm(g, vic)} pioche ${n} et passe son tour`);
+        nextTurn = next(g, k, 2); wait = 2700;
       }
     }
     else if (sp) {
@@ -243,9 +243,9 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
     if (g.pending) {
       const n = g.pending.n; g.pending = null;
       drawCards(g, k, n);
-      ev(g, { type: 'draw', seat: k, n, reason: 'stack' }); log(g, `😱 ${s.name} pioche ${n} cartes !`);
+      ev(g, { type: 'draw', seat: k, n, reason: 'stack', big: true }); log(g, `😱 ${s.name} ramasse les ${n} cartes !`);
       g.turn = next(g, k); g.phase = 'anim'; pushState(room);
-      return later(room, 1500, () => beginTurn(room));
+      return later(room, 2700, () => beginTurn(room));
     }
     const [c] = drawCards(g, k, 1);
     ev(g, { type: 'draw', seat: k, n: c ? 1 : 0 });

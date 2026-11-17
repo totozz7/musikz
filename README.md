@@ -25,7 +25,12 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Pièces pour une grille finie : 15 / 25 / 35 / 50 selon le niveau, +25 au vainqueur d'une course ; les autres gagnent selon leur % de lettres justes.
 - Clavier : flèches pour se déplacer, Espace pour changer de sens, Entrée pour passer au mot suivant. Record solo enregistré dans le navigateur.
 
-### 🃏 PRIMO ! (1 à 8 joueurs, robots possibles)
+### 🎨 Draw Time (2 à 12 joueurs)
+- Comme skribbl.io : chacun dessine à son tour un mot choisi parmi 3, les autres devinent dans le chat. Lettres dévoilées avec le temps, points selon la rapidité, le dessinateur gagne des points pour chaque joueur qui trouve.
+- Outils : 20 couleurs, 4 tailles, gomme, pot de peinture, annuler, tout effacer. Traits relayés en direct (événement socket `gdraw`).
+- Mots (`data-draw.js`) : classiques, marrants, pimentés 🌶️ ou tout mélangé. Options : 2 à 5 manches, 60 à 120 s, 0 à 3 lettres dévoilées.
+
+### 🎴 PRIMO ! (1 à 8 joueurs, robots possibles)
 - Jeu de cartes de défausse : même couleur, même chiffre ou même symbole. ⊘ Passe, ⇄ Inversion, +2, Joker, Joker +4. Option cumul des +2/+4. À une carte, clique **PRIMO !** sinon on peut te dénoncer (+2).
 - Mode **🤪 Pagaille** : 38 cartes vicieuses en plus — Échange de mains, Tornade, Cadeau piégé, Bombe, Sniper, Congélo, Miroir, Trèfle, Dynamite, Grand ménage, Roulette, Espion, Charité, Encore !, Pickpocket, +6.
 - Pièces : 10 + 2 par carte posée (max 25) + podium (30/15/8).
@@ -129,3 +134,8 @@ developer.spotify.com et ajoute dans Render (Environment) les variables `SPOTIFY
 - Un tour = 200 🪙 : pièces (25 à 500) ou objet surprise que tu n'as pas encore (commun 28 %, rare 10 %, épique 1,5 %, légendaire 0,3 %). Chances affichées sous la roue, réglables dans `public/shop.js` (`wheel`).
 - Boutique : un premier clic sur un objet pas encore acheté ouvre un **aperçu** (les animations se jouent), l'achat se fait avec le bouton « Acheter ».
 - Cadeau (10 min) et coffre (1 h) redessinés en SVG.
+
+## 🛡️ Mode modo (réservé au propriétaire)
+1. Sur Render : service → **Environment** → *Add Environment Variable* → clé `ADMIN_KEY`, valeur = ton code secret → *Save* (le site redémarre).
+2. Dans un salon, tape dans le chat : `/modo ton-code` (la commande n'est jamais envoyée aux autres).
+3. Un bouton 🛡️ apparaît : ajoute-toi des pièces (sans rien débloquer) ou donne des pièces à un joueur / à tout le salon. Le code est retenu sur ton appareil.
