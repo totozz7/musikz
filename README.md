@@ -21,7 +21,7 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 ### 🔤 Speed Word
 - Les grilles sont **générées automatiquement** à partir d'un dictionnaire maison de 400 mots (`data-words.js`, une ligne = `MOT | définition facile | définition difficile`) : chaque grille est nouvelle.
 - 4 niveaux : 🟢 Facile 9×9 · 🟡 Moyen 11×11 (définitions simples) · 🟠 Difficile 12×12 · 🔴 Expert 14×14 (définitions corsées).
-- **Avec indices** : les mots trouvés passent en vert, 3 lettres à révéler (−2 🪙 chacune). **Sans indices** : aucune aide jusqu'à la fin.
+- **Avec indices** : les mots trouvés passent en vert et sont verrouillés (plus modifiables), 3 lettres à révéler (−2 🪙 chacune). **Sans indices** : aucune aide jusqu'à la fin.
 - Pièces pour une grille finie : 15 / 25 / 35 / 50 selon le niveau, +25 au vainqueur d'une course ; les autres gagnent selon leur % de lettres justes.
 - Clavier : flèches pour se déplacer, Espace pour changer de sens, Entrée pour passer au mot suivant. Record solo enregistré dans le navigateur.
 

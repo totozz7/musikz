@@ -95,7 +95,9 @@ module.exports = ({ sysMsg, broadcast, pushState, reward, emit }) => {
       const g = room.g; if (g.stage !== 'play' || Date.now() < g.startAt - 300) return;
       i = +i; if (!(i in g.sol)) return;
       const p = pl(room, me.id); if (p.done) return;
-      if (p.hinted.includes(i)) return { ok: true }; // lettre révélée : bloquée
+      if (p.hinted.includes(i)) return { ok: true, locked: true }; // lettre révélée : bloquée
+      // mot déjà trouvé (en vert) : ses lettres ne peuvent plus être modifiées
+      if (g.hints && g.words.some(w => w.cells.includes(i) && w.cells.every(k => p.letters[k] === g.sol[k]))) return { ok: true, locked: true, solved: solvedWords(g, p) };
       ch = String(ch || '').toUpperCase().normalize('NFD').replace(/[^A-Z]/g, '').slice(0, 1);
       if (ch) p.letters[i] = ch; else delete p.letters[i];
       sendProgress(room);

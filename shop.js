@@ -22,6 +22,12 @@
       { id: '👾', price: 2600, anim: 'glitch', name: 'Space invader glitché' },
       { id: '🐉', price: 3200, anim: 'float', name: 'Dragon' },
       { id: '🏆', price: 4000, anim: 'shine', name: 'Trophée doré' },
+      // ── héros & jeux vidéo ──
+      ...[['🛡️', 300], ['⚔️', 400], ['🏹', 300], ['🧪', 300], ['🕹️', 350], ['🎮', 350], ['💣', 450], ['🪄', 500], ['🦾', 600]].map(([e, p]) => ({ id: e, price: p })),
+      { id: '🕷️', price: 1600, anim: 'swing', name: 'Araignée suspendue' },
+      { id: '🦇', price: 1400, anim: 'flap', name: 'Chauve-souris' },
+      { id: '💥', price: 2000, anim: 'boom', name: 'Explosion comics' },
+
     ],
     colors: [
       ...FREE_COLORS.map(c => ({ id: c, price: 0, base: c })),
@@ -42,6 +48,18 @@
       { id: 'electric', name: 'Électrique', price: 2400 }, { id: 'diamond', name: 'Diamant', price: 2800 },
       { id: 'inferno', name: 'Flammes vivantes', price: 3200 }, { id: 'hacker', name: 'Hacker', price: 3500 },
       { id: 'king', name: 'Roi', price: 4000 }, { id: 'strobe', name: 'Arc-en-ciel stroboscope', price: 4500 },
+      // ── héros ──
+      { id: 'comics', name: 'Comics POW!', price: 900 },
+      { id: 'cape', name: 'Cape de héros', price: 700 },
+      { id: 'thunder', name: 'Éclair héroïque', price: 1800 },
+      { id: 'web', name: 'Le Tisseur', price: 2200 },
+      { id: 'cosmic', name: 'Héros cosmique', price: 3400 },
+      // ── jeux vidéo ──
+      { id: 'arcade', name: 'Arcade 8-bit', price: 500 },
+      { id: 'powerup', name: 'Power-up', price: 1000 },
+      { id: 'hpbar', name: 'Barre de vie', price: 1500 },
+      { id: 'gameover', name: 'Game Over', price: 1400 },
+      { id: 'boss', name: 'Boss final', price: 3800 },
     ],
     nameFx: [
       { id: 'none', name: 'Normal', price: 0 }, { id: 'shadow', name: '3D', price: 100 }, { id: 'ice', name: 'Givré', price: 150 },
@@ -49,6 +67,9 @@
       { id: 'galaxy', name: 'Galaxie', price: 1300 }, { id: 'glitch', name: 'Glitch', price: 1600 }, { id: 'rgb', name: 'RGB qui bouge', price: 2000 },
       { id: 'inferno', name: 'Inferno', price: 2800 }, { id: 'hacker', name: 'Hacker', price: 3200 },
       { id: 'royal', name: 'Royal', price: 3600 }, { id: 'strobe', name: 'Stroboscope', price: 4000 },
+      { id: 'comics', name: 'Comics', price: 600 }, { id: 'arcade', name: 'Arcade', price: 800 },
+      { id: 'heroic', name: 'Héroïque', price: 1800 }, { id: 'web', name: 'Toile', price: 2200 },
+      { id: 'boss', name: 'Boss final', price: 3000 },
     ],
     titles: [
       { id: 'none', name: '(aucun)', price: 0 }, { id: 'debutant', name: 'Petite oreille', price: 0 },
@@ -58,13 +79,24 @@
       { id: 'hacker', name: 'Hacker de playlists', price: 1800 }, { id: 'shazam', name: 'Shazam humain', price: 2200 },
       { id: 'encyclo', name: 'Encyclopédie vivante', price: 3000 }, { id: 'roi', name: 'Roi de la soirée', price: 3800 },
       { id: 'legende', name: 'Légende du blind test', price: 6000 },
+      { id: 'p1', name: 'Player One', price: 700 }, { id: 'quartier', name: 'Héros du quartier', price: 900 },
+      { id: 'justicier', name: 'Justicier masqué', price: 1300 }, { id: 'speedrun', name: 'Speedrunner', price: 1800 },
+      { id: 'tisseur', name: 'Le Tisseur', price: 2200 }, { id: 'boss', name: 'Boss final', price: 2500 },
+      { id: 'multivers', name: 'Gardien du multivers', price: 4500 },
     ],
     winFx: [
       { id: 'party', name: 'Fête', emojis: '🎉🎊✨', price: 0 }, { id: 'stars', name: 'Étoiles', emojis: '⭐🌟✨', price: 150 },
       { id: 'hearts', name: 'Cœurs', emojis: '💖💘💕', price: 150 }, { id: 'pizza', name: 'Pizzas', emojis: '🍕🍕🧀', price: 250 },
       { id: 'ducks', name: 'Canards', emojis: '🦆🦆🐥', price: 350 }, { id: 'fire', name: 'Flammes', emojis: '🔥🔥💥', price: 500 },
       { id: 'money', name: 'Billets', emojis: '💸💵🪙', price: 900 }, { id: 'music', name: 'Notes', emojis: '🎵🎶🎸', price: 900 },
-      { id: 'goat', name: 'GOAT', emojis: '🐐👑🐐', price: 2500 }, { id: 'galaxy', name: 'Galaxie', emojis: '🪐🌌☄️', price: 3500 },
+      { id: 'goat', name: 'GOAT', emojis: '🐐👑🐐', price: 2500 },
+      // célébrations animées (pas juste une pluie d'emojis)
+      { id: 'comics', name: 'BAM ! POW !', emojis: '💥', kind: 'comics', price: 900 },
+      { id: 'levelup', name: 'Level up', emojis: '⬆️', kind: 'levelup', price: 1000 },
+      { id: 'fireworks', name: "Feu d'artifice", emojis: '🎆', kind: 'fireworks', price: 1500 },
+      { id: 'webs', name: 'Toiles du Tisseur', emojis: '🕸️', kind: 'webs', price: 2200 },
+      { id: 'galaxy', name: 'Galaxie', emojis: '🪐🌌☄️', kind: 'galaxy', price: 3500 },
+      { id: 'supernova', name: 'Supernova', emojis: '🌟', kind: 'supernova', price: 4500 },
     ],
   };
   SHOP.ids = (k) => SHOP[k].map(x => x.id);

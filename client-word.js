@@ -86,7 +86,7 @@
   function selectWord(k, at = null) {
     if (V.stage !== 'play' || k == null || !V.words[k]) return;
     const w = V.words[k]; dir = w.dir;
-    cur = at != null ? at : (w.cells.find(i => !inputAt(i)?.value) ?? w.cells[0]);
+    cur = at != null ? at : (w.cells.find(i => !inputAt(i)?.value && !locked(i)) ?? w.cells.find(i => !locked(i)) ?? w.cells[0]);
     highlight();
   }
   function highlight() {
@@ -104,7 +104,10 @@
   }
   function move(step) {
     const k = wordOf(cur, dir); if (k == null) return;
-    const cells = V.words[k].cells, pos = cells.indexOf(cur) + step;
+    const cells = V.words[k].cells;
+    let pos = cells.indexOf(cur) + step;
+    // en avançant, on saute les lettres déjà validées (vertes) ou révélées
+    while (step > 0 && pos < cells.length && locked(cells[pos])) pos++;
     if (pos >= 0 && pos < cells.length) { cur = cells[pos]; highlight(); }
     else if (step > 0) { // fin du mot → mot suivant non résolu
       const next = nextUnsolved(k); if (next != null) selectWord(next);
@@ -134,15 +137,20 @@
     inp.parentNode.classList.remove('bad');
     const res = await gAct('cell', { i, ch });
     if (!res) return;
-    if (res.solved) { const before = solved.size; solved = new Set(res.solved); paintSolved(); if (solved.size > before) sfx('pop'); }
+    if (res.locked) return;
+    if (res.solved) { const fresh = res.solved.filter(k => !solved.has(k)); solved = new Set(res.solved); paintSolved(); if (fresh.length) { sfx('pop'); wordFlash(fresh); } }
     if (res.full && !V.hints) toast('🤔 Grille pleine… mais il reste des erreurs !', 'error');
   }
+  const locked = (i) => !!inputAt(i)?.readOnly;
   function paintSolved() {
-    $$('#wd-grid .wd-c.l').forEach(e => e.classList.remove('ok'));
-    solved.forEach(k => V.words[k].cells.forEach(i => $(`#wd-grid .wd-c[data-i="${i}"]`)?.classList.add('ok')));
+    $$('#wd-grid .wd-c.l').forEach(e => { e.classList.remove('ok'); const inp = e.querySelector('input'); if (inp && !e.classList.contains('hint')) inp.readOnly = false; });
+    solved.forEach(k => V.words[k].cells.forEach(i => { const cell = $(`#wd-grid .wd-c[data-i="${i}"]`); cell?.classList.add('ok'); const inp = cell?.querySelector('input'); if (inp) inp.readOnly = true; }));
     $$('#wd-grid .cl').forEach(e => e.classList.toggle('done', solved.has(+e.dataset.w)));
     $$('#v-word .wd-def').forEach(b => b.classList.toggle('done', solved.has(+b.dataset.k)));
   }
+
+  // petit éclat vert quand un mot est trouvé
+  function wordFlash(ks) { ks.forEach(k => V.words[k].cells.forEach(i => { const e = $(`#wd-grid .wd-c[data-i="${i}"]`); if (!e) return; e.classList.remove('flash'); void e.offsetWidth; e.classList.add('flash'); })); }
 
   function bind() {
     const grid = $('#wd-grid');
@@ -167,7 +175,7 @@
       if (e.key === 'Backspace') {
         e.preventDefault();
         if (e.target.value && !e.target.readOnly) type(i, '');
-        else { move(-1); if (inputAt(cur) && !inputAt(cur).readOnly && inputAt(cur).value) type(cur, ''); }
+        else { move(-1); if (inputAt(cur) && !locked(cur) && inputAt(cur).value) type(cur, ''); }
       } else if (e.key === 'ArrowRight') { e.preventDefault(); arrowMove(0, 1); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); arrowMove(0, -1); }
       else if (e.key === 'ArrowDown') { e.preventDefault(); arrowMove(1, 0); }
@@ -181,7 +189,11 @@
       const i = +e.target.dataset.i;
       const ch = (e.target.value || '').toUpperCase().normalize('NFD').replace(/[^A-Z]/g, '').slice(-1);
       if (!ch) { e.target.value = ''; return; }
-      if (e.target.readOnly) return;
+      if (e.target.readOnly) {
+        const k = wordOf(i, dir), free = k != null ? V.words[k].cells.find(c => !locked(c) && c !== i) : null;
+        if (free != null) { cur = free; highlight(); type(free, ch); move(1); }
+        return;
+      }
       type(i, ch); move(1);
     });
     $$('#v-word .wd-def').forEach(b => b.addEventListener('click', () => selectWord(+b.dataset.k)));

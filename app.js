@@ -78,7 +78,7 @@ function itemPreview(kind, it, m, big = false) {
   if (kind === 'frames') return avatarHTML({ ...m, frame: it.id }, s);
   if (kind === 'nameFx') return `<div class="nprev">${nameHTML({ ...m, nameFx: it.id })}</div>`;
   if (kind === 'titles') return `<div class="tprev">${it.id === 'none' ? '—' : '« ' + esc(it.name) + ' »'}</div>`;
-  if (kind === 'winFx') return `<div class="wprev">${it.emojis}</div>`;
+  if (kind === 'winFx') return `<div class="wprev">${it.emojis}${it.kind ? '<small class="anim-tag">✨ animée</small>' : ''}</div>`;
   return '';
 }
 function renderShop() {
@@ -852,9 +852,10 @@ function whisper(text) {
 }
 
 
-// 🎉 Effet de victoire (pluie d'emojis choisie dans la boutique)
+// 🎉 Effet de victoire choisi dans la boutique : pluie d'emojis ou célébration animée
 function burst(fxId, n = 16) {
   const fx = SHOP.winFx.find(x => x.id === fxId) || SHOP.winFx[0];
+  if (fx.kind && CELEBRATIONS[fx.kind]) return CELEBRATIONS[fx.kind](Math.min(1.3, Math.max(.45, n / 22)));
   const em = [...fx.emojis];
   for (let i = 0; i < n; i++) {
     const el = document.createElement('div');
@@ -867,6 +868,68 @@ function burst(fxId, n = 16) {
     setTimeout(() => el.remove(), 3300);
   }
 }
+function fxEl(cls, css = {}, html = '', life = 2500) {
+  const el = document.createElement('div');
+  el.className = cls; el.innerHTML = html;
+  for (const [k, v] of Object.entries(css)) { if (k.startsWith('--')) el.style.setProperty(k, v); else el.style[k] = v; }
+  $('#reactions-layer').appendChild(el);
+  setTimeout(() => el.remove(), life);
+  return el;
+}
+const rnd = (a, b) => a + Math.random() * (b - a);
+const CELEBRATIONS = {
+  // 🎆 bouquets de particules colorées
+  fireworks(k) {
+    const colors = ['#ff2e4d', '#ffc21a', '#00e5ff', '#7dff8a', '#ff4fa3', '#c13cff', '#fff'];
+    const shots = Math.round(3 + 4 * k);
+    for (let s = 0; s < shots; s++) setTimeout(() => {
+      const x = rnd(12, 88), y = rnd(15, 55), c = colors[s % colors.length];
+      fxEl('fw-flash', { left: x + 'vw', top: y + 'vh', '--c': c }, '', 700);
+      for (let i = 0; i < 22; i++) {
+        const a = (i / 22) * Math.PI * 2, d = rnd(60, 140) * k + 30;
+        fxEl('fw-p', { left: x + 'vw', top: y + 'vh', '--dx': Math.cos(a) * d + 'px', '--dy': Math.sin(a) * d + 'px', '--c': i % 3 ? c : '#fff' }, '', 1300);
+      }
+    }, s * 260);
+  },
+  // 💥 onomatopées de BD
+  comics(k) {
+    const words = ['BAM !', 'POW !', 'WOW !', 'ZAP !', 'BOOM !', 'KAPOW !', 'YES !'];
+    const n = Math.round(2 + 3 * k);
+    for (let i = 0; i < n; i++) setTimeout(() => fxEl('cx-word', { left: rnd(8, 72) + 'vw', top: rnd(12, 62) + 'vh', '--r': rnd(-18, 18) + 'deg', '--bg': ['#ffe14d', '#ff4fa3', '#00e5ff', '#7dff8a'][i % 4] },
+      `<span>${words[Math.floor(Math.random() * words.length)]}</span>`, 1500), i * 220);
+  },
+  // ⬆️ LEVEL UP façon jeu rétro
+  levelup(k) {
+    fxEl('lv-text', {}, 'LEVEL UP!', 2000);
+    for (let i = 0; i < Math.round(10 + 10 * k); i++) fxEl('lv-star', { left: rnd(25, 75) + 'vw', '--d': rnd(0, .6) + 's', '--x': rnd(-80, 80) + 'px', color: ['#ffe14d', '#7dff8a', '#00e5ff'][i % 3] }, '★', 2000);
+  },
+  // 🕸️ toiles qui jaillissent des coins de l'écran
+  webs(k) {
+    const corners = [[0, 0], [100, 0], [0, 100], [100, 100]].slice(0, k > .8 ? 4 : 2);
+    corners.forEach(([x, y], i) => setTimeout(() => {
+      fxEl('web-shot', { left: x + 'vw', top: y + 'vh', '--rot': (x ? (y ? 225 : 135) : (y ? 315 : 45)) + 'deg' }, '', 1700);
+      const tx = x ? rnd(55, 75) : rnd(25, 45), ty = y ? rnd(55, 75) : rnd(25, 45);
+      fxEl('web-net', { left: tx + 'vw', top: ty + 'vh' }, `<svg viewBox="-50 -50 100 100">${[...Array(8)].map((_, j) => `<line x1="0" y1="0" x2="${48 * Math.cos(j * Math.PI / 4)}" y2="${48 * Math.sin(j * Math.PI / 4)}"/>`).join('')}${[12, 24, 36, 47].map(r => `<polygon points="${[...Array(8)].map((_, j) => `${r * Math.cos(j * Math.PI / 4)},${r * Math.sin(j * Math.PI / 4)}`).join(' ')}"/>`).join('')}</svg>`, 1900);
+    }, i * 180));
+  },
+  // 🌌 spirale d'étoiles et de planètes
+  galaxy(k) {
+    fxEl('gx-core', {}, '', 2600);
+    const items = ['✨', '🪐', '⭐', '🌟', '☄️', '💫', '🌌'];
+    const n = Math.round(14 + 16 * k);
+    for (let i = 0; i < n; i++) fxEl('gx-star', { '--a': (i * 137.5) + 'deg', '--r': (30 + i * 9 * k) + 'px', animationDelay: (i * 0.03) + 's', fontSize: rnd(1, 2) + 'rem' }, items[i % items.length], 2600);
+  },
+  // 🌟 explosion d'étoile : flash, ondes de choc, écran qui tremble
+  supernova(k) {
+    fxEl('sn-flash', {}, '', 900);
+    [0, 160, 320].forEach((d, i) => setTimeout(() => fxEl('sn-ring', { '--c': ['#fff', '#ffc21a', '#ff4fa3'][i] }, '', 1400), d));
+    for (let i = 0; i < Math.round(16 + 16 * k); i++) {
+      const a = Math.random() * Math.PI * 2, dist = rnd(30, 55);
+      fxEl('sn-shard', { '--dx': Math.cos(a) * dist + 'vmax', '--dy': Math.sin(a) * dist + 'vmax' }, ['🌟', '✨', '⭐', '💥'][i % 4], 1600);
+    }
+    document.body.classList.add('sn-shake'); setTimeout(() => document.body.classList.remove('sn-shake'), 600);
+  },
+};
 
 
 // 🦟 Moustique : bzzzz aigu continu
