@@ -481,9 +481,6 @@ body.blackout .stage:after{content:"🔌 Coupure de courant…";position:fixed;l
 /* ═════════ Boutique qui en jette ═════════ */
 .shop-title{background:linear-gradient(90deg,#ffc21a,#ff4fa3,#7c5cff,#00e5ff,#ffc21a);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:rbtext 4s linear infinite;letter-spacing:.06em}
 .modal-box{position:relative}
-.modal-box:before{content:"";position:absolute;inset:0;border-radius:22px;pointer-events:none;padding:2px;
-  background:conic-gradient(from var(--ang),#ff2e4d,#ffc21a,#7c5cff,#00e5ff,#ff2e4d);animation:spin-ang 6s linear infinite;
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .hide-sm{display:inline}
 #btn-shop2 b{background:#0005;border-radius:99px;padding:.05rem .45rem;margin-left:.2rem}
 .lobby-foot .open-shop{margin-top:.8rem}
@@ -948,3 +945,92 @@ body.blackout .stage:after{content:"🔌 Coupure de courant…";position:fixed;l
 @keyframes snshard{0%{transform:translate(-50%,-50%) scale(.3)}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.4) rotate(360deg);opacity:0}}
 body.sn-shake .screen.active{animation:shakehard .5s}
 .fr-cape{isolation:isolate}
+
+/* contour arc-en-ciel de la boutique : sur toute la fenêtre, même en la faisant défiler */
+.modal-box{border:3px solid transparent!important;
+  background:linear-gradient(160deg,var(--card2),var(--bg)) padding-box,conic-gradient(from var(--ang),#ff2e4d,#ffc21a,#7c5cff,#00e5ff,#ff2e4d) border-box!important;
+  animation:spin-ang 6s linear infinite}
+
+/* ═══════════════ 🎁 Cadeau & 💰 Coffre ═══════════════ */
+.rewards{position:fixed;left:14px;bottom:14px;z-index:15;display:flex;flex-direction:column;gap:.5rem}
+.rewards.hidden{display:none}
+.rw{display:flex;align-items:center;gap:.55rem;border:2px solid var(--line);background:linear-gradient(160deg,var(--card2),var(--card));color:var(--text);
+  border-radius:16px;padding:.4rem .8rem .4rem .45rem;box-shadow:0 8px 24px #0008;opacity:.8;transition:transform .15s,opacity .15s}
+.rw:hover{opacity:1;transform:translateY(-2px)}
+.rw-txt{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1}
+.rw-txt b{font-size:.85rem}.rw-txt small{font-size:.75rem;color:var(--muted);font-weight:700}
+.rw.ready{opacity:1;border-color:var(--yellow);animation:rwready 1.2s ease-in-out infinite}
+.rw.ready small{color:var(--yellow)}
+.rw.ready .rw-ico{animation:rwhop .9s ease-in-out infinite}
+.rw-chest.ready{border-color:#ffc21a;box-shadow:0 0 22px #ffc21a88,0 8px 24px #0008}
+@keyframes rwready{50%{box-shadow:0 0 26px #ffc21aaa,0 8px 24px #0008}}
+@keyframes rwhop{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-6px) rotate(-8deg)}60%{transform:translateY(0) rotate(6deg)}}
+.rw-ico{position:relative;width:38px;height:38px;display:grid;place-items:center}
+.rw.ready .rw-ico:after{content:"!";position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;font-weight:900;font-size:.75rem;display:grid;place-items:center;box-shadow:0 0 0 2px var(--bg)}
+/* mini cadeau / mini coffre du bouton */
+.mini-gift{position:relative;width:30px;height:24px;margin-top:8px;border-radius:3px;background:linear-gradient(90deg,#ff2e4d 40%,#ffc21a 40% 60%,#ff2e4d 60%)}
+.mini-gift:before{content:"";position:absolute;left:-3px;right:-3px;top:-8px;height:9px;border-radius:3px;background:linear-gradient(90deg,#ff4a64 40%,#ffd84d 40% 60%,#ff4a64 60%)}
+.mini-gift:after{content:"🎀";position:absolute;top:-19px;left:50%;transform:translateX(-50%);font-size:13px}
+.mini-chest{position:relative;width:32px;height:20px;margin-top:10px;border-radius:3px;background:linear-gradient(#a0612a,#6b3d16);box-shadow:inset 0 0 0 2px #ffc21a}
+.mini-chest:before{content:"";position:absolute;left:-1px;right:-1px;top:-10px;height:11px;border-radius:9px 9px 2px 2px;background:linear-gradient(#c27a3a,#8a4d1e);box-shadow:inset 0 0 0 2px #ffc21a}
+.mini-chest i{position:absolute;left:50%;top:-3px;width:7px;height:8px;margin-left:-3.5px;background:#ffc21a;border-radius:2px;z-index:1}
+
+/* fenêtre d'ouverture */
+.opener{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:radial-gradient(circle at 50% 45%,#3a0b16ee,#000e);backdrop-filter:blur(4px);overflow:hidden}
+.opener.hidden{display:none}
+.op-rays{position:absolute;left:50%;top:45%;width:200vmax;height:200vmax;margin:-100vmax;opacity:0;transition:opacity .4s;
+  background:repeating-conic-gradient(from 0deg,#ffc21a33 0 8deg,transparent 8deg 20deg);animation:rays 8s linear infinite}
+.opener.open .op-rays{opacity:1}
+.opener.jackpot .op-rays{background:repeating-conic-gradient(from 0deg,#ff4fa344 0 6deg,#00e5ff33 6deg 12deg,transparent 12deg 20deg)}
+@keyframes rays{to{transform:rotate(360deg)}}
+.op-stage{position:relative;display:flex;flex-direction:column;align-items:center;gap:1rem;text-align:center}
+.op-title{font-family:var(--display);font-size:clamp(1.1rem,4vw,1.6rem);color:var(--yellow);text-shadow:3px 3px 0 var(--red);margin:0;padding:0 1rem}
+.op-amount{font-family:var(--display);font-size:clamp(2.6rem,10vw,4.5rem);color:#fff;text-shadow:0 0 20px #ffc21a,4px 4px 0 var(--red);margin:0;min-height:1.2em}
+.op-box{position:relative;width:200px;height:200px;cursor:pointer;display:grid;place-items:end center;animation:opidle 1.6s ease-in-out infinite}
+.opener.open .op-box{animation:none;cursor:default}
+@keyframes opidle{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-8px) rotate(-3deg)}75%{transform:translateY(-4px) rotate(3deg)}}
+.opener.shaking .op-box{animation:opshake .12s linear infinite}
+@keyframes opshake{0%{transform:translate(-5px,0) rotate(-4deg)}50%{transform:translate(5px,-3px) rotate(4deg)}100%{transform:translate(-5px,0) rotate(-4deg)}}
+.gift3d,.chest3d{display:none;position:relative}
+.opener.gift .gift3d,.opener.chest .chest3d{display:block}
+/* cadeau */
+.gift3d{width:150px;height:150px}
+.g-body{position:absolute;left:0;right:0;bottom:0;height:110px;border-radius:8px;
+  background:linear-gradient(90deg,transparent 42%,#ffc21a 42% 58%,transparent 58%),linear-gradient(#ff2e4d,#c8102e);box-shadow:0 18px 40px #000a,inset 0 -10px 0 #0003}
+.g-lid{position:absolute;left:-10px;right:-10px;bottom:104px;height:34px;border-radius:8px;z-index:2;
+  background:linear-gradient(90deg,transparent 42%,#ffd84d 42% 58%,transparent 58%),linear-gradient(#ff4a64,#e0213f);box-shadow:0 6px 10px #0005;transition:transform .7s cubic-bezier(.3,1.6,.5,1)}
+.g-bow{position:absolute;left:50%;top:-38px;transform:translateX(-50%);font-size:48px;filter:drop-shadow(0 4px 4px #0006)}
+.opener.open .g-lid{transform:translateY(-160px) rotate(-28deg)}
+/* coffre */
+.chest3d{width:180px;height:150px;perspective:600px}
+.c-body{position:absolute;left:0;right:0;bottom:0;height:90px;border-radius:6px;
+  background:repeating-linear-gradient(90deg,#00000022 0 2px,transparent 2px 30px),linear-gradient(#9b5a24,#5e3312);
+  box-shadow:inset 0 0 0 5px #ffc21a,inset 0 -14px 0 #0003,0 18px 40px #000a}
+.c-body:before,.c-body:after{content:"";position:absolute;top:0;bottom:0;width:14px;background:linear-gradient(90deg,#b8860b,#ffe680,#b8860b)}
+.c-body:before{left:28px}.c-body:after{right:28px}
+.c-lock{position:absolute;left:50%;top:-6px;width:26px;height:30px;margin-left:-13px;border-radius:5px;z-index:3;
+  background:linear-gradient(#ffe680,#d99a00);box-shadow:0 0 0 2px #7a5200}
+.c-lock:after{content:"";position:absolute;left:50%;top:10px;width:6px;height:10px;margin-left:-3px;border-radius:3px;background:#3a2400}
+.c-lid{position:absolute;left:-4px;right:-4px;bottom:84px;height:60px;border-radius:70px 70px 6px 6px;z-index:2;transform-origin:50% 100%;
+  background:repeating-linear-gradient(90deg,#00000022 0 2px,transparent 2px 30px),linear-gradient(#c27a3a,#7a431a);
+  box-shadow:inset 0 0 0 5px #ffc21a;transition:transform .8s cubic-bezier(.3,1.5,.5,1)}
+.c-lid:before,.c-lid:after{content:"";position:absolute;top:0;bottom:0;width:14px;background:linear-gradient(90deg,#b8860b,#ffe680,#b8860b)}
+.c-lid:before{left:32px}.c-lid:after{right:32px}
+.c-glow{position:absolute;left:10px;right:10px;bottom:80px;height:20px;border-radius:50%;background:#fff6c0;opacity:0;filter:blur(6px);transition:.4s}
+.opener.open .c-lid{transform:rotateX(-115deg) translateY(-6px)}
+.opener.open .c-glow{opacity:1;box-shadow:0 -30px 60px 30px #ffe680,0 -80px 120px 40px #ffc21a88;animation:chestglow 1.2s ease-in-out infinite alternate}
+.opener.jackpot .c-glow{box-shadow:0 -30px 60px 30px #fff,0 -80px 140px 60px #ff4fa388,0 -60px 120px 40px #00e5ff88}
+.opener.jackpot .c-body,.opener.jackpot .c-lid{filter:hue-rotate(-15deg) saturate(1.5) brightness(1.2)}
+@keyframes chestglow{to{transform:scaleX(1.15)}}
+/* pièces qui volent */
+.coin-fly{position:fixed;left:50%;top:45%;font-size:1.7rem;z-index:90;pointer-events:none;animation:coinfly 1.9s cubic-bezier(.3,.6,.4,1) both}
+@keyframes coinfly{
+  0%{transform:translate(-50%,-50%) scale(.3) rotateY(0);opacity:0}
+  10%{opacity:1}
+  40%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.2) rotateY(540deg)}
+  100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.4) rotateY(1080deg);opacity:.2}}
+@media (max-width:760px){
+  .rewards{left:8px;bottom:8px;flex-direction:row}
+  .rw{padding:.3rem .55rem .3rem .35rem}
+  .rw-txt b{display:none}
+}

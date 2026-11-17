@@ -23,7 +23,7 @@ let save;
 try { save = JSON.parse(localStorage.getItem(SAVE_KEY)) || defaultSave(); } catch { save = defaultSave(); }
 save = { ...defaultSave(), ...save, look: { ...defaultSave().look, ...(save.look || {}) } };
 const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch {} };
-const owns = (kind, id) => (SHOP[kind].find(x => x.id === id)?.price || 0) === 0 || save.owned.includes(kind + ':' + id);
+const owns = (kind, id) => { const it = SHOP[kind].find(x => x.id === id); return !!it && (!it.price || save.owned.includes(kind + ':' + id)); };
 // un cosmétique équipé mais pas possédé (ancienne version) revient au gratuit
 for (const [k, d] of [['icons', null], ['colors', '#ffc21a'], ['frames', 'classic'], ['nameFx', 'none'], ['titles', 'debutant'], ['winFx', 'party']]) {
   const key = k === 'icons' ? 'avatar' : k === 'colors' ? 'color' : k === 'frames' ? 'frame' : k === 'titles' ? 'title' : k;
@@ -109,7 +109,10 @@ function renderShop() {
     };
     return;
   }
-  const kind = shopTab, items = SHOP[kind], lookKey = LOOK_KEY[kind];
+  const RANK = { free: 0, common: 1, rare: 2, epic: 3, legendary: 4 };
+  const kind = shopTab, lookKey = LOOK_KEY[kind];
+  const items = SHOP[kind].map((it, n) => ({ it, n })).sort((a, b) =>
+    RANK[a.it.price ? SHOP.rarity(a.it.price) : 'free'] - RANK[b.it.price ? SHOP.rarity(b.it.price) : 'free'] || (a.it.price || 0) - (b.it.price || 0) || a.n - b.n).map(x => x.it);
   // ⭐ À la une : l'objet légendaire le plus cher pas encore possédé
   const star = [...items].filter(it => it.price && !owns(kind, it.id)).sort((a, b) => b.price - a.price)[0];
   const feat = star ? `<div class="featured r-${SHOP.rarity(star.price)}">
@@ -329,6 +332,7 @@ function showView(id) {
 socket.on('room', (r) => {
   const prevPhase = state?.phase;
   state = r;
+  setTimeout(tickRewards, 0);
   renderPlayers();
   $$('.host-only').forEach(e => e.style.display = isHost() ? '' : 'none');
   $$('.guest-only').forEach(e => e.style.display = isHost() ? 'none' : '');
@@ -963,4 +967,79 @@ async function autoType(answers) {
     await new Promise(r => setTimeout(r, 700));
   }
   input.classList.remove('magic');
+}
+
+
+// ═════════════════ 🎁 CADEAU (toutes les 10 min) & 💰 COFFRE (toutes les heures) ═════════════════
+// Disponibles pendant l'attente (accueil, salon, fin de partie). Le minuteur est gardé dans la sauvegarde.
+const REWARD = { gift: SHOP.gift, chest: SHOP.chest };
+function rewardLeft(kind) { return Math.max(0, (save[kind + 'At'] || 0) - Date.now()); }
+const fmtLeft = (ms) => { const s = Math.ceil(ms / 1000), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return h ? `${h} h ${String(m).padStart(2, '0')}` : `${m}:${String(x).padStart(2, '0')}`; };
+function rewardsVisible() {
+  const home = $('#home').classList.contains('active');
+  const waiting = $('#room').classList.contains('active') && state && ['lobby', 'end'].includes(state.phase);
+  return home || waiting;
+}
+function tickRewards() {
+  $('#rewards').classList.toggle('hidden', !rewardsVisible());
+  for (const k of ['gift', 'chest']) {
+    const left = rewardLeft(k), btn = $('#rw-' + k);
+    btn.classList.toggle('ready', !left);
+    $(`#rw-${k}-t`).textContent = left ? fmtLeft(left) : 'À ouvrir !';
+  }
+}
+setInterval(tickRewards, 1000); tickRewards();
+
+let opening = null;
+function openReward(kind) {
+  if (rewardLeft(kind) || opening) { if (rewardLeft(kind)) toast(`${kind === 'gift' ? '🎁 Prochain cadeau' : '💰 Prochain coffre'} dans ${fmtLeft(rewardLeft(kind))}`); return; }
+  unlockAudio?.();
+  opening = { kind, opened: false };
+  const ov = $('#opener');
+  ov.className = 'opener ' + kind;
+  $('#op-title').textContent = kind === 'gift' ? '🎁 Un cadeau pour toi ! Touche pour l\'ouvrir' : '💰 Coffre au trésor ! Touche pour l\'ouvrir';
+  $('#op-amount').textContent = ''; $('#op-close').classList.add('hidden');
+  sfx('pop');
+}
+$('#rw-gift').onclick = () => openReward('gift');
+$('#rw-chest').onclick = () => openReward('chest');
+$('#op-box').onclick = () => {
+  if (!opening || opening.opened) return;
+  opening.opened = true;
+  const { kind } = opening, R = REWARD[kind];
+  let amount = Math.round(R.min + Math.random() * (R.max - R.min));
+  const jackpot = kind === 'chest' && Math.random() < R.jackpot;
+  if (jackpot) amount *= 2;
+  // on « consomme » tout de suite pour éviter le double clic / rechargement
+  save[kind + 'At'] = Date.now() + R.every; save.coins += amount; persist();
+  const ov = $('#opener');
+  ov.classList.add('shaking'); sfx('scratch');
+  setTimeout(() => {
+    ov.classList.remove('shaking'); ov.classList.add('open'); if (jackpot) ov.classList.add('jackpot');
+    sfx('legend'); setTimeout(() => sfx('legend'), 250);
+    coinFountain(kind === 'chest' ? (jackpot ? 70 : 45) : 22);
+    if (kind === 'chest') burst(jackpot ? 'supernova' : 'fireworks', 22);
+    $('#op-title').textContent = jackpot ? '🌟 JACKPOT ! Coffre doré ×2 !' : kind === 'gift' ? '🎉 Bravo !' : '💰 Trésor trouvé !';
+    countUp($('#op-amount'), amount);
+    setTimeout(() => { renderProfile(); $('#op-close').classList.remove('hidden'); }, 900);
+  }, kind === 'chest' ? 1300 : 900);
+};
+$('#op-close').onclick = () => { $('#opener').className = 'opener hidden'; opening = null; tickRewards(); };
+function countUp(el, n) {
+  let v = 0; const step = Math.max(1, Math.round(n / 25));
+  const iv = setInterval(() => { v = Math.min(n, v + step); el.textContent = `+${v} 🪙`; if (v >= n) clearInterval(iv); }, 35);
+}
+// pièces qui jaillissent puis filent vers le porte-monnaie
+function coinFountain(n) {
+  const wallet = [...$$('.coins-n')].map(e => e.getBoundingClientRect()).find(r => r.width) || { left: innerWidth - 80, top: 20 };
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement('div');
+    c.className = 'coin-fly'; c.textContent = '🪙';
+    const a = rnd(-Math.PI * .9, -Math.PI * .1), d = rnd(120, 300);
+    c.style.setProperty('--dx', Math.cos(a) * d + 'px'); c.style.setProperty('--dy', Math.sin(a) * d + 'px');
+    c.style.setProperty('--tx', (wallet.left - innerWidth / 2) + 'px'); c.style.setProperty('--ty', (wallet.top - innerHeight * .45) + 'px');
+    c.style.animationDelay = (i * 18) + 'ms';
+    $('#reactions-layer').appendChild(c);
+    setTimeout(() => c.remove(), 2200 + i * 18);
+  }
 }

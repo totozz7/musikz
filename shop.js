@@ -10,6 +10,9 @@
     startCoins: 100,
     // gains par partie (le serveur s'en sert) : participation + par bonne réponse + podium
     earn: { base: 10, perGood: 4, podium: [30, 15, 8] },
+    // cadeau toutes les 10 min, coffre toutes les heures (pendant l'attente)
+    gift: { every: 10 * 60e3, min: 6, max: 15 },
+    chest: { every: 60 * 60e3, min: 35, max: 90, jackpot: 0.1 },
     icons: [
       ...FREE_ICONS.map(e => ({ id: e, price: 0 })),
       // icônes premium
@@ -72,7 +75,7 @@
       { id: 'boss', name: 'Boss final', price: 3000 },
     ],
     titles: [
-      { id: 'none', name: '(aucun)', price: 0 }, { id: 'debutant', name: 'Petite oreille', price: 0 },
+      { id: 'debutant', name: 'Débutant', price: 0 },
       { id: 'dorothee', name: 'Fan de Dorothée', price: 150 }, { id: 'melomane', name: 'Mélomane', price: 250 },
       { id: 'dj', name: 'DJ de soirée', price: 400 }, { id: 'oreille', name: "Oreille d'or", price: 600 },
       { id: 'generique', name: 'Roi des génériques', price: 900 }, { id: 'chaos', name: 'Agent du chaos', price: 1300 },

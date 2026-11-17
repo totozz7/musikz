@@ -57,6 +57,8 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
   icônes (dont animées : dragon, planète, comète, space invader, trophée…), **couleurs animées** (coucher de soleil, océan,
   toxique, vaporwave, or massif, arc-en-ciel), cadres (jusqu'à Flammes vivantes, Hacker, Roi, Arc-en-ciel stroboscope),
   effets de pseudo (jusqu'à Inferno, Hacker, Royal, Stroboscope), titres, effets de victoire.
+- 🎁 **Cadeau** toutes les 10 minutes (6 à 15 🪙) et 💰 **coffre** toutes les heures (35 à 90 🪙, 10 % de chance de jackpot ×2),
+  à ouvrir en bas à gauche de l'écran pendant l'attente (accueil, salon, fin de partie). Réglages dans `shop.js` (`gift`, `chest`).
 - La progression est enregistrée **dans le navigateur** (le serveur gratuit de Render oublie tout quand il s'endort).
   Onglet **💾 Sauvegarde** : un code à copier pour la retrouver sur un autre appareil.
 
