@@ -36,7 +36,7 @@
           <div class="wallet" title="Tes pièces"><span>🪙</span><b class="coins-n">0</b></div>
         </div>
         <label class="lbl">Ton pseudo</label>
-        <input id="name" class="input" maxlength="18" placeholder="Ex. Thomas" autocomplete="off">
+        <input id="name" class="input" maxlength="18" placeholder="Ex. Zuppy" autocomplete="off">
         <button id="btn-shop" class="btn btn-shop" type="button">🎨 Personnaliser &amp; Boutique</button>
         <p class="muted small center-txt">Gagne des 🪙 dans tous les jeux pour débloquer cadres, effets, titres…</p>
         <div class="or"><span>tu as un code ?</span></div>
@@ -148,6 +148,29 @@
         </div>
 
         <!-- réglages Petits chevaux -->
+        <div id="set-guess" class="settings gset hidden">
+          <div class="set-block">
+            <h4>🗂️ Thèmes <small class="muted">(plusieurs au choix)</small></h4>
+            <div class="cats" id="gp-themes"></div>
+          </div>
+          <div class="set-row">
+            <div class="set-block">
+              <h4>🔥 Difficulté</h4>
+              <div class="seg gseg" data-key="level"><button data-v="1">😎 Facile</button><button data-v="2">🤔 Moyen</button><button data-v="3">💀 Très dur</button></div>
+              <p class="muted small hint2">Facile : images connues, la pixellisation disparaît vite + indice. Moyen : plus pointu, l'image reste pixelisée. Très dur : images rares, gros zoom en noir et blanc, aucun indice.</p>
+            </div>
+            <div class="set-block">
+              <h4>🖼️ Images</h4>
+              <div class="seg gseg" data-key="rounds"><button data-v="5">5</button><button data-v="10">10</button><button data-v="15">15</button><button data-v="20">20</button></div>
+              <h4 style="margin-top:.8rem">⏱️ Temps par image</h4>
+              <div class="seg gseg" data-key="time"><button data-v="20">20 s</button><button data-v="30">30 s</button><button data-v="45">45 s</button></div>
+            </div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>Une image apparaît, brouillée. Tape ta réponse : le nom du dessin animé, du film, du pays… Pour les <b>pochettes d'album</b>, il faut l'<b>artiste ET l'album</b> (deux réponses séparées). Plus tu trouves vite, plus tu marques, +25 pts au premier qui trouve.</p>
+          </div>
+        </div>
         <div id="set-liar" class="settings gset hidden">
           <div class="set-row">
             <div class="set-block">
@@ -328,6 +351,7 @@
       <!-- PETITS CHEVAUX -->
       <div id="v-horses" class="view"></div>
       <div id="v-liar" class="view"></div>
+      <div id="v-guess" class="view"></div>
       <!-- SPEED WORD -->
       <div id="v-word" class="view"></div>
 
@@ -490,5 +514,6 @@
 <script src="/client-word.js"></script>
 <script src="/client-horses.js"></script>
 <script src="/client-liar.js"></script>
+<script src="/client-guess.js"></script>
 </body>
 </html>

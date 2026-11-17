@@ -25,6 +25,12 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Pièces pour une grille finie : 15 / 25 / 35 / 50 selon le niveau, +25 au vainqueur d'une course ; les autres gagnent selon leur % de lettres justes.
 - Clavier : flèches pour se déplacer, Espace pour changer de sens, Entrée pour passer au mot suivant. Record solo enregistré dans le navigateur.
 
+### 🖼️ Guess Party (1 à 12 joueurs)
+- Une image apparaît brouillée : devine le dessin animé, le film, le pays… Pour les pochettes d'album : l'artiste ET l'album.
+- 12 thèmes (≈ 640 images) : dessins animés, Disney & Pixar, films, pochettes rap FR, rap US, pop & variété, animés japonais, séries, jeux vidéo, drapeaux, monuments, logos de clubs de foot. Plusieurs thèmes au choix.
+- 3 niveaux : 😎 facile (images connues, pixellisation qui disparaît vite + indice), 🤔 moyen (plus pointu, reste pixelisé), 💀 très dur (images rares, gros zoom en noir et blanc, aucun indice).
+- Images chargées à la volée : Wikipédia (affiches, jaquettes, logos, photos), Deezer (pochettes), flagcdn (drapeaux). Contenu dans `data-guess.js`.
+
 ### 🃏 Bar des Menteurs (1 à 6 joueurs, robots possibles)
 - Chaque manche : 5 cartes chacun (Dames, Rois, As + Jokers qui valent tout) et une **carte du tour**. Pose 1 à 3 cartes face cachée en prétendant que ce sont des cartes du tour… ou crie **MENTEUR !** sur la pose précédente.
 - Le menteur démasqué (ou l'accusateur qui s'est trompé) tire au **pistolet à bouchon** : 6 chambres, un seul bouchon, le risque monte à chaque tir. Dernier debout = gagnant.

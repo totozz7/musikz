@@ -30,7 +30,7 @@ for (const [k, d] of [['icons', null], ['colors', '#ffc21a'], ['frames', 'classi
   if (!owns(k, save.look[key])) save.look[key] = d || SHOP.icons[0].id;
 }
 persist();
-const me = () => ({ ...save.look, name: ($('#name')?.value || '').trim() || 'Ton pseudo', titleName: SHOP.titles.find(t => t.id === save.look.title && t.id !== 'none')?.name || '' });
+const me = () => ({ ...save.look, name: ($('#name')?.value || '').trim() || 'Zuppy', titleName: SHOP.titles.find(t => t.id === save.look.title && t.id !== 'none')?.name || '' });
 
 let pid = store.get('mz_pid');
 if (!pid) { pid = Math.random().toString(36).slice(2) + Date.now().toString(36); store.set('mz_pid', pid); }
@@ -48,7 +48,7 @@ let tick = null;
 
 
 // ───────────── Accueil ─────────────
-$('#name').value = store.get('mz_name', '');
+$('#name').value = store.get('mz_name', '') || 'Zuppy';
 function renderProfile() {
   const m = me();
   for (const [av, nm, tt] of [['#pv-avatar', '#pv-name', '#pv-title'], ['#sp-avatar', '#sp-name', '#sp-title']]) {
@@ -204,11 +204,13 @@ const GAME_META = {
   blindtest: { emoji: '🎵', name: 'Blind test', desc: "Devine l'artiste, le titre, le dessin animé… 42 catégories, mode Zizanie avec bonus et malus.", cls: 'g-blind', lobby: 'Préparez vos oreilles 🎧' },
   undercover: { emoji: '🕵️', name: 'Undercover', desc: 'Un mot secret, un imposteur parmi vous. Donnez des indices, démasquez-le… sans vous faire avoir.', cls: 'g-uc', lobby: 'Qui est l\'undercover ? 🕵️' },
   word: { emoji: '🔤', name: 'Speed Word', desc: 'Des mots fléchés inédits à chaque partie, 4 niveaux. Seul contre la montre ou en course : le premier qui finit la grille gagne !', cls: 'g-word', lobby: 'À vos crayons… prêts ? ✏️' },
+  guess: { emoji: '🖼️', name: 'Guess Party', desc: 'Une image floutée, pixelisée ou zoomée : dessins animés, films, pochettes de rap… Trouve-la avant les autres !', cls: 'g-guess', lobby: 'Ouvrez grand les yeux ! 👀' },
   liar: { emoji: '🃏', name: 'Bar des Menteurs', desc: 'Pose tes cartes face cachée et bluffe… ou crie MENTEUR ! Le perdant tente sa chance au pistolet à bouchon.', cls: 'g-liar', lobby: 'Tout le monde au comptoir ! 🥃' },
   horses: { emoji: '🐎', name: 'Petits chevaux', desc: 'Le grand classique : lance le dé, sors tes chevaux, renvoie les autres à l\'écurie ! Choisis le skin de tes pions.', cls: 'g-horses', lobby: 'Tous en selle ! 🐎' },
   note: { emoji: '🔢', name: 'Jeu de la Note', desc: "Une note secrète sur 10, trois thèmes : réponds avec quelque chose qui « vaut » ta note. Les autres devinent !", cls: 'g-note', lobby: 'Sur une échelle de 1 à 10… 🔢' },
 };
-let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, note: { min: 2, max: 10 } }, UC_THEMES = [];
+let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [];
+fetch('/api/guess-themes').then(r => r.json()).then(t => { GP_THEMES = t; if (state?.game === 'guess') renderGameLobby?.(); }).catch(() => {});
 const playersLabel = (g) => { const i = GAME_INFO[g]; return i.min === i.max ? `${i.min} joueurs` : `${i.min} à ${i.max} joueurs`; };
 function renderGames() {
   $('#games').innerHTML = Object.entries(GAME_META).map(([id, m], i) => `
@@ -334,7 +336,8 @@ function renderGameLobby() {
   $('#set-word').classList.toggle('hidden', g !== 'word');
   $('#set-horses').classList.toggle('hidden', g !== 'horses');
   $('#set-liar').classList.toggle('hidden', g !== 'liar');
-  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs' }[g]}`;
+  $('#set-guess').classList.toggle('hidden', g !== 'guess');
+  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party' }[g]}`;
   $('#btn-start').disabled = !ok;
   if (g === 'blindtest') return;
   const box = $('#set-' + g), gs = state.gs?.[g] || {};
@@ -343,6 +346,17 @@ function renderGameLobby() {
     $('#uc-themes').innerHTML = [{ id: 'all', emoji: '🎲', name: 'Tout mélangé' }, ...UC_THEMES].map(t =>
       `<button class="cat ${gs.theme === t.id ? 'on' : ''} ${t.id === 'anime' ? 'star' : ''}" data-t="${t.id}">${t.emoji} ${esc(t.name)}</button>`).join('');
     $$('#uc-themes .cat').forEach(b => b.onclick = () => socket.emit('gsettings', { theme: b.dataset.t }));
+  }
+  if (g === 'guess') {
+    const on = gs.themes || [];
+    $('#gp-themes').innerHTML = GP_THEMES.map(t => `<button class="cat ${on.includes(t.id) ? 'on' : ''}" data-t="${t.id}">${t.emoji} ${esc(t.name)} <small>${t.n}</small></button>`).join('')
+      + `<button class="cat" data-t="__all">🎲 Tout cocher</button>`;
+    $$('#gp-themes .cat').forEach(b => b.onclick = () => {
+      if (b.dataset.t === '__all') return socket.emit('gsettings', { themes: GP_THEMES.map(t => t.id) });
+      const nx = on.includes(b.dataset.t) ? on.filter(x => x !== b.dataset.t) : [...on, b.dataset.t];
+      if (!nx.length) return toast('Garde au moins un thème 😉', 'error');
+      socket.emit('gsettings', { themes: nx });
+    });
   }
   box.querySelectorAll('.gseg').forEach(seg => seg.querySelectorAll('button').forEach(b => {
     b.classList.toggle('on', String(gs[seg.dataset.key]) === b.dataset.v);
@@ -565,6 +579,7 @@ socket.on('reward', grantCoins);
 const gAct = (type, data) => new Promise(r => socket.emit('g', { type, data }, (res) => { if (res?.error) toast(res.error, 'error'); r(res); }));
 socket.on('g:state', (v) => {
   if (v.game === 'undercover' && window.UC) { if (!$('#v-uc').classList.contains('active')) showView('v-uc'); window.UC.render(v); }
+  if (v.game === 'guess' && window.GUESS) { if (!$('#v-guess').classList.contains('active')) showView('v-guess'); window.GUESS.render(v); }
   if (v.game === 'liar' && window.LIAR) { if (!$('#v-liar').classList.contains('active')) showView('v-liar'); window.LIAR.render(v); }
   if (v.game === 'horses' && window.HORSES) { if (!$('#v-horses').classList.contains('active')) showView('v-horses'); window.HORSES.render(v); }
   if (v.game === 'word' && window.WORD) { if (!$('#v-word').classList.contains('active')) showView('v-word'); window.WORD.render(v); }
@@ -1153,14 +1168,14 @@ window.WHEEL = (() => {
         <text x="${tx}" y="${ty}" class="wl ${id.startsWith('c') ? 'coin' : ''}" text-anchor="middle" dominant-baseline="central" transform="rotate(${mid + 90} ${tx} ${ty})">${s.t}</text>`;
     }).join('');
     const bulbs = Array.from({ length: 24 }, (_, i) => { const [x, y] = pt(i * 15, R + 13); return `<circle cx="${x}" cy="${y}" r="4.5" class="bulb b${i % 2}"/>`; }).join('');
-    return `<svg viewBox="-18 -18 356 356" class="wh-svg"><defs>
+    const VB = 'viewBox="-18 -18 356 356"';
+    return `<svg ${VB} class="wh-svg wh-base"><defs><linearGradient id="wGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#e2a70f"/><stop offset="1" stop-color="#8a5a00"/></linearGradient></defs>
+      <circle cx="160" cy="160" r="168" fill="#3a0d1f" stroke="url(#wGold)" stroke-width="10"/>${bulbs}</svg>
+      <svg ${VB} class="wh-svg wh-rot" id="wh-rot"><defs>
       <linearGradient id="wRain" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff004c"/><stop offset=".25" stop-color="#ffe600"/><stop offset=".5" stop-color="#3dff6e"/><stop offset=".75" stop-color="#00e5ff"/><stop offset="1" stop-color="#c13cff"/></linearGradient>
       <radialGradient id="wShade" cx="160" cy="160" r="150" gradientUnits="userSpaceOnUse"><stop offset=".2" stop-color="#fff" stop-opacity=".25"/><stop offset=".75" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></radialGradient>
-      <linearGradient id="wGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#e2a70f"/><stop offset="1" stop-color="#8a5a00"/></linearGradient></defs>
-      <circle cx="160" cy="160" r="168" fill="#3a0d1f" stroke="url(#wGold)" stroke-width="10"/>
-      ${bulbs}
-      <g class="wh-rot" id="wh-rot">${slices}</g>
-      <circle cx="160" cy="160" r="34" fill="url(#wGold)" stroke="#5a3a00" stroke-width="3"/>
+      <linearGradient id="wGold2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#e2a70f"/><stop offset="1" stop-color="#8a5a00"/></linearGradient></defs>${slices}</svg>
+      <svg ${VB} class="wh-svg"><circle cx="160" cy="160" r="34" fill="url(#wGold)" stroke="#5a3a00" stroke-width="3"/>
       <circle cx="160" cy="160" r="26" fill="#3a0d1f"/>
       <text x="160" y="161" text-anchor="middle" dominant-baseline="central" class="wh-hub">PZ</text></svg>`;
   }
