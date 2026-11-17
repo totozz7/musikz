@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>MUSIKZ — Blind test entre potes</title>
+<title>PlayZup — Jeux entre potes</title>
 <meta name="theme-color" content="#16070b">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%23ff2e4d'/><circle cx='50' cy='50' r='16' fill='%23ffc21a'/><circle cx='50' cy='50' r='4' fill='%2316070b'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='6' y='6' width='88' height='88' rx='24' fill='%23ff2e4d'/><text x='50' y='68' font-size='52' text-anchor='middle' font-family='Arial Black' fill='%23ffc21a'>P</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
@@ -19,33 +19,38 @@
 
 <!-- ───────── ACCUEIL ───────── -->
 <section id="home" class="screen active">
-  <div class="home-wrap">
+  <div class="home-wrap wide">
     <div class="logo-block">
-      <div class="vinyl big"><div class="label">MZ</div></div>
-      <h1 class="logo">MUSI<span>KZ</span></h1>
-      <p class="tagline">Le blind test entre potes. Génériques, tubes, films… qui sera le plus rapide ?</p>
+      <h1 class="logo">PLAY<span>ZUP</span></h1>
+      <p class="tagline">Les jeux de soirée entre potes. Un lien, tes amis, et c'est parti.</p>
     </div>
 
-    <div class="card home-card">
-      <div class="profile-preview">
-        <span id="pv-avatar"></span>
-        <div class="pv-txt">
-          <div id="pv-name" class="pv-name">Ton pseudo</div>
-          <div id="pv-title" class="pv-title"></div>
+    <div class="home-grid">
+      <div class="card home-card">
+        <div class="profile-preview">
+          <span id="pv-avatar"></span>
+          <div class="pv-txt">
+            <div id="pv-name" class="pv-name">Ton pseudo</div>
+            <div id="pv-title" class="pv-title"></div>
+          </div>
+          <div class="wallet" title="Tes pièces"><span>🪙</span><b class="coins-n">0</b></div>
         </div>
-        <div class="wallet" title="Tes pièces"><span>🪙</span><b class="coins-n">0</b></div>
+        <label class="lbl">Ton pseudo</label>
+        <input id="name" class="input" maxlength="18" placeholder="Ex. Thomas" autocomplete="off">
+        <button id="btn-shop" class="btn btn-shop" type="button">🎨 Personnaliser &amp; Boutique</button>
+        <p class="muted small center-txt">Gagne des 🪙 dans tous les jeux pour débloquer cadres, effets, titres…</p>
+        <div class="or"><span>tu as un code ?</span></div>
+        <div class="join-row">
+          <input id="code" class="input code-input" maxlength="5" placeholder="CODE" autocomplete="off">
+          <button id="btn-join" class="btn btn-yellow">Rejoindre</button>
+        </div>
+        <p id="home-err" class="err"></p>
       </div>
-      <label class="lbl">Ton pseudo</label>
-      <input id="name" class="input" maxlength="18" placeholder="Ex. Thomas" autocomplete="off">
-      <button id="btn-shop" class="btn btn-shop" type="button">🎨 Personnaliser &amp; Boutique</button>
-      <p class="muted small center-txt">Gagne des 🪙 à chaque partie pour débloquer cadres, effets, titres…</p>
-      <button id="btn-create" class="btn btn-primary btn-xl">🎤 Créer un salon</button>
-      <div class="or"><span>ou rejoindre</span></div>
-      <div class="join-row">
-        <input id="code" class="input code-input" maxlength="5" placeholder="CODE" autocomplete="off">
-        <button id="btn-join" class="btn btn-yellow">Rejoindre</button>
+
+      <div class="games-col">
+        <h2 class="pick-title">🎮 Choisis ton jeu</h2>
+        <div id="games" class="games"></div>
       </div>
-      <p id="home-err" class="err"></p>
     </div>
   </div>
 </section>
@@ -53,7 +58,8 @@
 <!-- ───────── SALON / JEU ───────── -->
 <section id="room" class="screen">
   <header class="topbar">
-    <div class="logo small">MUSI<span>KZ</span></div>
+    <div class="logo small">PLAY<span>ZUP</span></div>
+    <span id="game-badge" class="game-badge"></span>
     <div class="room-code" id="room-code-box" title="Copier le lien d'invitation">
       <span class="muted">Salon</span> <b id="room-code">-----</b> <span class="copy">🔗 Copier le lien</span>
     </div>
@@ -74,10 +80,73 @@
     <main class="stage">
       <!-- LOBBY -->
       <div id="v-lobby" class="view">
+        <div id="game-switch" class="game-switch"></div>
         <div class="lobby-head">
-          <h2>Préparez vos oreilles 🎧</h2>
+          <h2 id="lobby-title">Préparez vos oreilles 🎧</h2>
           <p class="muted" id="lobby-sub">Invite tes potes avec le lien, choisis les catégories et lance la partie.</p>
+          <p id="lobby-count" class="lobby-count"></p>
         </div>
+
+        <!-- réglages Undercover -->
+        <div id="set-undercover" class="settings gset hidden">
+          <div class="set-block">
+            <h4>Thème des mots</h4>
+            <div id="uc-themes" class="uc-themes"></div>
+          </div>
+          <div class="set-row">
+            <div class="set-block">
+              <h4>Undercovers</h4>
+              <div class="seg gseg" data-key="undercovers"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button></div>
+              <p class="muted small hint2">Ajusté automatiquement selon le nombre de joueurs (2 dès 5 joueurs, 3 dès 8).</p>
+            </div>
+            <div class="set-block">
+              <h4>Mr. White 👻</h4>
+              <label class="tog"><input type="checkbox" class="gtog" data-key="mrWhite"><span></span> Ajouter un Mr. White <small>il n'a aucun mot (dès 4 joueurs)</small></label>
+            </div>
+          </div>
+          <div class="set-row">
+            <div class="set-block">
+              <h4>Indices</h4>
+              <div class="seg gseg" data-key="mode"><button data-v="written">✍️ Écrits dans le jeu</button><button data-v="oral">🎙️ À l'oral</button></div>
+            </div>
+            <div class="set-block">
+              <h4>Tours d'indices avant le vote</h4>
+              <div class="seg gseg" data-key="clueRounds"><button data-v="1">1 tour</button><button data-v="2">2 tours</button></div>
+            </div>
+          </div>
+          <div class="set-block">
+            <h4>Temps pour donner son indice</h4>
+            <div class="seg gseg" data-key="clueTime"><button data-v="20">20 s</button><button data-v="30">30 s</button><button data-v="40">40 s</button><button data-v="60">60 s</button></div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>Les <b>civils</b> ont tous le même mot. L'<b>undercover</b> a un mot proche… sans savoir qu'il est undercover.
+            <b>Mr. White</b> n'a aucun mot et doit bluffer. Chacun donne un indice à tour de rôle, puis on vote pour éliminer un suspect.
+            Si Mr. White est éliminé, il peut gagner en devinant le mot des civils !</p>
+          </div>
+        </div>
+
+        <!-- réglages Jeu de la Note -->
+        <div id="set-note" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block">
+              <h4>Nombre de passages</h4>
+              <div class="seg gseg" data-key="tours"><button data-v="1">1 fois chacun</button><button data-v="2">2 fois</button><button data-v="3">3 fois</button></div>
+            </div>
+            <div class="set-block">
+              <h4>Temps pour répondre</h4>
+              <div class="seg gseg" data-key="answerTime"><button data-v="60">1 min</button><button data-v="90">1 min 30</button><button data-v="120">2 min</button><button data-v="180">3 min</button></div>
+            </div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>À chaque manche, un joueur reçoit une <b>note secrète de 1 à 10</b>. Un autre joueur lui choisit <b>3 thèmes</b>
+            (un film, un plat, un animal…). Il doit répondre à chaque thème par quelque chose qui « vaut » sa note :
+            note 1 → le pire, note 10 → le meilleur. Les autres devinent la note.</p>
+            <p class="muted small">🎯 Note exacte = 3 pts · à 1 près = 2 pts · à 2 près = 1 pt. Le répondeur gagne 1 pt par joueur qui tombe à 1 près.</p>
+          </div>
+        </div>
+
         <div id="settings" class="settings">
           <div class="set-block">
             <h4>Catégories <span class="muted" id="cat-count"></span></h4>
@@ -167,9 +236,14 @@
         </div>
       </div>
 
+      <!-- UNDERCOVER -->
+      <div id="v-uc" class="view"></div>
+      <!-- JEU DE LA NOTE -->
+      <div id="v-note" class="view"></div>
+
       <!-- CHARGEMENT -->
       <div id="v-loading" class="view center">
-        <div class="vinyl spin"><div class="label">MZ</div></div>
+        <div class="vinyl spin"><div class="label">PZ</div></div>
         <h2>On fouille les bacs à disques…</h2>
         <p class="muted">Préparation des extraits</p>
       </div>
@@ -298,5 +372,7 @@
 <script src="/shop.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/app.js"></script>
+<script src="/client-undercover.js"></script>
+<script src="/client-note.js"></script>
 </body>
 </html>

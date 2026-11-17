@@ -1,7 +1,7 @@
 {
-  "name": "musikz",
+  "name": "playzup",
   "version": "1.0.0",
-  "description": "Blind test multijoueur entre potes",
+  "description": "Jeux de soir\u00e9e entre potes : Blind test, Undercover, Jeu de la Note",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

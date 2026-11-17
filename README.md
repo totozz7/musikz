@@ -1,15 +1,26 @@
-# 🎵 MUSIKZ — le blind test entre potes
+# 🎮 PLAYZUP — les jeux de soirée entre potes
 
-Blind test multijoueur en temps réel (jusqu'à 12 joueurs), extraits Deezer de 30 s, 43 catégories
-choisies à la main (~1 100 morceaux) : Dessins animés 2000-2010, Disney VF, films, séries, animés, jeux vidéo,
-rap FR, variété, décennies, genres, monde, et des catégories fun (tubes de soirée,
-tubes de l'été, hymnes de stade, Noël, Disney Channel, comédies musicales, émissions télé)…
+Un site à partager par lien : chacun crée son profil (icône, couleur, cadre, boutique), puis l'hôte choisit un jeu.
 
-Seules les **versions originales** sont gardées : les reprises piano/guitare, karaoké, live, remix… sont filtrées,
-et parmi les versions restantes on prend la plus écoutée.
+| Jeu | Joueurs | Le principe |
+|---|---|---|
+| 🎵 **Blind test** | 1 à 12 | Extraits de 30 s, 42 catégories, mode Zizanie avec bonus et malus |
+| 🕵️ **Undercover** | 3 à 12 | Les civils ont un mot, l'undercover un mot proche, Mr. White rien du tout. Indices puis vote |
+| 🔢 **Jeu de la Note** | 2 à 10 | Une note secrète sur 10, 3 thèmes : on répond avec quelque chose qui « vaut » sa note, les autres devinent |
 
-Dans les catégories « Écrans » on devine le **nom de l'œuvre** (dessin animé, film, série…) ;
-dans les autres, l'**artiste** et le **titre**.
+Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se reconnecter.
+
+### 🕵️ Undercover
+- 12 thèmes : **Animés japonais**, nourriture, animaux, dessins animés, films & séries, sport, objets, lieux, métiers,
+  jeux vidéo, musique, soirée (ou tout mélangé). Les paires de mots sont dans `data-undercover.js` (une ligne = une paire).
+- Réglages : nombre d'undercovers (1 à 3, ajusté au nombre de joueurs), Mr. White (dès 4 joueurs), indices écrits ou à l'oral,
+  1 ou 2 tours d'indices avant le vote, temps par indice.
+- Points : civils 2 · undercover 10 · Mr. White 6. Mr. White éliminé peut gagner en devinant le mot des civils.
+
+### 🔢 Jeu de la Note
+- 70 thèmes avec leur échelle (« Un animal : 1 = inoffensif, 10 = terrifiant »…), dans `data-note.js`.
+- Le questionneur choisit 3 thèmes parmi 12 (2 relances), le répondeur répond, les autres devinent.
+- Points : note exacte 3 · à 1 près 2 · à 2 près 1. Le répondeur gagne 1 point par joueur tombé à 1 près.
 
 ## Mettre le site en ligne (gratuit, ~10 min) avec Render
 

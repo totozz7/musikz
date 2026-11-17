@@ -1,4 +1,4 @@
-// MUSIKZ — client
+// PLAYZUP — client (accueil, boutique, salon, Blind test). Undercover et Note : client-undercover.js / client-note.js
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -156,10 +156,29 @@ function unlockAudio() {
   try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); } catch {}
 }
 let actx = null;
-$('#btn-create').onclick = () => {
-  const id = identity(); if (!id) return;
-  socket.emit('create', id, onJoined);
+// ───────────── Choix du jeu ─────────────
+const GAME_META = {
+  blindtest: { emoji: '🎵', name: 'Blind test', desc: "Devine l'artiste, le titre, le dessin animé… 42 catégories, mode Zizanie avec bonus et malus.", cls: 'g-blind', lobby: 'Préparez vos oreilles 🎧' },
+  undercover: { emoji: '🕵️', name: 'Undercover', desc: 'Un mot secret, un imposteur parmi vous. Donnez des indices, démasquez-le… sans vous faire avoir.', cls: 'g-uc', lobby: 'Qui est l\'undercover ? 🕵️' },
+  note: { emoji: '🔢', name: 'Jeu de la Note', desc: "Une note secrète sur 10, trois thèmes : réponds avec quelque chose qui « vaut » ta note. Les autres devinent !", cls: 'g-note', lobby: 'Sur une échelle de 1 à 10… 🔢' },
 };
+let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, note: { min: 2, max: 10 } }, UC_THEMES = [];
+const playersLabel = (g) => { const i = GAME_INFO[g]; return i.min === i.max ? `${i.min} joueurs` : `${i.min} à ${i.max} joueurs`; };
+function renderGames() {
+  $('#games').innerHTML = Object.entries(GAME_META).map(([id, m]) => `
+    <button class="game-card ${m.cls}" data-game="${id}">
+      <span class="g-emoji">${m.emoji}</span>
+      <span class="g-body"><b>${m.name}</b><small>${m.desc}</small></span>
+      <span class="g-players">👥 ${playersLabel(id)}</span>
+      <span class="g-go">Créer un salon ▶</span>
+    </button>`).join('');
+  $$('#games .game-card').forEach(b => b.onclick = () => {
+    const id = identity(); if (!id) return;
+    socket.emit('create', { ...id, game: b.dataset.game }, onJoined);
+  });
+}
+renderGames();
+fetch('/api/games').then(r => r.json()).then(j => { GAME_INFO = j.info; UC_THEMES = j.ucThemes; renderGames(); if (state) renderSettings(); }).catch(() => {});
 $('#btn-join').onclick = () => {
   const id = identity(); if (!id) return;
   const code = $('#code').value.trim().toUpperCase();
@@ -167,7 +186,7 @@ $('#btn-join').onclick = () => {
   socket.emit('join', { ...id, code }, onJoined);
 };
 $('#code').addEventListener('keydown', e => { if (e.key === 'Enter') $('#btn-join').click(); });
-$('#name').addEventListener('keydown', e => { if (e.key === 'Enter') (urlCode ? $('#btn-join') : $('#btn-create')).click(); });
+$('#name').addEventListener('keydown', e => { if (e.key === 'Enter' && urlCode) $('#btn-join').click(); });
 
 let joinedCode = null;
 function onJoined(res) {
@@ -231,7 +250,8 @@ function renderSettings() {
   if (!state) return;
   const s = state.settings;
   renderCats();
-  $$('.seg').forEach(seg => {
+  renderGameLobby();
+  $$('#settings .seg').forEach(seg => {
     const k = seg.dataset.key;
     seg.querySelectorAll('button').forEach(b => {
       b.classList.toggle('on', String(s[k]) === b.dataset.v);
@@ -239,14 +259,47 @@ function renderSettings() {
     });
   });
   $('#answer-block').style.display = s.mode === 'qcm' ? 'none' : '';
-  $$('.tog input').forEach(i => { i.checked = !!s[i.dataset.key]; i.onchange = () => setSetting({ [i.dataset.key]: i.checked }); });
+  $$('#settings .tog input').forEach(i => { i.checked = !!s[i.dataset.key]; i.onchange = () => setSetting({ [i.dataset.key]: i.checked }); });
   if (document.activeElement !== $('#custom-link')) $('#custom-link').value = s.customLink || '';
   $('#pl-status').textContent = s.customLink ? `✅ ${s.customSource ? s.customSource + ' · ' : ''}${s.customTitle || 'Playlist perso ajoutée à la partie'}` : '';
   $('#custom-only-row').classList.toggle('hidden', !s.customLink);
   $('#settings').classList.toggle('readonly', !isHost());
   $('#btn-start').style.display = isHost() ? '' : 'none';
   $('#wait-host').style.display = isHost() ? 'none' : '';
-  $('#lobby-sub').textContent = isHost() ? 'Invite tes potes avec le lien en haut, choisis les catégories et lance la partie.' : 'L\'hôte prépare la partie. Tu vois les réglages en direct.';
+  $('#lobby-sub').textContent = isHost() ? 'Invite tes potes avec le lien en haut, règle la partie et lance-la.' : 'L\'hôte prépare la partie. Tu vois les réglages en direct.';
+}
+
+// Salon : choix du jeu (hôte), nombre de joueurs, réglages Undercover / Note
+function renderGameLobby() {
+  const g = state.game || 'blindtest', m = GAME_META[g], info = GAME_INFO[g];
+  const n = state.players.filter(p => p.online).length;
+  $('#game-badge').innerHTML = `${m.emoji} ${m.name}`;
+  $('#game-switch').innerHTML = Object.entries(GAME_META).map(([id, x]) => `<button class="gs ${x.cls} ${id === g ? 'on' : ''}" data-g="${id}" ${isHost() ? '' : 'disabled'}>
+    <span>${x.emoji}</span><b>${x.name}</b><small>👥 ${playersLabel(id)}</small></button>`).join('');
+  $$('#game-switch .gs').forEach(b => b.onclick = () => { if (isHost() && b.dataset.g !== g) socket.emit('setGame', b.dataset.g); });
+  $('#lobby-title').textContent = m.lobby;
+  const ok = n >= info.min && n <= info.max;
+  $('#lobby-count').className = 'lobby-count ' + (ok ? 'ok' : 'ko');
+  $('#lobby-count').textContent = ok ? `👥 ${n} joueur${n > 1 ? 's' : ''} — c'est bon (${playersLabel(g)})`
+    : n < info.min ? `👥 ${n} joueur${n > 1 ? 's' : ''} — il en faut au moins ${info.min} pour ce jeu. Invite tes potes avec le lien en haut !` : `👥 ${n} joueurs — ${info.max} maximum pour ce jeu`;
+  $('#settings').classList.toggle('hidden', g !== 'blindtest');
+  $('#set-undercover').classList.toggle('hidden', g !== 'undercover');
+  $('#set-note').classList.toggle('hidden', g !== 'note');
+  $('#btn-start').textContent = `▶ Lancer ${m.name === 'Jeu de la Note' ? 'le Jeu de la Note' : m.name === 'Blind test' ? 'le Blind test' : "l'Undercover"}`;
+  $('#btn-start').disabled = !ok;
+  if (g === 'blindtest') return;
+  const box = $('#set-' + g), gs = state.gs?.[g] || {};
+  box.classList.toggle('readonly', !isHost());
+  if (g === 'undercover') {
+    $('#uc-themes').innerHTML = [{ id: 'all', emoji: '🎲', name: 'Tout mélangé' }, ...UC_THEMES].map(t =>
+      `<button class="cat ${gs.theme === t.id ? 'on' : ''} ${t.id === 'anime' ? 'star' : ''}" data-t="${t.id}">${t.emoji} ${esc(t.name)}</button>`).join('');
+    $$('#uc-themes .cat').forEach(b => b.onclick = () => socket.emit('gsettings', { theme: b.dataset.t }));
+  }
+  box.querySelectorAll('.gseg').forEach(seg => seg.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('on', String(gs[seg.dataset.key]) === b.dataset.v);
+    b.onclick = () => socket.emit('gsettings', { [seg.dataset.key]: isNaN(+b.dataset.v) ? b.dataset.v : +b.dataset.v });
+  }));
+  box.querySelectorAll('.gtog').forEach(i => { i.checked = !!gs[i.dataset.key]; i.onchange = () => socket.emit('gsettings', { [i.dataset.key]: i.checked }); });
 }
 $('#btn-check-pl').onclick = () => {
   const link = $('#custom-link').value.trim();
@@ -278,6 +331,7 @@ socket.on('room', (r) => {
   $$('.host-only').forEach(e => e.style.display = isHost() ? '' : 'none');
   $$('.guest-only').forEach(e => e.style.display = isHost() ? 'none' : '');
   if (r.phase === 'lobby') { showView('v-lobby'); renderSettings(); stopAudio(); resetEffects(); }
+  else $('#game-badge').innerHTML = `${GAME_META[r.game || 'blindtest'].emoji} ${GAME_META[r.game || 'blindtest'].name}`;
   if (r.phase === 'powers') renderPowerStatus();
   if (r.phase === 'loading') showView('v-loading');
   if (r.phase === 'end' && prevPhase !== 'end') renderEnd();
@@ -447,12 +501,24 @@ socket.on('reveal', (rv) => {
 });
 
 // ───────────── Fin ─────────────
-socket.on('end', (e) => {
+function grantCoins(e) {
   const mine = e.coins?.[pid];
   if (mine && save.lastGame !== e.gameId) {
-    save.lastGame = e.gameId; save.coins += mine.coins; save.games++; save.good += mine.good; if (mine.win) save.wins++;
+    save.lastGame = e.gameId; save.coins += mine.coins; save.games++; save.good += mine.good || 0; if (mine.win) save.wins++;
     persist(); renderProfile();
+    if (state?.game !== 'blindtest') toast(`🪙 +${mine.coins} pièces !`);
   }
+  return mine;
+}
+socket.on('reward', grantCoins);
+// actions des jeux Undercover / Note
+const gAct = (type, data) => new Promise(r => socket.emit('g', { type, data }, (res) => { if (res?.error) toast(res.error, 'error'); r(res); }));
+socket.on('g:state', (v) => {
+  if (v.game === 'undercover' && window.UC) { if (!$('#v-uc').classList.contains('active')) showView('v-uc'); window.UC.render(v); }
+  if (v.game === 'note' && window.NOTE) { if (!$('#v-note').classList.contains('active')) showView('v-note'); window.NOTE.render(v); }
+});
+socket.on('end', (e) => {
+  const mine = grantCoins(e);
   if (mine) {
     $('#earned').classList.remove('hidden');
     $('#earned').innerHTML = `<span class="coin-spin">🪙</span> +${mine.coins} pièces <small>(${mine.good} bonne${mine.good > 1 ? 's' : ''} réponse${mine.good > 1 ? 's' : ''}${mine.rank <= 3 && Object.keys(e.coins).length > 1 ? ' · bonus podium' : ''})</small> · Total : <b>${save.coins} 🪙</b>`;

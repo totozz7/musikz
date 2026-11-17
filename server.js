@@ -1,4 +1,4 @@
-// MUSIKZ — serveur de blind test multijoueur (Express + Socket.io + Deezer, import Spotify)
+// PLAYZUP — serveur de jeux entre potes : Blind test, Undercover, Jeu de la Note (Express + Socket.io)
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
@@ -20,7 +20,7 @@ const io = new Server(server);
 const PUB = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : __dirname;
 const INDEX = path.join(PUB, 'index.html');
 const SHOP = require(path.join(PUB, 'shop.js'));
-for (const f of ['app.js', 'style.css', 'shop.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
+for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
 app.get('/', (req, res) => res.sendFile(INDEX));
 app.get('/r/:code', (req, res) => res.sendFile(INDEX));
 app.get('/health', (req, res) => res.send('ok'));
@@ -350,7 +350,8 @@ function publicPlayers(room) {
   return [...room.players.values()].map(p => {
     const f = room.round?.found.get(p.id) || {};
     return {
-      id: p.id, name: p.name, avatar: p.avatar, color: p.color, frame: p.frame || 'none', score: p.score,
+      id: p.id, name: p.name, avatar: p.avatar, color: p.color, frame: p.frame || 'none',
+      score: room.game === 'blindtest' || !room.game ? p.score : room.g?.game === 'note' && room.g.stage !== 'over' ? room.g.scores[p.id] || 0 : room.gscores?.[room.game]?.[p.id] || 0,
       nameFx: p.nameFx || 'none', title: SHOP.titles.find(t => t.id === p.title && t.id !== 'none')?.name || '', winFx: p.winFx || 'party',
       online: p.online, host: p.id === room.hostId,
       foundArtist: !!f.artist, foundTitle: !!f.title, answered: !!f.answered, streak: p.streak || 0,
@@ -360,12 +361,36 @@ function publicPlayers(room) {
 }
 function roomState(room) {
   return {
-    code: room.code, phase: room.phase, settings: room.settings,
+    code: room.code, phase: room.phase, settings: room.settings, game: room.game, gs: room.gs,
     players: publicPlayers(room), hostId: room.hostId,
     roundIndex: room.roundIndex, totalRounds: room.queue?.length || room.settings.rounds,
   };
 }
 const broadcast = (room) => io.to(room.code).emit('room', roomState(room));
+
+// ───────────────────────── les autres jeux (modules) ─────────────────────────
+function pushState(room) {
+  if (!room.g) return;
+  const mod = GAMES[room.g.game];
+  for (const p of room.players.values()) if (p.online && p.socketId) io.to(p.socketId).emit('g:state', mod.view(room, p.id));
+}
+function reward(room, coins) {
+  room.gameId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  io.to(room.code).emit('reward', { coins, gameId: room.gameId });
+}
+const gameCtx = { sysMsg: (...a) => sysMsg(...a), broadcast: (r) => broadcast(r), pushState: (r) => pushState(r), shuffle, reward };
+const GAMES = {
+  undercover: require('./game-undercover')(gameCtx),
+  note: require('./game-note')(gameCtx),
+};
+// infos affichées sur l'écran de choix (nombre de joueurs !)
+const GAME_INFO = {
+  blindtest: { min: 1, max: 12 },
+  undercover: { min: GAMES.undercover.min, max: GAMES.undercover.max },
+  note: { min: GAMES.note.min, max: GAMES.note.max },
+};
+app.get('/api/games', (req, res) => res.json({ info: GAME_INFO, ucThemes: GAMES.undercover.themes() }));
+function stopModuleGame(room) { if (room.g) { clearTimeout(room.g.timer); room.g = null; } }
 function sysMsg(room, text) {
   const m = { id: Date.now() + Math.random(), sys: true, text, at: Date.now() };
   room.chat.push(m); room.chat = room.chat.slice(-100);
@@ -720,9 +745,10 @@ function endGame(room) {
 io.on('connection', (socket) => {
   let room = null, me = null;
 
-  socket.on('create', ({ name, avatar, pid, ...look }, cb) => {
+  socket.on('create', ({ name, avatar, pid, game, ...look }, cb) => {
     const code = makeCode();
-    room = { code, players: new Map(), hostId: pid, phase: 'lobby', settings: defaultSettings(), chat: [], history: [] };
+    room = { code, players: new Map(), hostId: pid, phase: 'lobby', settings: defaultSettings(), chat: [], history: [],
+      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults() }, gscores: {}, g: null };
     rooms.set(code, room);
     join(room, { name, avatar, pid, ...look }, cb);
   });
@@ -756,6 +782,7 @@ io.on('connection', (socket) => {
     cb?.({ ok: true, code: r.code, chat: r.chat });
     broadcast(r);
     if (r.phase === 'playing' && r.round) socket.emit('round', roundPayload(r, true, pid));
+    if (r.phase === 'game' && r.g) socket.emit('g:state', GAMES[r.g.game].view(r, pid));
     if (r.phase === 'powers' && r.round) {
       if (!r.round.offers.has(pid)) r.round.offers.set(pid, drawOffers(r));
       socket.emit('powers', powersPayload(r, pid));
@@ -800,8 +827,34 @@ io.on('connection', (socket) => {
     catch (e) { console.warn('playlist', e.message); cb?.({ error: e.message }); }
   });
 
+  // l'hôte change de jeu (dans le salon)
+  socket.on('setGame', (game) => {
+    if (!isHost() || !['lobby', 'end'].includes(room.phase) || !GAME_INFO[game]) return;
+    room.game = game; room.phase = 'lobby'; stopModuleGame(room);
+    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note' }[game]}`);
+    broadcast(room);
+  });
+  socket.on('gsettings', (patch = {}) => {
+    if (!isHost() || room.phase !== 'lobby' || !GAMES[room.game]) return;
+    GAMES[room.game].applySettings(room, patch); broadcast(room);
+  });
+  // actions des jeux Undercover / Note
+  socket.on('g', ({ type, data } = {}, cb) => {
+    if (!room || !me || room.phase !== 'game' || !room.g) return;
+    const h = GAMES[room.g.game]?.handlers[type];
+    if (!h) return;
+    const res = h(room, me, data);
+    cb?.(res || { ok: true });
+  });
+
   socket.on('start', () => {
     if (!isHost() || !['lobby', 'end'].includes(room.phase)) return;
+    if (room.game !== 'blindtest') {
+      const n = [...room.players.values()].filter(p => p.online).length, info = GAME_INFO[room.game];
+      if (n < info.min || n > info.max) return socket.emit('toast', { type: 'error', text: `Ce jeu se joue de ${info.min} à ${info.max} joueurs (vous êtes ${n})` });
+      try { GAMES[room.game].start(room); } catch (e) { socket.emit('toast', { type: 'error', text: e.message }); }
+      return;
+    }
     const s = room.settings;
     if (!s.categories.length && !s.customLink) return socket.emit('toast', { type: 'error', text: 'Choisis au moins une catégorie !' });
     startGame(room);
@@ -845,7 +898,7 @@ io.on('connection', (socket) => {
   socket.on('next', () => { if (isHost() && room.phase === 'reveal') nextRound(room); });
   socket.on('stop', () => {
     if (isHost() && room.phase !== 'lobby') {
-      clearTimeout(room.timer); room.phase = 'lobby'; broadcast(room); sysMsg(room, '⏹️ Partie arrêtée par l\'hôte');
+      clearTimeout(room.timer); stopModuleGame(room); room.phase = 'lobby'; broadcast(room); sysMsg(room, '⏹️ Retour au salon');
     }
   });
   socket.on('backToLobby', () => { if (isHost() && room.phase === 'end') { room.phase = 'lobby'; broadcast(room); } });
@@ -938,11 +991,12 @@ io.on('connection', (socket) => {
     broadcast(room);
     if (room.phase === 'playing' && allDone(room)) revealRound(room);
     if (room.phase === 'powers' && allChosePowers(room)) startPlaying(room);
+    if (room.phase === 'game' && room.g) { GAMES[room.g.game].onLeave(room, me); pushState(room); }
     const r = room;
     setTimeout(() => {
-      if ([...r.players.values()].every(p => !p.online)) { clearTimeout(r.timer); rooms.delete(r.code); }
+      if ([...r.players.values()].every(p => !p.online)) { clearTimeout(r.timer); stopModuleGame(r); rooms.delete(r.code); }
     }, 30 * 60 * 1000);
   });
 });
 
-server.listen(PORT, () => console.log(`🎵 Musikz en ligne sur http://localhost:${PORT}${MOCK ? ' (mode test)' : ''}`));
+server.listen(PORT, () => console.log(`🎮 PlayZup en ligne sur http://localhost:${PORT}${MOCK ? ' (mode test)' : ''}`));
