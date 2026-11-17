@@ -44,8 +44,8 @@
     if (fresh) build(v);
     skinBoard();
     updatePanel(v);
-    if (v.last && v.last.n !== lastN) {
-      const L = v.last; lastN = L.n;
+    if (v.last && v.last.type + v.last.n !== lastN) {
+      const L = v.last; lastN = L.type + L.n;
       rollDice(L.dice, L.type === 'roll');
       if (L.type === 'move') animateMove(L, v);
       else placeAll(v);
@@ -70,7 +70,8 @@
     TRACK.forEach(([r, c], i) => {
       const st = START.indexOf(i), gt = GATE.indexOf(i);
       const k = st >= 0 ? st : gt;
-      board += `<div class="pc-cell ${st >= 0 ? 'start' : ''} ${gt >= 0 ? 'gate' : ''}" style="--r:${r};--c:${c};${k >= 0 ? `--k:${HEX[k]}` : ''}">${st >= 0 ? '★' : gt >= 0 ? ARROW[gt] : ''}</div>`;
+      const sp = v.specials?.[i];
+      board += `<div class="pc-cell ${st >= 0 ? 'start' : ''} ${gt >= 0 ? 'gate' : ''} ${sp ? 'sp sp-' + sp : ''}" style="--r:${r};--c:${c};${k >= 0 ? `--k:${HEX[k]}` : ''}" ${sp ? `title="${SPN[sp]}"` : ''}>${st >= 0 ? '★' : gt >= 0 ? ARROW[gt] : sp ? `<span>${SP[sp][0]}</span>` : ''}</div>`;
     });
     board += '<div class="pc-center"><i></i></div>';
     HOME.forEach((cells, k) => cells.forEach(([r, c], j) => { board += `<div class="pc-cell home" style="--r:${r};--c:${c};--k:${HEX[k]}">${v.ladder ? j + 1 : j === 4 ? '▲' : ''}</div>`; }));
@@ -84,7 +85,7 @@
       <div class="uc-head">
         <span class="pill big pc-pill">🐎 Petits chevaux</span>
         <span class="pill">${v.mode === 'auto' ? '🎲 100 % hasard' : '🧠 Tu choisis ton cheval'}</span>
-        <span class="pill">${v.nHorses} chevaux chacun</span>${v.ladder ? '<span class="pill">🪜 Échelle 1→6</span>' : ''}
+        <span class="pill">${v.nHorses} chevaux chacun</span>${v.ladder ? '<span class="pill">🪜 Échelle 1→6</span>' : ''}${v.specials ? '<span class="pill spicy">🌶️ Cases spéciales</span>' : ''}${v.exit16 ? '<span class="pill">🚪 Sortie 1 ou 6</span>' : ''}${v.capReplay ? '<span class="pill">💥 Manger = rejouer</span>' : ''}
         ${isHost() ? '<button class="btn btn-ghost btn-sm pc-push" id="pc-stop">🏠 Salon</button>' : ''}
       </div>
       <div class="pc-main">
@@ -92,9 +93,11 @@
         <aside class="pc-side">
           <div class="pc-turn" id="pc-turn"></div>
           <div class="pc-dicebox"><div class="pc-dice" id="pc-dice"></div><button class="btn btn-primary btn-xl pc-roll" id="pc-roll">🎲 Lancer le dé</button></div>
+          <div class="pc-extra" id="pc-extra"></div>
           <div class="uc-timer pc-timer" id="pc-timer"><i></i><span></span></div>
           <div class="pc-seats" id="pc-seats"></div>
           <ul class="pc-log" id="pc-log"></ul>
+          ${v.specials ? `<div class="pc-legend">${Object.keys(SP).map(t => `<span class="sp-${t}"><i>${SP[t][0]}</i>${SPN[t]}</span>`).join('')}</div>` : ''}
         </aside>
       </div>
       <div id="pc-end"></div>`;
@@ -120,6 +123,7 @@
       const el = $(`#tok-${si}-${h}`); if (!el) return;
       pos(el, cellOf(s.color, rel, h, v.nHorses));
       el.classList.toggle('done', rel === v.finish);
+      el.classList.toggle('shielded', !!v.shield?.[si]?.[h]);
     }));
     stackOffsets(v);
   }
@@ -129,38 +133,101 @@
     $$('#v-horses .pc-tok').forEach(t => { const k = t.style.getPropertyValue('--r') + ',' + t.style.getPropertyValue('--c'); seen[k] = (seen[k] || 0) + 1; t.style.setProperty('--o', seen[k] - 1); });
   }
 
+  // un saut de case en case (rapide, mais on voit le cheval avancer)
+  const HOP = 175;
+  function hop(el, cell, back = false) {
+    pos(el, cell);
+    el.classList.remove('hop', 'hopb'); void el.offsetWidth; el.classList.add(back ? 'hopb' : 'hop');
+  }
+  function walk(el, color, h, from, to, done, ms = HOP) {
+    const dir = to >= from ? 1 : -1, steps = [];
+    for (let p = from + dir; dir > 0 ? p <= to : p >= to; p += dir) steps.push(p);
+    el.classList.add('moving');
+    let i = 0;
+    const tick = () => {
+      if (i >= steps.length) { el.classList.remove('moving', 'hop', 'hopb'); return done(); }
+      hop(el, cellOf(color, steps[i], h, V.nHorses), dir < 0); sfx('pop', .3); i++;
+      anim = setTimeout(tick, ms);
+    };
+    tick();
+  }
   function animateMove(L, v) {
     const seat = v.seats[L.seat], el = $(`#tok-${L.seat}-${L.h}`);
+    const ef = L.effect;
     // tous les autres pions à leur place (sauf les capturés, qui partent après l'impact)
-    const capturedKeys = new Set(L.captures.map(c => `${c.seat}-${c.h}`));
+    const capturedKeys = new Set([...L.captures, ...(ef ? ef.captures : [])].map(c => `${c.seat}-${c.h}`));
     v.seats.forEach((s, si) => v.horses[si].forEach((rel, h) => {
       if ((si === L.seat && h === L.h) || capturedKeys.has(`${si}-${h}`)) return;
       const t = $(`#tok-${si}-${h}`); if (t) pos(t, cellOf(s.color, rel, h, v.nHorses));
     }));
-    const steps = L.from === -1 ? [0] : Array.from({ length: L.to - L.from }, (_, i) => L.from + 1 + i);
-    clearInterval(anim); let i = 0;
-    el.classList.add('moving');
-    if (L.from === -1) { el.classList.add('v-out'); setTimeout(() => el.classList.remove('v-out'), 600); }
-    anim = setInterval(() => {
-      if (i >= steps.length) {
-        clearInterval(anim); anim = null; el.classList.remove('moving');
-        const here = cellOf(seat.color, L.to, L.h, v.nHorses);
-        if (L.to === v.finish) {
-          el.classList.add('v-win'); setTimeout(() => el.classList.remove('v-win'), 1400);
-          playFx('finish', seat.fx, cellOf(seat.color, v.ladder ? 56 : 55, L.h, v.nHorses), seat.hex);
-          if (seat.pid === pid) burst('fireworks', 10);
-          setTimeout(() => el.classList.add('done'), 900);
-        } else if (v.ladder && L.to > 50) { el.classList.add('v-step'); setTimeout(() => el.classList.remove('v-step'), 600); sfx('pop', .6); }
-        if (L.captures.length) {
-          const it = playFx('capture', seat.fx, here, seat.hex);
-          const delay = ['meteor', 'dragon'].includes(it.special) ? 560 : 220;
-          L.captures.forEach(c => setTimeout(() => victim(c, it.victim || 'spin', v), delay));
-        }
-        if (!L.captures.length) placeAll(V);
-        return;
+    clearTimeout(anim); anim = 'busy';
+    const end = () => { anim = null; placeAll(V); };
+    const afterMain = () => {
+      const here = cellOf(seat.color, L.to, L.h, v.nHorses);
+      if (L.to === v.finish) {
+        el.classList.add('v-win'); setTimeout(() => el.classList.remove('v-win'), 1400);
+        playFx('finish', seat.fx, cellOf(seat.color, v.ladder ? 56 : 55, L.h, v.nHorses), seat.hex);
+        if (seat.pid === pid) burst('fireworks', 10);
+        setTimeout(() => el.classList.add('done'), 900);
+      } else if (v.ladder && L.to > 50) { el.classList.add('v-step'); setTimeout(() => el.classList.remove('v-step'), 600); sfx('pop', .6); }
+      (L.shieldHits || []).forEach(c => shieldBlock(c));
+      const wait = strike(L.captures, here, seat, v);
+      if (ef) setTimeout(() => runEffect(L, ef, seat, el, v, end), wait ? 1400 : 250);
+      else setTimeout(end, wait ? 900 : 0);
+    };
+    if (L.from === -1) {
+      el.classList.add('moving', 'v-out'); pos(el, cellOf(seat.color, 0, L.h, v.nHorses)); sfx('pop', .5);
+      anim = setTimeout(() => { el.classList.remove('moving', 'v-out'); afterMain(); }, 560);
+    } else walk(el, seat.color, L.h, L.from, L.to, afterMain);
+  }
+  // capture : animation de l'attaquant + cinématique des pions mangés. Renvoie vrai s'il y a eu capture.
+  function strike(list, cell, seat, v) {
+    if (!list.length) return false;
+    const it = playFx('capture', seat.fx, cell, seat.hex);
+    const delay = ['meteor', 'dragon'].includes(it.special) ? 560 : 220;
+    list.forEach(c => setTimeout(() => victim(c, it.victim || 'spin', v), delay));
+    return true;
+  }
+  function shieldBlock(c) {
+    const t = $(`#tok-${c.seat}-${c.h}`); if (!t) return;
+    t.classList.add('v-block'); setTimeout(() => t.classList.remove('v-block'), 900);
+    const [r, cc] = [+t.style.getPropertyValue('--r'), +t.style.getPropertyValue('--c')];
+    node($('#pc-fx'), 'pf-sp shieldpop', r, cc, '🛡️<b>BLOQUÉ !</b>'); sfx('buzzer', .4);
+  }
+  // 🌶️ case spéciale
+  const SP = {
+    turbo: ['🚀', 'TURBO +3'], banana: ['🍌', 'GLISSADE −3'], portal: ['🌀', 'PORTAIL !'], shield: ['🛡️', 'BOUCLIER !'],
+    replay: ['🎲', 'REJOUE !'], trap: ['🕳️', 'TROU !'], star: ['⭐', '+5 🪙'],
+  };
+  const SPN = { turbo: 'Turbo : +3 cases', banana: 'Peau de banane : −3 cases', portal: "Portail : file à l'autre portail", shield: 'Bouclier : protège de la prochaine capture', replay: 'Rejoue une fois', trap: "Trou : retour à l'écurie", star: '+5 🪙 en fin de partie' };
+  function runEffect(L, ef, seat, el, v, end) {
+    const fx = $('#pc-fx'); const at = cellOf(seat.color, ef.from, L.h, v.nHorses);
+    const [ico, txt] = SP[ef.type] || ['❓', ''];
+    node(fx, `pf-sp sp-${ef.type}`, at[0], at[1], `${ico}<b>${ef.blocked ? txt + ' (bloqué)' : txt}</b>`);
+    sfx(['banana', 'trap'].includes(ef.type) ? 'buzzer' : 'legend', .5);
+    const fin = () => {
+      const wait = strike(ef.captures, cellOf(seat.color, ef.to, L.h, v.nHorses), seat, v);
+      setTimeout(end, wait ? 1200 : 150);
+    };
+    setTimeout(() => {
+      if (ef.blocked || ef.to === ef.from) {
+        if (ef.type === 'shield') { el.classList.add('shielded', 'v-step'); setTimeout(() => el.classList.remove('v-step'), 600); }
+        if (ef.type === 'star' && seat.pid === pid) burst('money', 10);
+        if (ef.type === 'replay') { el.classList.add('v-step'); setTimeout(() => el.classList.remove('v-step'), 600); }
+        return fin();
       }
-      pos(el, cellOf(seat.color, steps[i], L.h, v.nHorses)); sfx('pop', .35); i++;
-    }, 140);
+      if (ef.type === 'turbo') { el.classList.add('turbo'); walk(el, seat.color, L.h, ef.from, ef.to, () => { el.classList.remove('turbo'); fin(); }, 110); }
+      else if (ef.type === 'banana') { el.classList.add('slip'); walk(el, seat.color, L.h, ef.from, ef.to, () => { el.classList.remove('slip'); fin(); }, 140); }
+      else if (ef.type === 'portal') {
+        el.classList.add('v-portal');
+        const to = cellOf(seat.color, ef.to, L.h, v.nHorses);
+        node(fx, 'pf-sp sp-portal', to[0], to[1], '🌀');
+        setTimeout(() => { el.classList.add('v-teleport'); pos(el, to); void el.offsetWidth; el.classList.remove('v-teleport', 'v-portal'); el.classList.add('v-portin'); setTimeout(() => { el.classList.remove('v-portin'); fin(); }, 500); }, 520);
+      } else if (ef.type === 'trap') {
+        el.classList.add('v-suck');
+        setTimeout(() => { el.classList.remove('v-suck'); el.classList.add('v-teleport'); pos(el, cellOf(seat.color, -1, L.h, v.nHorses)); void el.offsetWidth; el.classList.remove('v-teleport'); el.classList.add('v-drop'); setTimeout(() => { el.classList.remove('v-drop'); fin(); }, 650); }, 650);
+      } else fin();
+    }, 700);
   }
 
   // le pion mangé : petite cinématique selon l'animation de l'attaquant, puis retour à l'écurie
@@ -262,7 +329,7 @@
   function updatePanel(v) {
     const cur = v.seats[v.turn], mine = v.me === v.turn && v.stage === 'play';
     $('#pc-turn').innerHTML = v.stage === 'over' ? '🏁 Partie terminée'
-      : `<span class="dot" style="--k:${cur.hex}"></span>${mine ? '<b>À toi de jouer !</b>' : `C'est à <b>${esc(cur.name)}</b>`}${v.phase === 'move' && mine ? '<small>Clique sur le cheval à déplacer</small>' : ''}`;
+      : `<span class="dot" style="--k:${cur.hex}"></span>${mine ? '<b>À toi de jouer !</b>' : `C'est à <b>${esc(cur.name)}</b>`}${v.phase === 'move' && mine ? `<small>${v.mode === 'auto' ? 'Avancer ou relancer ?' : 'Clique sur le cheval à déplacer'}</small>` : ''}${v.phase === 'stuck' && mine ? '<small>Aucun cheval ne peut bouger… tente une relance ?</small>' : ''}`;
     $('#pc-turn').style.setProperty('--k', cur.hex);
     $('#pc-turn').classList.toggle('mine', mine);
     const canRoll = mine && v.phase === 'roll';
@@ -270,20 +337,27 @@
     $('#pc-roll').classList.toggle('ready', canRoll);
     $('#pc-roll').textContent = canRoll ? '🎲 Lancer le dé' : v.stage === 'over' ? '🏁 Fin' : mine ? '⏳…' : '🎲 Patiente…';
     if (canRoll && lastStage === 'play') sfx('pop');
-    $$('#v-horses .pc-tok').forEach(t => t.classList.toggle('pick', v.phase === 'move' && mine && +t.dataset.s === v.me && v.legal.includes(+t.dataset.h)));
+    $$('#v-horses .pc-tok').forEach(t => t.classList.toggle('pick', v.phase === 'move' && mine && v.mode !== 'auto' && +t.dataset.s === v.me && v.legal.includes(+t.dataset.h)));
+    const rr = v.rerolls?.[v.me] || 0, ex = $('#pc-extra');
+    const btns = [];
+    if (mine && v.phase === 'move' && v.mode === 'auto') btns.push('<button class="btn btn-primary" data-a="go">▶ Avancer</button>');
+    if (mine && ['move', 'stuck'].includes(v.phase) && rr > 0) btns.push(`<button class="btn btn-yellow pc-rr" data-a="reroll">🔁 Relancer (${rr})</button>`);
+    if (mine && v.phase === 'stuck') btns.push('<button class="btn btn-ghost" data-a="pass">Passer</button>');
+    ex.innerHTML = btns.join('');
+    ex.querySelectorAll('button').forEach(b => b.onclick = () => { ex.innerHTML = ''; b.dataset.a === 'go' ? gAct('move', -1) : gAct(b.dataset.a); });
     $('#pc-seats').innerHTML = v.seats.map((s, k) => {
       const p = P(s.pid);
       return `<div class="pc-seat ${k === v.turn && v.stage === 'play' ? 'cur' : ''} ${k === v.me ? 'me' : ''}" style="--k:${s.hex}">
         ${p ? avatarHTML(p, 32) : '<span class="bot">🤖</span>'}<div><span>${p ? nameHTML(p) : esc(s.name)}</span><small>${s.colorName}${s.online ? '' : ' · absent'}</small></div>
-        <b>${'🏁'.repeat(s.home)}${'·'.repeat(v.nHorses - s.home)}</b>${s.captures ? `<em>💥${s.captures}</em>` : ''}</div>`;
+        <b>${'🏁'.repeat(s.home)}${'·'.repeat(v.nHorses - s.home)}</b>${s.captures ? `<em>💥${s.captures}</em>` : ''}${v.rerolls?.[k] ? `<em title="relances">🔁${v.rerolls[k]}</em>` : ''}${v.shield?.[k]?.some(Boolean) ? `<em title="boucliers">🛡️${v.shield[k].filter(Boolean).length}</em>` : ''}</div>`;
     }).join('');
     $('#pc-log').innerHTML = v.log.map(l => `<li>${esc(l)}</li>`).join('');
     // minuteur du tour
     clearInterval(timerIv);
     const tEl = $('#pc-timer');
-    if (mine && ['roll', 'move'].includes(v.phase)) {
+    if (mine && ['roll', 'move', 'stuck'].includes(v.phase)) {
       tEl.classList.remove('hidden');
-      const end = Date.now() + v.left, total = v.phase === 'roll' ? 20000 : 15000;
+      const end = Date.now() + v.left, total = v.phase === 'roll' ? 20000 : v.phase === 'stuck' ? 9000 : 15000;
       const tick = () => { const l = Math.max(0, end - Date.now()); tEl.querySelector('i').style.transform = `scaleX(${l / total})`; tEl.querySelector('span').textContent = Math.ceil(l / 1000) + ' s'; if (!l) clearInterval(timerIv); };
       tick(); timerIv = setInterval(tick, 250);
     } else tEl.classList.add('hidden');

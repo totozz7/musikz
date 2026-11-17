@@ -29,6 +29,8 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Règles classiques, 100 % hasard : un **6 pour sortir** un cheval, un 6 fait rejouer, on **renvoie à l'écurie** le cheval adverse sur lequel on s'arrête, les cases ★ de départ sont protégées, arrivée au chiffre exact.
 - Les places vides sont prises par des **robots**. Options : nombre de chevaux (2/3/4), nombre de camps, *Tu choisis ton cheval* (par défaut) ou *100 % hasard*.
 - Option **🪜 Échelle** : on s'arrête pile au pied de son escalier, puis il faut faire 1, 2, 3, 4, 5, 6 pour monter chaque marche, et encore un 6 pour rentrer (≈ 7 min à 2 chevaux, 35 min à 4 chevaux/4 camps).
+- **🌶️ Pimenter la partie** (options du salon) : cases spéciales posées au hasard (🚀 turbo +3, 🍌 peau de banane −3, 🌀 2 portails reliés, 🛡️ bouclier anti-capture, 🎲 rejoue, 🕳️ trou = retour à l'écurie, ⭐ +5 🪙), sortie de l'écurie sur 1 ou 6, 0/1/3 relances de dé par joueur, « manger un cheval fait rejouer ».
+- Les chevaux avancent case par case en sautillant ; chaque case spéciale a sa propre animation.
 - Boutique : **22 skins de pions** (🐎 Pions), **12 plateaux** (🎲 Plateaux : Bois verni gratuit → Prisme arc-en-ciel légendaire, chacun voit le plateau qu'il a équipé) et **12 animations** de capture / cheval rentré (💥 Animations chevaux, vues par tout le monde, aperçu en cliquant dans la boutique).
 - Pièces : selon la durée de la partie (≈ 4 à 7 🪙/min), +2 par cheval rentré, +2 par capture, gros bonus au vainqueur.
 
