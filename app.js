@@ -67,7 +67,7 @@ const openShop = () => { $('#shop').classList.remove('hidden'); renderProfile();
 [$('#btn-shop'), $('#btn-shop2'), ...$$('.open-shop')].forEach(b => b.onclick = openShop);
 $('#shop-close').onclick = () => $('#shop').classList.add('hidden');
 $('#shop').onclick = (e) => { if (e.target.id === 'shop') $('#shop').classList.add('hidden'); };
-$$('#shop-tabs button').forEach(b => b.onclick = () => { shopTab = b.dataset.tab; renderShop(); });
+$$('#shop-tabs button').forEach(b => b.onclick = () => { shopTab = b.dataset.tab; shopSel = null; renderShop(); });
 
 const LOOK_KEY = { icons: 'avatar', colors: 'color', frames: 'frame', nameFx: 'nameFx', titles: 'title', winFx: 'winFx', pawns: 'pawn', boards: 'board', pcfx: 'pcfx' };
 const RARITY_LABEL = { common: 'Commun', rare: '◆ Rare', epic: '✦ Épique', legendary: '★ Légendaire' };
@@ -87,6 +87,13 @@ function itemPreview(kind, it, m, big = false) {
 function renderShop() {
   $$('#shop-tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === shopTab));
   const body = $('#shop-body'); const m = me();
+  if (shopTab === 'wheel') {
+    body.innerHTML = `<div class="wheel-promo"><div class="wp-ico">🎡</div><h3>Roue de la chance</h3>
+      <p>Un tour = <b>🪙 ${SHOP.wheel.cost}</b>. Gagne des pièces (jusqu'à 500 !) ou un <b>objet surprise</b> de la boutique que tu n'as pas encore — commun, rare, et, avec beaucoup de chance, épique ou légendaire.</p>
+      <button class="btn btn-primary" id="wp-open">🎡 Ouvrir la roue</button></div>`;
+    $('#wp-open').onclick = () => { $('#shop').classList.add('hidden'); window.WHEEL.open(); };
+    return;
+  }
   if (shopTab === 'save') {
     body.innerHTML = `
       <div class="stats"><div><b>${save.games}</b><small>parties</small></div><div><b>${save.wins}</b><small>victoires</small></div>
@@ -122,27 +129,55 @@ function renderShop() {
       <div class="f-prev">${itemPreview(kind, star, m, true)}</div>
       <div class="f-txt"><span class="f-tag">⭐ À LA UNE · ${RARITY_LABEL[SHOP.rarity(star.price)]}</span><b>${esc(star.name || star.id)}</b>
       <span class="f-price">🪙 ${star.price}</span>${save.coins < star.price ? `<small>Encore ${star.price - save.coins} 🪙 à gagner</small>` : '<small>Tu peux te l\'offrir !</small>'}</div></div>` : '';
-  body.innerHTML = feat + `<div class="shop-grid ${kind}">${items.map(it => {
+  const sel = shopSel?.kind === kind ? items.find(x => x.id === shopSel.id && !owns(kind, x.id)) : null;
+  const animated = kind === 'winFx' || kind === 'pcfx';
+  const pane = sel ? `<div class="pv-pane r-${SHOP.rarity(sel.price)}">
+      <button class="pv-x" id="pv-close" title="Fermer">✕</button>
+      <div class="pv-prev ${kind}">${itemPreview(kind, sel, m, true).replace('bd-prev', 'bd-prev huge')}</div>
+      <div class="pv-txt"><span class="f-tag">👁️ APERÇU · ${RARITY_LABEL[SHOP.rarity(sel.price)]}</span><b>${esc(sel.name || sel.id)}</b>
+        <small>${animated ? "L'animation se joue à l'écran — regarde bien !" : kind === 'boards' ? 'Voilà ton futur plateau de Petits chevaux.' : 'Voilà à quoi ça ressemble sur toi.'}</small>
+        <div class="pv-btns">${animated ? '<button class="btn btn-ghost" id="pv-again">▶ Revoir</button>' : ''}<button class="btn btn-primary ${save.coins < sel.price ? 'poor' : ''}" id="pv-buy">Acheter · 🪙 ${sel.price}</button></div>
+        ${save.coins < sel.price ? `<small class="pv-miss">Il te manque ${sel.price - save.coins} 🪙</small>` : ''}</div></div>` : '';
+  body.innerHTML = (pane || feat) + `<div class="shop-grid ${kind}">${items.map(it => {
     const own = owns(kind, it.id), eq = save.look[lookKey] === it.id, rar = it.price ? SHOP.rarity(it.price) : 'free';
     const label = kind === 'icons' && !it.name ? '' : `<small>${esc(it.name || '')}</small>`;
     const btn = eq ? '<span class="state eq">✔ Équipé</span>' : own ? '<span class="state">Équiper</span>' : `<span class="state price ${save.coins >= it.price ? '' : 'poor'}">🪙 ${it.price}</span>`;
-    return `<button class="item r-${rar} ${eq ? 'eq' : ''} ${own ? '' : 'locked'}" data-id="${esc(it.id)}">${rar !== 'free' && rar !== 'common' ? `<span class="rtag">${RARITY_LABEL[rar]}</span>` : ''}${itemPreview(kind, it, m)}${label}${btn}</button>`;
+    return `<button class="item r-${rar} ${eq ? 'eq' : ''} ${own ? '' : 'locked'} ${sel && sel.id === it.id ? 'pv-on' : ''}" data-id="${esc(it.id)}">${rar !== 'free' && rar !== 'common' ? `<span class="rtag">${RARITY_LABEL[rar]}</span>` : ''}${itemPreview(kind, it, m)}${label}${btn}</button>`;
   }).join('')}</div>`;
-  $$('#shop-body .item, #shop-body .featured').forEach(b => b.onclick = () => {
-    const it = b.classList.contains('featured') ? star : items.find(x => x.id === b.dataset.id);
-    if (!owns(kind, it.id)) {
-      if (save.coins < it.price) { b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 300); return toast(`Il te manque ${it.price - save.coins} 🪙`, 'error'); }
-      save.coins -= it.price; save.owned.push(kind + ':' + it.id);
-      const rar = SHOP.rarity(it.price);
-      toast(`🛍️ ${rar === 'legendary' ? '★ LÉGENDAIRE ★ ' : ''}Acheté ! (-${it.price} 🪙)`);
-      sfx('legend'); if (rar === 'legendary' || rar === 'epic') setTimeout(() => sfx('legend'), 300);
-      burst(rar === 'legendary' ? 'galaxy' : rar === 'epic' ? 'money' : 'party', rar === 'legendary' ? 40 : 18);
-    }
+  const equip = (it) => {
     save.look[lookKey] = it.id; persist(); renderProfile(); renderShop(); pushLook();
     if (kind === 'winFx') burst(it.id);
     if (kind === 'pcfx') window.HORSES?.demo(it.id);
     if (kind === 'boards') window.HORSES?.skinBoard();
+  };
+  const buy = (it, el) => {
+    if (save.coins < it.price) { el?.classList.add('shake'); setTimeout(() => el?.classList.remove('shake'), 300); return toast(`Il te manque ${it.price - save.coins} 🪙`, 'error'); }
+    save.coins -= it.price; save.owned.push(kind + ':' + it.id);
+    const rar = SHOP.rarity(it.price);
+    toast(`🛍️ ${rar === 'legendary' ? '★ LÉGENDAIRE ★ ' : ''}Acheté ! (-${it.price} 🪙)`);
+    sfx('legend'); if (rar === 'legendary' || rar === 'epic') setTimeout(() => sfx('legend'), 300);
+    burst(rar === 'legendary' ? 'galaxy' : rar === 'epic' ? 'money' : 'party', rar === 'legendary' ? 40 : 18);
+    shopSel = null; equip(it);
+  };
+  $$('#shop-body .item, #shop-body .featured').forEach(b => b.onclick = () => {
+    const it = b.classList.contains('featured') ? star : items.find(x => x.id === b.dataset.id);
+    if (owns(kind, it.id)) { shopSel = null; return equip(it); }
+    // pas encore à toi : 1er clic = aperçu, l'achat se fait depuis le panneau d'aperçu
+    shopSel = { kind, id: it.id }; renderShop(); previewItem(kind, it);
+    $('#shop-body').scrollTo?.({ top: 0, behavior: 'smooth' }); $('.modal-box')?.scrollTo?.({ top: 0, behavior: 'smooth' });
   });
+  if (sel) {
+    $('#pv-buy').onclick = (e) => buy(sel, e.currentTarget);
+    $('#pv-again')?.addEventListener('click', () => previewItem(kind, sel));
+    $('#pv-close').onclick = () => { shopSel = null; renderShop(); };
+  }
+}
+let shopSel = null;
+// aperçu sans acheter : animations jouées, plateau en grand…
+function previewItem(kind, it) {
+  if (kind === 'winFx') burst(it.id, 30);
+  if (kind === 'pcfx') window.HORSES?.demo(it.id);
+  sfx('pop', .5);
 }
 // déjà dans un salon : on met à jour son look pour les autres, sans recharger la partie
 function pushLook() { if (joinedCode) socket.emit('look', save.look); }
@@ -169,10 +204,11 @@ const GAME_META = {
   blindtest: { emoji: '🎵', name: 'Blind test', desc: "Devine l'artiste, le titre, le dessin animé… 42 catégories, mode Zizanie avec bonus et malus.", cls: 'g-blind', lobby: 'Préparez vos oreilles 🎧' },
   undercover: { emoji: '🕵️', name: 'Undercover', desc: 'Un mot secret, un imposteur parmi vous. Donnez des indices, démasquez-le… sans vous faire avoir.', cls: 'g-uc', lobby: 'Qui est l\'undercover ? 🕵️' },
   word: { emoji: '🔤', name: 'Speed Word', desc: 'Des mots fléchés inédits à chaque partie, 4 niveaux. Seul contre la montre ou en course : le premier qui finit la grille gagne !', cls: 'g-word', lobby: 'À vos crayons… prêts ? ✏️' },
+  liar: { emoji: '🃏', name: 'Bar des Menteurs', desc: 'Pose tes cartes face cachée et bluffe… ou crie MENTEUR ! Le perdant tente sa chance au pistolet à bouchon.', cls: 'g-liar', lobby: 'Tout le monde au comptoir ! 🥃' },
   horses: { emoji: '🐎', name: 'Petits chevaux', desc: 'Le grand classique : lance le dé, sors tes chevaux, renvoie les autres à l\'écurie ! Choisis le skin de tes pions.', cls: 'g-horses', lobby: 'Tous en selle ! 🐎' },
   note: { emoji: '🔢', name: 'Jeu de la Note', desc: "Une note secrète sur 10, trois thèmes : réponds avec quelque chose qui « vaut » ta note. Les autres devinent !", cls: 'g-note', lobby: 'Sur une échelle de 1 à 10… 🔢' },
 };
-let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, note: { min: 2, max: 10 } }, UC_THEMES = [];
+let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, note: { min: 2, max: 10 } }, UC_THEMES = [];
 const playersLabel = (g) => { const i = GAME_INFO[g]; return i.min === i.max ? `${i.min} joueurs` : `${i.min} à ${i.max} joueurs`; };
 function renderGames() {
   $('#games').innerHTML = Object.entries(GAME_META).map(([id, m], i) => `
@@ -297,7 +333,8 @@ function renderGameLobby() {
   $('#set-note').classList.toggle('hidden', g !== 'note');
   $('#set-word').classList.toggle('hidden', g !== 'word');
   $('#set-horses').classList.toggle('hidden', g !== 'horses');
-  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux' }[g]}`;
+  $('#set-liar').classList.toggle('hidden', g !== 'liar');
+  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs' }[g]}`;
   $('#btn-start').disabled = !ok;
   if (g === 'blindtest') return;
   const box = $('#set-' + g), gs = state.gs?.[g] || {};
@@ -528,6 +565,7 @@ socket.on('reward', grantCoins);
 const gAct = (type, data) => new Promise(r => socket.emit('g', { type, data }, (res) => { if (res?.error) toast(res.error, 'error'); r(res); }));
 socket.on('g:state', (v) => {
   if (v.game === 'undercover' && window.UC) { if (!$('#v-uc').classList.contains('active')) showView('v-uc'); window.UC.render(v); }
+  if (v.game === 'liar' && window.LIAR) { if (!$('#v-liar').classList.contains('active')) showView('v-liar'); window.LIAR.render(v); }
   if (v.game === 'horses' && window.HORSES) { if (!$('#v-horses').classList.contains('active')) showView('v-horses'); window.HORSES.render(v); }
   if (v.game === 'word' && window.WORD) { if (!$('#v-word').classList.contains('active')) showView('v-word'); window.WORD.render(v); }
   if (v.game === 'note' && window.NOTE) { if (!$('#v-note').classList.contains('active')) showView('v-note'); window.NOTE.render(v); }
@@ -824,6 +862,20 @@ function sfx(name, vol = 1) {
   }
   if (name === 'legend') { [523, 659, 784, 1047].forEach((f, i) => osc('triangle', f, i * .09, i * .09 + .5, .7)); }
   if (name === 'pop') { const o = osc('sine', 500, 0, .12, .8); o.frequency.exponentialRampToValueAtTime(1100, t0 + .1); }
+  const noise = (dur, f0, f1, type = 'bandpass', gain = 1, start = 0) => {
+    const len = Math.floor(actx.sampleRate * dur), buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
+    const src = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
+    f.type = type; f.frequency.setValueAtTime(f0, t0 + start); f.frequency.exponentialRampToValueAtTime(f1, t0 + start + dur);
+    g.gain.value = gain; src.buffer = buf; src.connect(f); f.connect(g); g.connect(out); src.start(t0 + start);
+  };
+  if (name === 'tick') { noise(.03, 4000, 2500, 'highpass', .8); }
+  if (name === 'click') { noise(.05, 2500, 1200, 'bandpass', 1.6); osc('square', 1800, 0, .04, .25); }
+  if (name === 'card') { noise(.14, 1500, 5000, 'bandpass', .9); }
+  if (name === 'spin') { for (let i = 0; i < 14; i++) noise(.025, 3500, 2500, 'highpass', .7, i * (.04 + i * .006)); }
+  if (name === 'drum') { for (let i = 0; i < 18; i++) noise(.05, 1800, 900, 'bandpass', .4 + i * .03, i * .06); }
+  if (name === 'bang') { noise(.9, 900, 60, 'lowpass', 3); const o = osc('sine', 120, 0, .5, 1); o.frequency.exponentialRampToValueAtTime(35, t0 + .5); }
+  if (name === 'stamp') { noise(.12, 400, 120, 'lowpass', 2.5); osc('sine', 90, 0, .18, .8); }
 }
 
 
@@ -996,7 +1048,213 @@ function tickRewards() {
     $(`#rw-${k}-t`).textContent = left ? fmtLeft(left) : 'À ouvrir !';
   }
 }
+// ── dessins du cadeau et du coffre (SVG faits main, un jeu d'ids par exemplaire) ──
+const ART = (() => {
+  let n = 0;
+  const giftBody = (u) => `<svg viewBox="0 0 160 118" class="art"><defs>
+    <linearGradient id="gp${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6b97"/><stop offset=".5" stop-color="#e8174f"/><stop offset="1" stop-color="#9c0b35"/></linearGradient>
+    <pattern id="gd${u}" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="2.4" fill="#fff" opacity=".35"/><path d="M19 13l1.7 3.6 3.9.5-2.9 2.6.8 3.9-3.5-2-3.5 2 .8-3.9-2.9-2.6 3.9-.5z" fill="#ffe27a" opacity=".6"/></pattern>
+    <linearGradient id="gr${u}" x1="0" x2="1"><stop offset="0" stop-color="#b37400"/><stop offset=".3" stop-color="#ffe680"/><stop offset=".6" stop-color="#ffc21a"/><stop offset="1" stop-color="#a86a00"/></linearGradient>
+    <linearGradient id="gs${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></linearGradient></defs>
+    <rect x="4" y="2" width="152" height="114" rx="12" fill="url(#gp${u})"/>
+    <rect x="4" y="2" width="152" height="114" rx="12" fill="url(#gd${u})"/>
+    <rect x="68" y="2" width="24" height="114" fill="url(#gr${u})"/><rect x="72" y="2" width="4" height="114" fill="#fff" opacity=".5"/>
+    <rect x="4" y="2" width="152" height="114" rx="12" fill="url(#gs${u})"/>
+    <rect x="12" y="12" width="9" height="92" rx="4.5" fill="#fff" opacity=".2"/>
+    <rect x="4" y="2" width="152" height="9" fill="#000" opacity=".22"/>
+    <rect x="4" y="2" width="152" height="114" rx="12" fill="none" stroke="#5c0420" stroke-opacity=".5" stroke-width="2"/></svg>`;
+  const giftLid = (u) => `<svg viewBox="0 0 176 96" class="art"><defs>
+    <linearGradient id="lp${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7ea3"/><stop offset="1" stop-color="#d81447"/></linearGradient>
+    <linearGradient id="lr${u}" x1="0" x2="1"><stop offset="0" stop-color="#b37400"/><stop offset=".35" stop-color="#fff0a0"/><stop offset=".65" stop-color="#ffc21a"/><stop offset="1" stop-color="#a86a00"/></linearGradient>
+    <radialGradient id="lk${u}" cx=".4" cy=".35"><stop offset="0" stop-color="#fff3b0"/><stop offset=".6" stop-color="#ffc21a"/><stop offset="1" stop-color="#9a6200"/></radialGradient></defs>
+    <path d="M86 58 L66 92 L76 87 L80 96 L92 62Z M90 58 L110 92 L100 87 L96 96 L84 62Z" fill="url(#lr${u})" stroke="#7a4a00" stroke-width="1.5"/>
+    <rect x="2" y="56" width="172" height="36" rx="9" fill="url(#lp${u})" stroke="#5c0420" stroke-opacity=".5" stroke-width="2"/>
+    <rect x="76" y="56" width="24" height="36" fill="url(#lr${u})"/><rect x="80" y="56" width="4" height="36" fill="#fff" opacity=".5"/>
+    <rect x="10" y="61" width="156" height="6" rx="3" fill="#fff" opacity=".28"/>
+    <path d="M88 52 C 62 14, 22 26, 38 54 C 48 70, 74 62, 88 52Z" fill="url(#lr${u})" stroke="#7a4a00" stroke-width="2"/>
+    <path d="M86 50 C 66 26, 40 32, 48 50 C 54 60, 72 56, 86 50Z" fill="#a86a00" opacity=".55"/>
+    <path d="M88 52 C 114 14, 154 26, 138 54 C 128 70, 102 62, 88 52Z" fill="url(#lr${u})" stroke="#7a4a00" stroke-width="2"/>
+    <path d="M90 50 C 110 26, 136 32, 128 50 C 122 60, 104 56, 90 50Z" fill="#a86a00" opacity=".55"/>
+    <path d="M44 40 C 52 28, 66 30, 74 40" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="88" cy="53" rx="13" ry="11" fill="url(#lk${u})" stroke="#7a4a00" stroke-width="2"/>
+    <ellipse cx="84" cy="49" rx="4" ry="3" fill="#fff" opacity=".7"/></svg>`;
+  const chestBody = (u) => `<svg viewBox="0 0 200 104" class="art"><defs>
+    <linearGradient id="cw${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a8602c"/><stop offset="1" stop-color="#5a2a0e"/></linearGradient>
+    <linearGradient id="cg${u}" x1="0" x2="1"><stop offset="0" stop-color="#8a5a00"/><stop offset=".3" stop-color="#ffe680"/><stop offset=".55" stop-color="#f0b429"/><stop offset="1" stop-color="#7a4a00"/></linearGradient>
+    <linearGradient id="cv${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#f0b429"/><stop offset="1" stop-color="#8a5a00"/></linearGradient>
+    <filter id="cn${u}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.32" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 .22  0 0 0 0 .1  0 0 0 0 .03  0 0 0 .6 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+    <radialGradient id="cj${u}" cx=".35" cy=".3"><stop offset="0" stop-color="#ffd1dc"/><stop offset=".4" stop-color="#ff2e4d"/><stop offset="1" stop-color="#7a0018"/></radialGradient></defs>
+    <rect x="2" y="2" width="196" height="100" rx="8" fill="url(#cw${u})"/>
+    <rect x="2" y="2" width="196" height="100" rx="8" fill="#000" filter="url(#cn${u})"/>
+    <path d="M2 36 H198 M2 70 H198" stroke="#2a1004" stroke-width="2.5" opacity=".7"/>
+    <path d="M2 38 H198 M2 72 H198" stroke="#fff" stroke-width="1" opacity=".12"/>
+    <rect x="24" y="2" width="22" height="100" fill="url(#cg${u})" stroke="#5a3a00" stroke-width="1.5"/>
+    <rect x="154" y="2" width="22" height="100" fill="url(#cg${u})" stroke="#5a3a00" stroke-width="1.5"/>
+    ${[14, 52, 90].map(y => `<circle cx="35" cy="${y}" r="3.4" fill="#fff4c2" stroke="#5a3a00"/><circle cx="165" cy="${y}" r="3.4" fill="#fff4c2" stroke="#5a3a00"/>`).join('')}
+    <rect x="2" y="2" width="196" height="8" fill="url(#cg${u})"/><rect x="2" y="94" width="196" height="8" rx="3" fill="url(#cg${u})"/>
+    <path d="M2 2 h16 v8 h-8 v16 h-8z M198 2 h-16 v8 h8 v16 h8z M2 102 h16 v-8 h-8 v-16 h-8z M198 102 h-16 v-8 h8 v-16 h8z" fill="url(#cv${u})" stroke="#5a3a00" stroke-width="1.2"/>
+    <path d="M82 4 h36 v28 q0 16 -18 24 q-18 -8 -18 -24z" fill="url(#cv${u})" stroke="#5a3a00" stroke-width="2"/>
+    <circle cx="100" cy="14" r="5.5" fill="url(#cj${u})" stroke="#5a0010"/>
+    <circle cx="100" cy="30" r="5" fill="#2a1600"/><path d="M97 32 h6 l2 12 h-10z" fill="#2a1600"/>
+    <rect x="2" y="2" width="196" height="100" rx="8" fill="none" stroke="#2a1004" stroke-width="2.5"/></svg>`;
+  const chestLid = (u) => `<svg viewBox="0 0 204 68" class="art"><defs>
+    <linearGradient id="kw${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c4773a"/><stop offset="1" stop-color="#7a3a14"/></linearGradient>
+    <linearGradient id="kg${u}" x1="0" x2="1"><stop offset="0" stop-color="#8a5a00"/><stop offset=".3" stop-color="#ffe680"/><stop offset=".55" stop-color="#f0b429"/><stop offset="1" stop-color="#7a4a00"/></linearGradient>
+    <filter id="kn${u}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.3" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 .22  0 0 0 0 .1  0 0 0 0 .03  0 0 0 .55 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+    <clipPath id="kc${u}"><path d="M2 66 V30 Q2 2 102 2 Q202 2 202 30 V66Z"/></clipPath></defs>
+    <g clip-path="url(#kc${u})">
+      <rect width="204" height="68" fill="url(#kw${u})"/><rect width="204" height="68" fill="#000" filter="url(#kn${u})"/>
+      <path d="M2 30 Q102 4 202 30" fill="none" stroke="#2a1004" stroke-width="2.5" opacity=".7"/>
+      <path d="M10 22 Q102 0 194 22" fill="none" stroke="#fff" stroke-width="3" opacity=".22"/>
+      <rect x="26" width="22" height="68" fill="url(#kg${u})" stroke="#5a3a00" stroke-width="1.5"/><rect x="156" width="22" height="68" fill="url(#kg${u})" stroke="#5a3a00" stroke-width="1.5"/>
+      ${[22, 46].map(y => `<circle cx="37" cy="${y}" r="3.4" fill="#fff4c2" stroke="#5a3a00"/><circle cx="167" cy="${y}" r="3.4" fill="#fff4c2" stroke="#5a3a00"/>`).join('')}
+      <rect y="58" width="204" height="10" fill="url(#kg${u})"/>
+    </g>
+    <path d="M2 66 V30 Q2 2 102 2 Q202 2 202 30 V66Z" fill="none" stroke="#2a1004" stroke-width="2.5"/>
+    <path d="M88 58 h28 v8 h-28z" fill="url(#kg${u})" stroke="#5a3a00" stroke-width="1.5"/></svg>`;
+  const treasure = (u) => `<svg viewBox="0 0 180 70" class="art"><defs>
+    <radialGradient id="tc${u}" cx=".35" cy=".3"><stop offset="0" stop-color="#fff6c4"/><stop offset=".55" stop-color="#ffc21a"/><stop offset="1" stop-color="#a86a00"/></radialGradient></defs>
+    <path d="M6 70 Q20 26 60 30 Q90 4 122 28 Q164 22 174 70Z" fill="url(#tc${u})" stroke="#8a5a00" stroke-width="2"/>
+    ${[[30, 44], [52, 36], [74, 22], [98, 16], [120, 28], [144, 38], [40, 56], [86, 40], [130, 52], [110, 50], [64, 52]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="5" fill="url(#tc${u})" stroke="#8a5a00" stroke-width="1.5"/>`).join('')}
+    <path d="M58 22 l8 -10 l8 10 l-8 8z" fill="#2fd3ff" stroke="#0a5a7a" stroke-width="1.5"/><path d="M126 18 l9 -9 l9 9 l-9 9z" fill="#ff2e6e" stroke="#7a0030" stroke-width="1.5"/>
+    <path d="M92 6 l7 -6 l7 6 l-7 9z" fill="#3dff8e" stroke="#0a6a30" stroke-width="1.5"/>
+    <path d="M84 28 l6 -12 l6 8 l6 -10 l6 10 l6 -8 l6 12z" fill="url(#tc${u})" stroke="#8a5a00" stroke-width="1.5"/></svg>`;
+  return {
+    gift: () => { const u = 'g' + n++; return `<div class="gf-lid">${giftLid(u)}</div><div class="gf-body">${giftBody(u)}</div><div class="gf-shine"></div>`; },
+    chest: () => { const u = 'c' + n++; return `<div class="c-glow"></div><div class="c-gold">${treasure(u)}</div><div class="c-body">${chestBody(u)}</div><div class="c-lid">${chestLid(u)}</div>`; },
+  };
+})();
+$('#op-box .gift3d').innerHTML = ART.gift();
+$('#op-box .chest3d').innerHTML = ART.chest();
+$('#rw-gift .rw-ico').innerHTML = `<span class="mini-art gift3d">${ART.gift()}</span>`;
+$('#rw-chest .rw-ico').innerHTML = `<span class="mini-art chest3d">${ART.chest()}</span>`;
 setInterval(tickRewards, 1000); tickRewards();
+
+// ───────────── 🎡 Roue de la chance ─────────────
+window.WHEEL = (() => {
+  const W = SHOP.wheel, N = W.slices.length, A = 360 / N;
+  const KIND_LABEL = { icons: 'Icône', colors: 'Couleur de pseudo', frames: 'Cadre', nameFx: 'Effet de pseudo', titles: 'Titre', winFx: 'Célébration', pawns: 'Pion', boards: 'Plateau', pcfx: 'Animation chevaux' };
+  const SL = {
+    c25: { t: '25', e: '🪙', c: '#ffcf3d', c2: '#f0a400' }, c60: { t: '60', e: '🪙', c: '#ffb12b', c2: '#e07b00' }, c120: { t: '120', e: '💰', c: '#ffd84d', c2: '#e3a300' },
+    c250: { t: '250', e: '💰', c: '#ff9a1f', c2: '#d96500' }, c500: { t: '500', e: '💎', c: '#ff5aa0', c2: '#c4126a' },
+    common: { t: 'COMMUN', e: '🎁', c: '#a9bccf', c2: '#6f859b' }, rare: { t: 'RARE', e: '🔷', c: '#3b95ff', c2: '#1356c4' },
+    epic: { t: 'ÉPIQUE', e: '🔮', c: '#ab64ff', c2: '#6a1fc9' }, legendary: { t: 'LÉGENDE', e: '👑', c: 'url(#wRain)', c2: '#000' },
+  };
+  let rot = 0, spinning = false;
+  function wheelSVG() {
+    const R = 150, cx = 160, cy = 160;
+    const pt = (a, r) => [cx + r * Math.sin(a * Math.PI / 180), cy - r * Math.cos(a * Math.PI / 180)];
+    const slices = W.slices.map((id, i) => {
+      const a0 = i * A, a1 = a0 + A, [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R), s = SL[id], mid = a0 + A / 2;
+      const [tx, ty] = pt(mid, R * .68), [ex, ey] = pt(mid, R * .87);
+      return `<path d="M${cx} ${cy} L${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1}Z" fill="${s.c}" stroke="#2a1600" stroke-width="2"/>
+        <path d="M${cx} ${cy} L${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1}Z" fill="url(#wShade)"/>
+        <text x="${ex}" y="${ey}" font-size="20" text-anchor="middle" dominant-baseline="central" transform="rotate(${mid} ${ex} ${ey})">${s.e}</text>
+        <text x="${tx}" y="${ty}" class="wl ${id.startsWith('c') ? 'coin' : ''}" text-anchor="middle" dominant-baseline="central" transform="rotate(${mid + 90} ${tx} ${ty})">${s.t}</text>`;
+    }).join('');
+    const bulbs = Array.from({ length: 24 }, (_, i) => { const [x, y] = pt(i * 15, R + 13); return `<circle cx="${x}" cy="${y}" r="4.5" class="bulb b${i % 2}"/>`; }).join('');
+    return `<svg viewBox="-18 -18 356 356" class="wh-svg"><defs>
+      <linearGradient id="wRain" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff004c"/><stop offset=".25" stop-color="#ffe600"/><stop offset=".5" stop-color="#3dff6e"/><stop offset=".75" stop-color="#00e5ff"/><stop offset="1" stop-color="#c13cff"/></linearGradient>
+      <radialGradient id="wShade" cx="160" cy="160" r="150" gradientUnits="userSpaceOnUse"><stop offset=".2" stop-color="#fff" stop-opacity=".25"/><stop offset=".75" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></radialGradient>
+      <linearGradient id="wGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#e2a70f"/><stop offset="1" stop-color="#8a5a00"/></linearGradient></defs>
+      <circle cx="160" cy="160" r="168" fill="#3a0d1f" stroke="url(#wGold)" stroke-width="10"/>
+      ${bulbs}
+      <g class="wh-rot" id="wh-rot">${slices}</g>
+      <circle cx="160" cy="160" r="34" fill="url(#wGold)" stroke="#5a3a00" stroke-width="3"/>
+      <circle cx="160" cy="160" r="26" fill="#3a0d1f"/>
+      <text x="160" y="161" text-anchor="middle" dominant-baseline="central" class="wh-hub">PZ</text></svg>`;
+  }
+  function build() {
+    let el = $('#wheel');
+    if (el) return el;
+    el = document.createElement('div'); el.id = 'wheel'; el.className = 'wheel hidden';
+    el.innerHTML = `<div class="wh-rays"></div><div class="wh-box">
+      <button class="wh-x" id="wh-x">✕</button>
+      <h2 class="wh-title">🎡 ROUE DE LA CHANCE</h2>
+      <p class="wh-sub">Tente ta chance : pièces ou objet surprise de la boutique !</p>
+      <div class="wh-wheel"><div class="wh-pointer" id="wh-pointer"></div>${wheelSVG()}</div>
+      <div class="wh-result" id="wh-result"></div>
+      <button class="btn btn-primary wh-spin" id="wh-spin"></button>
+      <div class="wh-odds">${W.odds.map(o => `<span class="o-${o.id}">${o.coins ? o.coins + ' 🪙' : SL[o.id].e + ' ' + { common: 'Objet commun', rare: 'Objet rare', epic: 'Objet épique', legendary: 'Objet légendaire' }[o.id]} <b>${String(o.p).replace('.', ',')} %</b></span>`).join('')}</div>
+    </div>`;
+    document.body.appendChild(el);
+    $('#wh-x').onclick = close;
+    el.onclick = (e) => { if (e.target === el) close(); };
+    $('#wh-spin').onclick = spin;
+    return el;
+  }
+  function refresh() {
+    const b = $('#wh-spin'); if (!b) return;
+    b.disabled = spinning || save.coins < W.cost;
+    b.innerHTML = spinning ? '🎡 Ça tourne…' : save.coins < W.cost ? `Il te manque ${W.cost - save.coins} 🪙` : `Tourner la roue · 🪙 ${W.cost}`;
+  }
+  function open() { build().classList.remove('hidden'); $('#wh-result').innerHTML = ''; refresh(); unlockAudio?.(); sfx('pop'); }
+  function close() { if (spinning) return; $('#wheel')?.classList.add('hidden'); }
+  function draw() {
+    let r = Math.random() * W.odds.reduce((a, o) => a + o.p, 0);
+    for (const o of W.odds) { r -= o.p; if (r < 0) return o; }
+    return W.odds[0];
+  }
+  function spin() {
+    if (spinning || save.coins < W.cost) return;
+    const o = draw();
+    // on applique le gain tout de suite (pas de triche en rechargeant la page)
+    save.coins -= W.cost;
+    let prize;
+    if (o.coins) { prize = { coins: o.coins }; save.coins += o.coins; }
+    else {
+      const pool = W.kinds.flatMap(k => SHOP[k].filter(it => it.price && SHOP.rarity(it.price) === o.rar && !owns(k, it.id)).map(it => ({ k, it })));
+      if (pool.length) { prize = pool[Math.floor(Math.random() * pool.length)]; save.owned.push(prize.k + ':' + prize.it.id); }
+      else { prize = { coins: W.fallback[o.rar], all: true }; save.coins += prize.coins; }
+    }
+    persist(); renderProfile();
+    spinning = true; refresh(); $('#wh-result').innerHTML = '';
+    const idx = W.slices.map((s, i) => s === o.id ? i : -1).filter(i => i >= 0);
+    const i = idx[Math.floor(Math.random() * idx.length)];
+    const target = -(i * A + A / 2) + (Math.random() - .5) * A * .7;
+    const cur = ((rot % 360) + 360) % 360;
+    rot += 360 * 6 + ((((target - cur) % 360) + 360) % 360);
+    const g = $('#wh-rot');
+    g.style.transition = 'transform 5.4s cubic-bezier(.12,.72,.14,1)';
+    g.style.transform = `rotate(${rot}deg)`;
+    $('#wheel').classList.add('spinning');
+    // tic-tac du pointeur à chaque case
+    let lastSlice = null; const t0 = performance.now();
+    const tick = () => {
+      const m = getComputedStyle(g).transform;
+      if (m && m !== 'none') {
+        const [a, b] = m.slice(7, -1).split(',').map(Number);
+        const ang = ((Math.atan2(b, a) * 180 / Math.PI) + 360) % 360, sl = Math.floor(ang / A);
+        if (sl !== lastSlice) { lastSlice = sl; sfx('tick', .7); const p = $('#wh-pointer'); p.classList.remove('flick'); void p.offsetWidth; p.classList.add('flick'); }
+      }
+      if (performance.now() - t0 < 5400) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    setTimeout(() => reveal(o, prize), 5500);
+  }
+  function reveal(o, prize) {
+    spinning = false; $('#wheel').classList.remove('spinning');
+    const res = $('#wh-result');
+    if (prize.coins) {
+      res.innerHTML = `<div class="wh-win coins ${o.id === 'c500' || o.id === 'c250' ? 'big' : ''}"><b>+${prize.coins} 🪙</b><small>${prize.all ? `Tu as déjà tous les objets ${SL[o.id].t.toLowerCase()}s : pièces de consolation !` : prize.coins >= W.cost ? 'Gagné !' : 'Petit lot… retente ta chance ?'}</small></div>`;
+      coinFountain(Math.min(60, Math.round(prize.coins / 6) + 6));
+      sfx(prize.coins >= W.cost ? 'legend' : 'pop');
+      if (prize.coins >= 250) burst('supernova', 26);
+    } else {
+      const rar = SHOP.rarity(prize.it.price), lk = LOOK_KEY[prize.k];
+      res.innerHTML = `<div class="wh-win item r-${rar}"><span class="f-tag">${RARITY_LABEL[rar]} · ${KIND_LABEL[prize.k]}</span>
+        <div class="wh-prev">${itemPreview(prize.k, prize.it, me(), true)}</div><b>${esc(prize.it.name || prize.it.id)}</b>
+        <small>Valeur boutique : 🪙 ${prize.it.price}</small><button class="btn btn-yellow" id="wh-equip">✨ Équiper</button></div>`;
+      $('#wh-equip').onclick = () => { save.look[lk] = prize.it.id; persist(); renderProfile(); pushLook(); toast('✨ Équipé !'); $('#wh-equip').disabled = true; if (prize.k === 'boards') window.HORSES?.skinBoard(); };
+      sfx('legend'); if (rar !== 'common') setTimeout(() => sfx('legend'), 280);
+      burst(rar === 'legendary' ? 'galaxy' : rar === 'epic' ? 'supernova' : rar === 'rare' ? 'fireworks' : 'party', rar === 'legendary' ? 50 : 24);
+      if (prize.k === 'winFx') setTimeout(() => burst(prize.it.id, 24), 600);
+      if (prize.k === 'pcfx') setTimeout(() => window.HORSES?.demo(prize.it.id), 600);
+    }
+    refresh();
+  }
+  return { open };
+})();
 
 let opening = null;
 function openReward(kind) {
@@ -1010,6 +1268,7 @@ function openReward(kind) {
   sfx('pop');
 }
 $('#rw-gift').onclick = () => openReward('gift');
+$('#rw-wheel').onclick = () => window.WHEEL.open();
 $('#rw-chest').onclick = () => openReward('chest');
 $('#op-box').onclick = () => {
   if (!opening || opening.opened) return;

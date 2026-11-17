@@ -25,6 +25,11 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Pièces pour une grille finie : 15 / 25 / 35 / 50 selon le niveau, +25 au vainqueur d'une course ; les autres gagnent selon leur % de lettres justes.
 - Clavier : flèches pour se déplacer, Espace pour changer de sens, Entrée pour passer au mot suivant. Record solo enregistré dans le navigateur.
 
+### 🃏 Bar des Menteurs (1 à 6 joueurs, robots possibles)
+- Chaque manche : 5 cartes chacun (Dames, Rois, As + Jokers qui valent tout) et une **carte du tour**. Pose 1 à 3 cartes face cachée en prétendant que ce sont des cartes du tour… ou crie **MENTEUR !** sur la pose précédente.
+- Le menteur démasqué (ou l'accusateur qui s'est trompé) tire au **pistolet à bouchon** : 6 chambres, un seul bouchon, le risque monte à chaque tir. Dernier debout = gagnant.
+- Options : robots bluffeurs (0 à 5), temps de jeu 20/30/45 s. Pièces : manches survécues, bonnes dénonciations, bluffs réussis, bonus vainqueur.
+
 ### 🐎 Petits chevaux (1 à 4 joueurs)
 - Règles classiques, 100 % hasard : un **6 pour sortir** un cheval, un 6 fait rejouer, on **renvoie à l'écurie** le cheval adverse sur lequel on s'arrête, les cases ★ de départ sont protégées, arrivée au chiffre exact.
 - Les places vides sont prises par des **robots**. Options : nombre de chevaux (2/3/4), nombre de camps, *Tu choisis ton cheval* (par défaut) ou *100 % hasard*.
@@ -108,3 +113,8 @@ Tout est dans `categories.js`, une ligne par morceau :
 ## Spotify (facultatif)
 L'import Spotify marche sans rien configurer. Si un jour Spotify bloque, crée une appli sur
 developer.spotify.com et ajoute dans Render (Environment) les variables `SPOTIFY_CLIENT_ID` et `SPOTIFY_CLIENT_SECRET`.
+
+## 🎡 Roue de la chance & récompenses
+- Un tour = 200 🪙 : pièces (25 à 500) ou objet surprise que tu n'as pas encore (commun 28 %, rare 10 %, épique 1,5 %, légendaire 0,3 %). Chances affichées sous la roue, réglables dans `public/shop.js` (`wheel`).
+- Boutique : un premier clic sur un objet pas encore acheté ouvre un **aperçu** (les animations se jouent), l'achat se fait avec le bouton « Acheter ».
+- Cadeau (10 min) et coffre (1 h) redessinés en SVG.

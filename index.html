@@ -148,6 +148,24 @@
         </div>
 
         <!-- réglages Petits chevaux -->
+        <div id="set-liar" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block">
+              <h4>🤖 Robots au comptoir</h4>
+              <div class="seg gseg" data-key="bots"><button data-v="0">Aucun</button><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="5">Plein</button></div>
+              <p class="muted small hint2">Des robots bluffeurs complètent la table (6 places max). Seul, ajoute au moins 1 robot.</p>
+            </div>
+            <div class="set-block">
+              <h4>⏱️ Temps pour jouer</h4>
+              <div class="seg gseg" data-key="time"><button data-v="20">20 s</button><button data-v="30">30 s</button><button data-v="45">45 s</button></div>
+            </div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>Chaque manche, une <b>carte du tour</b> (Dame, Roi ou As). Pose <b>1 à 3 cartes face cachée</b> en prétendant que ce sont des cartes du tour — les <b>Jokers</b> valent tout. Le suivant te croit… ou crie <b>MENTEUR !</b>
+            Le perdant tente sa chance au <b>pistolet à bouchon</b> : 6 chambres, 1 seul bouchon, le risque monte à chaque tir. Dernier debout = gagnant.</p>
+          </div>
+        </div>
         <div id="set-horses" class="settings gset hidden">
           <div class="set-row">
             <div class="set-block">
@@ -309,6 +327,7 @@
 
       <!-- PETITS CHEVAUX -->
       <div id="v-horses" class="view"></div>
+      <div id="v-liar" class="view"></div>
       <!-- SPEED WORD -->
       <div id="v-word" class="view"></div>
 
@@ -418,6 +437,7 @@
 <!-- ───────── CADEAU (10 min) & COFFRE (1 h) ───────── -->
 <div id="rewards" class="rewards">
   <button class="rw rw-gift" id="rw-gift"><span class="rw-ico"><span class="mini-gift"><i></i></span></span><span class="rw-txt"><b>Cadeau</b><small id="rw-gift-t">…</small></span></button>
+  <button class="rw rw-wheel" id="rw-wheel"><span class="rw-ico"><span class="mini-wheel"></span></span><span class="rw-txt"><b>Roue</b><small>🪙 200</small></span></button>
   <button class="rw rw-chest" id="rw-chest"><span class="rw-ico"><span class="mini-chest"><i></i></span></span><span class="rw-txt"><b>Coffre</b><small id="rw-chest-t">…</small></span></button>
 </div>
 <div id="opener" class="opener hidden">
@@ -452,6 +472,7 @@
       <button data-tab="nameFx">Effets de pseudo</button>
       <button data-tab="titles">Titres</button>
       <button data-tab="winFx">Effet de victoire</button>
+      <button data-tab="wheel" class="tab-wheel">🎡 Roue</button>
       <button data-tab="pawns">🐎 Pions</button>
       <button data-tab="boards">🎲 Plateaux</button>
       <button data-tab="pcfx">💥 Animations chevaux</button>
@@ -468,5 +489,6 @@
 <script src="/client-note.js"></script>
 <script src="/client-word.js"></script>
 <script src="/client-horses.js"></script>
+<script src="/client-liar.js"></script>
 </body>
 </html>
