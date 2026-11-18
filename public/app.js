@@ -210,6 +210,7 @@ const GAME_META = {
   sem: { emoji: '🌡️', name: 'Ça chauffe !', desc: 'Trouve le mot secret : chaque essai te dit si tu chauffes ou si tu gèles (°C). Le premier qui trouve gagne… et on enchaîne !', cls: 'g-sem', lobby: 'Prêts à chauffer ? 🔥' },
   bac: { emoji: '📋', name: 'Petit Bac', desc: 'Une lettre, des catégories classiques ou complètement fun… Remplis tout et crie STOP ! Puis on démonte les réponses des autres.', cls: 'g-bac', lobby: 'Tous à vos stylos ! ✍️' },
   bluff: { emoji: '🎭', name: 'Le Bluff', desc: 'Une anecdote vraie à trou : invente une fausse réponse crédible pour piéger tes potes… et retrouve la vraie !', cls: 'g-bluff', lobby: 'Que le meilleur menteur gagne 😏' },
+  top7: { emoji: '7️⃣', name: 'Top 7', desc: 'Les 7 réponses préférées des gens sur un thème. Chacun son tour : plus ta réponse est rare dans le top, plus elle rapporte (n°7 = 7 pts) !', cls: 'g-top7', lobby: 'Plateau prêt ! 7️⃣' },
   punch: { emoji: '🎤', name: 'Punchline', desc: 'Réponds aux sujets de la façon la plus drôle possible. Duel de vannes, les autres votent. 100 % des votes = PUNCHLINE !', cls: 'g-punch', lobby: 'Micro ouvert ! 🎤' },
   draw: { emoji: '🎨', name: 'Draw Time', desc: "Un joueur dessine, les autres devinent ! Des mots classiques, marrants… ou un peu pimentés 🌶️", cls: 'g-draw', lobby: 'Sortez les crayons ! ✏️' },
   primo: { emoji: '🎴', name: 'PRIMO !', desc: 'Même couleur ou même chiffre, +2, +4, inversions… et un mode Pagaille plein de cartes vicieuses. Crie PRIMO à ta dernière carte !', cls: 'g-primo', lobby: 'Battez les cartes ! 🃏' },
@@ -218,7 +219,7 @@ const GAME_META = {
   horses: { emoji: '🐎', name: 'Petits chevaux', desc: 'Le grand classique : lance le dé, sors tes chevaux, renvoie les autres à l\'écurie ! Choisis le skin de tes pions.', cls: 'g-horses', lobby: 'Tous en selle ! 🐎' },
   note: { emoji: '🔢', name: 'Jeu de la Note', desc: "Une note secrète sur 10, trois thèmes : réponds avec quelque chose qui « vaut » ta note. Les autres devinent !", cls: 'g-note', lobby: 'Sur une échelle de 1 à 10… 🔢' },
 };
-let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, primo: { min: 1, max: 8 }, draw: { min: 2, max: 12 }, bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [];
+let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, primo: { min: 1, max: 8 }, draw: { min: 2, max: 12 }, bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [];
 fetch('/api/guess-themes').then(r => r.json()).then(t => { GP_THEMES = t; if (state?.game === 'guess') renderGameLobby?.(); }).catch(() => {});
 const playersLabel = (g) => { const i = GAME_INFO[g]; return i.min === i.max ? `${i.min} joueurs` : `${i.min} à ${i.max} joueurs`; };
 function renderGames() {
@@ -348,8 +349,8 @@ function renderGameLobby() {
   $('#set-guess').classList.toggle('hidden', g !== 'guess');
   $('#set-primo').classList.toggle('hidden', g !== 'primo');
   $('#set-draw').classList.toggle('hidden', g !== 'draw');
-  ['bac', 'bluff', 'punch', 'sem'].forEach(k => $('#set-' + k).classList.toggle('hidden', g !== k));
-  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO', draw: 'Draw Time', bac: 'le Petit Bac', bluff: 'le Bluff', punch: 'Punchline', sem: 'Ça chauffe' }[g]}`;
+  ['bac', 'bluff', 'punch', 'sem', 'top7'].forEach(k => $('#set-' + k).classList.toggle('hidden', g !== k));
+  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO', draw: 'Draw Time', bac: 'le Petit Bac', bluff: 'le Bluff', punch: 'Punchline', sem: 'Ça chauffe', top7: 'le Top 7' }[g]}`;
   $('#btn-start').disabled = !ok;
   if (g === 'blindtest') return;
   const box = $('#set-' + g), gs = state.gs?.[g] || {};
@@ -591,7 +592,7 @@ socket.on('reward', grantCoins);
 const gAct = (type, data) => new Promise(r => socket.emit('g', { type, data }, (res) => { if (res?.error) toast(res.error, 'error'); r(res); }));
 socket.on('g:state', (v) => {
   if (v.game === 'undercover' && window.UC) { if (!$('#v-uc').classList.contains('active')) showView('v-uc'); window.UC.render(v); }
-  const MODS = { bac: 'BAC', bluff: 'BLUFF', punch: 'PUNCH', sem: 'SEM' };
+  const MODS = { bac: 'BAC', bluff: 'BLUFF', punch: 'PUNCH', sem: 'SEM', top7: 'TOP7' };
   if (MODS[v.game] && window[MODS[v.game]]) { if (!$('#v-' + v.game).classList.contains('active')) showView('v-' + v.game); window[MODS[v.game]].render(v); }
   if (v.game === 'draw' && window.DRAW) { if (!$('#v-draw').classList.contains('active')) showView('v-draw'); window.DRAW.render(v); }
   if (v.game === 'primo' && window.PRIMO) { if (!$('#v-primo').classList.contains('active')) showView('v-primo'); window.PRIMO.render(v); }
@@ -653,26 +654,66 @@ const MODO = (() => {
       else { if (!silent) toast(r?.error || 'Refusé', 'error'); if (silent) store.set('mz_modo', ''); }
     });
   }
+  let tab = 'coins', target = '*';
+  const FX = [
+    ['flip', '🙃', 'Écran à l\'envers'], ['spin', '🌀', 'Toupie'], ['disco', '🪩', 'Disco arc-en-ciel'], ['wobble', '🫠', 'Écran en gelée'],
+    ['tiny', '🔬', 'Écran minuscule'], ['big', '🔎', 'Zoom géant'], ['blur', '😵‍💫', 'Vision floue'], ['quake', '📳', 'Tremblement de terre'],
+    ['dark', '🔦', 'Lampe torche'], ['ducks', '🦆', 'Invasion de canards'], ['clown', '🤡', 'Tout le monde en clown'], ['ghost', '👻', 'Bouh !'],
+    ['horn', '📯', 'Corne de brume'], ['fakelegend', '🎰', 'Faux légendaire'], ['rain', '🌧️', 'Pluie d\'emojis'], ['msg', '📢', 'Message géant'],
+  ];
+  const KN = { icons: '😀 Avatars', colors: '🎨 Couleurs', frames: '🖼️ Cadres', nameFx: '✨ Effets de pseudo', titles: '🏷️ Titres', winFx: '🎉 Victoires', pawns: '♟️ Pions', boards: '🎲 Plateaux', pcfx: '💥 Anim. chevaux', cardbacks: '🃏 Dos de cartes' };
+  const done = (ok) => (r) => r?.ok ? toast(ok + (r.n > 1 ? ` (${r.n} joueurs)` : '')) : toast(r?.error || 'Erreur', 'error');
   function panel() {
     let m = $('#modo-panel');
     if (!m) { m = document.createElement('div'); m.id = 'modo-panel'; m.className = 'modo-panel hidden'; document.body.appendChild(m); m.onclick = (e) => { if (e.target === m) m.classList.add('hidden'); }; }
     const others = (state?.players || []).filter(p => p.id !== pid);
-    m.innerHTML = `<div class="modo-box"><button class="modo-x">✕</button>
-      <h3>🛡️ Mode modo</h3><p class="muted small">Visible par toi seul. Tes objets ne sont pas débloqués : à toi de les acheter 😉</p>
-      <h4>Mes pièces <b>🪙 ${save.coins.toLocaleString('fr-FR')}</b></h4>
+    if (target !== '*' && !others.some(p => p.id === target)) target = '*';
+    const tp = others.find(p => p.id === target);
+    const who = `<div class="modo-who"><button class="${target === '*' ? 'on' : ''}" data-tg="*">👥 Tout le monde</button>${others.map(p => `<button class="${target === p.id ? 'on' : ''}" data-tg="${p.id}">${avatarHTML(p, 22)} ${esc(p.name)}</button>`).join('')}</div>`;
+    const tabs = [['coins', '🪙 Pièces'], ['fun', '🎭 Farces'], ['items', '🎁 Objets'], ['room', '🛠️ Salon']];
+    let body = '';
+    if (tab === 'coins') body = `<h4>Mes pièces <b>🪙 ${save.coins.toLocaleString('fr-FR')}</b></h4>
       <div class="modo-row">${[1000, 10000, 100000].map(n => `<button class="btn btn-yellow btn-sm" data-self="${n}">+${n.toLocaleString('fr-FR')}</button>`).join('')}<button class="btn btn-ghost btn-sm" data-self="max">♾️ 999 999</button></div>
-      <h4>Donner des pièces</h4>
-      ${others.length ? `<div class="modo-amt"><input class="input" id="modo-n" type="number" min="1" value="200"><button class="btn btn-primary btn-sm" data-to="*">🎁 À tout le monde</button></div>
-      <div class="modo-list">${others.map(p => `<div class="modo-pl">${avatarHTML(p, 30)}<b>${esc(p.name)}</b><button class="btn btn-sm btn-yellow" data-to="${p.id}">🎁 Donner</button></div>`).join('')}</div>` : '<p class="muted small">Personne d\'autre dans le salon pour l\'instant.</p>'}
+      <h4>Donner / reprendre des pièces</h4>${others.length ? `${who}<div class="modo-amt"><input class="input" id="modo-n" type="number" value="200"><button class="btn btn-primary btn-sm" id="modo-give">🎁 Donner</button><button class="btn btn-ghost btn-sm" id="modo-steal">🦹 Voler</button></div>` : '<p class="muted small">Personne d\'autre dans le salon.</p>'}`;
+    if (tab === 'fun') body = others.length ? `${who}<div class="modo-fx">${FX.map(([k, e, n]) => `<button data-fx="${k}"><span>${e}</span>${n}</button>`).join('')}</div>
+      <div class="modo-amt"><input class="input" id="modo-txt" maxlength="120" placeholder="Texte du message géant / emoji de la pluie (ex. 💩)"></div>
+      <p class="muted small">Les effets durent quelques secondes et disparaissent tout seuls.</p>` : '<p class="muted small">Personne à embêter pour l\'instant 😇</p>';
+    if (tab === 'items') body = others.length ? `${who}<div class="modo-amt"><select class="input" id="modo-kind">${Object.entries(KN).map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}</select></div><div class="modo-items" id="modo-items"></div>` : '<p class="muted small">Personne d\'autre dans le salon.</p>';
+    if (tab === 'room') body = `<div class="modo-row"><button class="btn btn-yellow btn-sm" data-act="host">👑 Devenir l'hôte</button><button class="btn btn-ghost btn-sm" data-act="lobby">⏹️ Stopper la partie</button></div>
+      ${others.length ? `<div class="modo-list">${others.map(p => `<div class="modo-pl">${avatarHTML(p, 30)}<b>${esc(p.name)}</b>
+        <button class="btn btn-sm btn-ghost" data-act="rename" data-p="${p.id}" title="Renommer">✏️</button><button class="btn btn-sm btn-ghost" data-act="mute" data-p="${p.id}" title="Couper son chat 2 min">🤐</button><button class="btn btn-sm btn-ghost" data-act="kick" data-p="${p.id}" title="Exclure">🚪</button></div>`).join('')}</div>` : ''}`;
+    m.innerHTML = `<div class="modo-box"><button class="modo-x">✕</button>
+      <h3>🛡️ Mode modo</h3><p class="muted small">Visible par toi seul.</p>
+      <div class="modo-tabs">${tabs.map(([k, n]) => `<button class="${tab === k ? 'on' : ''}" data-tab="${k}">${n}</button>`).join('')}</div>
+      <div class="modo-body">${body}</div>
       <button class="btn btn-ghost btn-sm modo-off">Désactiver sur cet appareil</button></div>`;
     m.querySelector('.modo-x').onclick = () => m.classList.add('hidden');
+    m.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; panel(); });
+    m.querySelectorAll('[data-tg]').forEach(b => b.onclick = () => { target = b.dataset.tg; panel(); });
     m.querySelectorAll('[data-self]').forEach(b => b.onclick = () => {
       if (b.dataset.self === 'max') save.coins = 999999; else save.coins += +b.dataset.self;
       persist(); renderProfile(); coinFountain(20); sfx('legend'); panel();
     });
-    m.querySelectorAll('[data-to]').forEach(b => b.onclick = () => {
-      const n = Math.round(+$('#modo-n').value || 0); if (n <= 0) return toast('Montant invalide', 'error');
-      socket.emit('modoGift', { to: b.dataset.to, coins: n }, (r) => r?.ok ? toast(`🎁 ${n} 🪙 envoyées${r.n > 1 ? ` à ${r.n} joueurs` : ''} !`) : toast(r?.error || 'Erreur', 'error'));
+    const amt = () => Math.round(+$('#modo-n')?.value || 0);
+    if ($('#modo-give')) $('#modo-give').onclick = () => { const n = amt(); if (n <= 0) return toast('Montant invalide', 'error'); socket.emit('modoGift', { to: target, coins: n }, done(`🎁 ${n} 🪙 envoyées`)); };
+    if ($('#modo-steal')) $('#modo-steal').onclick = () => { const n = amt(); if (n <= 0) return toast('Montant invalide', 'error'); socket.emit('modoGift', { to: target, coins: -n }, done(`🦹 ${n} 🪙 volées`)); };
+    m.querySelectorAll('[data-fx]').forEach(b => b.onclick = () => {
+      const fx = b.dataset.fx, text = $('#modo-txt')?.value || '';
+      if (fx === 'msg' && !text.trim()) return toast('Écris le message dans le champ 👇', 'error');
+      socket.emit('modoFx', { to: target, fx, text }, done(`${b.querySelector('span').textContent} envoyé !`));
+    });
+    const drawItems = () => {
+      const k = $('#modo-kind').value;
+      $('#modo-items').innerHTML = SHOP[k].filter(it => it.price).map(it => `<button data-it="${it.id}" class="r-${SHOP.rarity(it.price)}">${k === 'icons' ? `<em>${esc(it.id)}</em>` : k === 'colors' ? `<i style="background:${esc(it.base || it.id)}"></i><span>${esc(it.name || 'Couleur')}</span>` : `${esc(it.emoji || it.emojis || '🎁')} <span>${esc(it.name || it.id)}</span>`}</button>`).join('');
+      $$('#modo-items [data-it]').forEach(b => b.onclick = () => socket.emit('modoItem', { to: target, kind: k, id: b.dataset.it }, done('🎁 Objet offert')));
+    };
+    if ($('#modo-kind')) { $('#modo-kind').onchange = drawItems; drawItems(); }
+    m.querySelectorAll('[data-act]').forEach(b => b.onclick = () => {
+      const act = b.dataset.act, to = b.dataset.p;
+      let name;
+      if (act === 'rename') { name = prompt('Nouveau pseudo ?'); if (!name) return; }
+      if (act === 'kick' && !confirm('Exclure ce joueur ?')) return;
+      socket.emit('modoAct', { act, to, name }, (r) => r?.ok ? (toast(act === 'mute' ? (r.muted ? '🤐 Chat coupé 2 min' : '🗣️ Chat rétabli') : '✅ C\'est fait'), setTimeout(panel, 300)) : toast(r?.error || 'Erreur', 'error'));
     });
     m.querySelector('.modo-off').onclick = () => { store.set('mz_modo', ''); on = false; btn().classList.add('hidden'); m.classList.add('hidden'); toast('Mode modo désactivé sur cet appareil'); };
     m.classList.remove('hidden');
@@ -680,11 +721,53 @@ const MODO = (() => {
   btn().onclick = () => on && panel();
   socket.on('connect', () => { const k = store.get('mz_modo', ''); if (k) login(k, true); });
   socket.on('modoGift', ({ coins }) => {
+    if (coins < 0) { const n = Math.min(save.coins, -coins); save.coins -= n; persist(); renderProfile(); toast(`🦹 Un voleur masqué t'a piqué ${n} 🪙 !`, 'error'); sfx('buzzer'); document.body.classList.add('sn-shake'); setTimeout(() => document.body.classList.remove('sn-shake'), 500); return; }
     save.coins += coins; persist(); renderProfile();
     toast(`🎁 Cadeau surprise : +${coins} 🪙 !`); coinFountain(Math.min(60, 10 + Math.round(coins / 20))); sfx('legend');
   });
+  socket.on('modoItem', ({ kind, id }) => {
+    const it = SHOP[kind]?.find(x => x.id === id); if (!it) return;
+    if (!save.owned.includes(kind + ':' + id)) save.owned.push(kind + ':' + id);
+    persist(); renderProfile();
+    toast(`🎁 Cadeau surprise : « ${it.name || (kind === 'colors' ? 'une couleur' : id)} » débloqué dans la boutique !`); burst('fireworks', 18); sfx('legend');
+  });
+  socket.on('modoFx', (p) => PRANK(p));
   return { login };
 })();
+// 🎭 farces envoyées par le modo (durée courte, tout se remet en place tout seul)
+function PRANK({ fx, text }) {
+  const L = $('#reactions-layer'), B = document.body;
+  const cls = (c, ms) => { B.classList.add(c); setTimeout(() => B.classList.remove(c), ms); };
+  const el = (c, html, ms, css = {}) => { const e = document.createElement('div'); e.className = c; e.innerHTML = html; Object.assign(e.style, css); L.appendChild(e); setTimeout(() => e.remove(), ms); return e; };
+  switch (fx) {
+    case 'flip': cls('pr-flip', 6000); sfx('spin'); break;
+    case 'spin': cls('pr-spin', 3200); sfx('spin'); break;
+    case 'disco': cls('pr-disco', 6000); for (let i = 0; i < 6; i++) setTimeout(() => sfx('tick', .5), i * 450); el('pr-ball', '🪩', 6000); break;
+    case 'wobble': cls('pr-wobble', 5000); break;
+    case 'tiny': cls('pr-tiny', 5000); break;
+    case 'big': cls('pr-big', 4000); break;
+    case 'blur': cls('pr-blur', 5000); break;
+    case 'quake': cls('pr-quake', 2200); sfx('bang'); setTimeout(() => sfx('bang'), 400); break;
+    case 'clown': cls('pr-clown', 20000); sfx('klaxon'); break;
+    case 'dark': {
+      const d = el('pr-dark', '', 7000);
+      const mv = (e) => { const t = e.touches ? e.touches[0] : e; d.style.setProperty('--x', t.clientX + 'px'); d.style.setProperty('--y', t.clientY + 'px'); };
+      addEventListener('mousemove', mv); addEventListener('touchmove', mv); setTimeout(() => { removeEventListener('mousemove', mv); removeEventListener('touchmove', mv); }, 7000);
+      break;
+    }
+    case 'ducks': for (let i = 0; i < 14; i++) setTimeout(() => { el('pr-duck', '🦆', 4200, { top: (8 + Math.random() * 80) + 'vh', fontSize: (2 + Math.random() * 2.5) + 'rem', animationDuration: (2.5 + Math.random() * 1.6) + 's' }); if (i % 3 === 0) sfx('klaxon', .4); }, i * 180); break;
+    case 'ghost': el('pr-ghost', '👻<b>BOUH !</b>', 1600); sfx('buzzer'); cls('pr-quake', 500); break;
+    case 'horn': el('pr-horn', '📯 <b>POUET POUET !</b>', 2200); for (let i = 0; i < 3; i++) setTimeout(() => sfx('klaxon'), i * 300); cls('pr-quake', 900); break;
+    case 'fakelegend': {
+      const e = el('pr-fake', '<div class="pr-fk"><small>✨ OBJET LÉGENDAIRE ✨</small><b>👑 Couronne du roi</b><span>débloqué !</span></div>', 5200);
+      burst('supernova', 22); sfx('legend');
+      setTimeout(() => { e.querySelector('.pr-fk').innerHTML = '<b>…c\'était une blague 😜</b><small>signé : le modo</small>'; e.classList.add('troll'); sfx('buzzer'); }, 2600);
+      break;
+    }
+    case 'rain': { const em = [...(text || '💩').trim()].filter(c => c.trim()).slice(0, 4).join('') || '💩'; for (let i = 0; i < 40; i++) setTimeout(() => el('flying pr-rain', em.split('')[0] && [...em][i % [...em].length], 3300, { left: Math.random() * 100 + 'vw', fontSize: (1.4 + Math.random() * 2) + 'rem' }), i * 60); break; }
+    case 'msg': el('pr-msg', `<small>📢 MESSAGE DU MODO</small><b>${esc(text || '')}</b>`, 5000); sfx('drum'); break;
+  }
+}
 $('#reacts').innerHTML = REACTS.map(r => `<button type="button">${r}</button>`).join('');
 $$('#reacts button').forEach(b => b.onclick = () => socket.emit('react', b.textContent));
 socket.on('react', ({ emoji, avatar, name }) => {
@@ -1070,6 +1153,47 @@ const CELEBRATIONS = {
       fxEl('sn-shard', { '--dx': Math.cos(a) * dist + 'vmax', '--dy': Math.sin(a) * dist + 'vmax' }, ['🌟', '✨', '⭐', '💥'][i % 4], 1600);
     }
     document.body.classList.add('sn-shake'); setTimeout(() => document.body.classList.remove('sn-shake'), 600);
+  },
+  // 🐐👑 G.O.A.T. : la chèvre à lunettes débarque sur son podium, la couronne tombe pile sur sa tête
+  goat(k) {
+    const svg = `<svg viewBox="0 0 220 220" class="goat-svg">
+      <defs><radialGradient id="gtF" cx=".4" cy=".35"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e6dccb"/></radialGradient>
+      <linearGradient id="gtH" x1="0" x2="1"><stop offset="0" stop-color="#6b4a2a"/><stop offset="1" stop-color="#b98a52"/></linearGradient>
+      <linearGradient id="gtP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe680"/><stop offset=".5" stop-color="#f0b429"/><stop offset="1" stop-color="#9a6200"/></linearGradient></defs>
+      <path d="M40 186h140l-10 24H50z" fill="url(#gtP)" stroke="#7a4a00" stroke-width="3"/><text x="110" y="205" text-anchor="middle" font-family="Bungee,sans-serif" font-size="14" fill="#7a4a00">N°1</text>
+      <g class="goat-body">
+        <rect x="62" y="140" width="12" height="44" rx="5" fill="url(#gtF)" stroke="#3a2a1a" stroke-width="3"/><rect x="82" y="142" width="12" height="42" rx="5" fill="url(#gtF)" stroke="#3a2a1a" stroke-width="3"/>
+        <rect x="120" y="142" width="12" height="42" rx="5" fill="url(#gtF)" stroke="#3a2a1a" stroke-width="3"/><rect x="140" y="140" width="12" height="44" rx="5" fill="url(#gtF)" stroke="#3a2a1a" stroke-width="3"/>
+        <path d="M60 180h16v6H60zM80 180h16v6H80zM118 180h16v6h-16zM138 180h16v6h-16z" fill="#3a2a1a"/>
+        <path d="M46 118c-8-4-12-14-6-18" fill="none" stroke="#3a2a1a" stroke-width="5" stroke-linecap="round" class="goat-tail"/>
+        <ellipse cx="102" cy="128" rx="58" ry="32" fill="url(#gtF)" stroke="#3a2a1a" stroke-width="3"/>
+        <path d="M70 112q10-6 20 0M96 108q10-6 20 0" fill="none" stroke="#d8ccb8" stroke-width="3" stroke-linecap="round"/>
+        <path d="M84 150h40" stroke="#ffc21a" stroke-width="7" stroke-linecap="round"/><circle cx="104" cy="158" r="9" fill="url(#gtP)" stroke="#7a4a00" stroke-width="2"/><text x="104" y="162" text-anchor="middle" font-size="10" font-weight="900" fill="#7a4a00">1</text>
+        <g class="goat-head">
+          <path d="M140 64c-4-26 10-40 26-42-12 8-16 22-14 38z" fill="url(#gtH)" stroke="#3a2a1a" stroke-width="3"/>
+          <path d="M160 66c4-24 22-34 38-32-14 6-22 18-24 34z" fill="url(#gtH)" stroke="#3a2a1a" stroke-width="3"/>
+          <path d="M128 78c-14-2-24 4-28 12 12 2 22 0 30-6z" fill="url(#gtF)" stroke="#3a2a1a" stroke-width="3"/>
+          <path d="M184 80c14-4 24 0 30 8-12 4-22 4-30-2z" fill="url(#gtF)" stroke="#3a2a1a" stroke-width="3"/>
+          <path d="M132 70c0-14 14-20 26-20s26 6 26 20c0 22-8 50-26 50s-26-28-26-50z" fill="url(#gtF)" stroke="#3a2a1a" stroke-width="3"/>
+          <path d="M148 116l10 26 10-26z" fill="#e6dccb" stroke="#3a2a1a" stroke-width="3" stroke-linejoin="round" class="goat-beard"/>
+          <ellipse cx="158" cy="104" rx="14" ry="10" fill="#ffd0c8" stroke="#3a2a1a" stroke-width="2.5"/>
+          <ellipse cx="153" cy="103" rx="2.4" ry="3" fill="#3a2a1a"/><ellipse cx="163" cy="103" rx="2.4" ry="3" fill="#3a2a1a"/>
+          <path d="M152 112q6 5 12 0" fill="none" stroke="#3a2a1a" stroke-width="2.5" stroke-linecap="round"/>
+          <g class="goat-shades"><path d="M128 78h60v4l-4 12c-2 6-20 6-22 0l-2-6h-4l-2 6c-2 6-20 6-22 0l-4-12z" fill="#111" stroke="#000" stroke-width="2"/>
+          <path d="M136 82l6 0-4 8zM166 82l6 0-4 8z" fill="#fff" opacity=".7"/></g>
+        </g>
+      </g></svg>`;
+    const crown = `<svg viewBox="0 0 100 70"><defs><linearGradient id="gtC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3a8"/><stop offset=".45" stop-color="#ffc21a"/><stop offset="1" stop-color="#a86a00"/></linearGradient></defs>
+      <path d="M8 62L4 18l22 20L50 4l24 34 22-20-4 44z" fill="url(#gtC)" stroke="#7a4a00" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="8" y="54" width="84" height="10" rx="3" fill="#ffd84d" stroke="#7a4a00" stroke-width="2.5"/>
+      <circle cx="50" cy="40" r="7" fill="#ff2e6e" stroke="#7a0030" stroke-width="2"/><circle cx="26" cy="46" r="4.5" fill="#2fd3ff" stroke="#0a5a7a" stroke-width="1.5"/><circle cx="74" cy="46" r="4.5" fill="#3dff8e" stroke="#0a6a30" stroke-width="1.5"/>
+      <circle cx="4" cy="18" r="4" fill="#fff6c0"/><circle cx="50" cy="4" r="4.5" fill="#fff6c0"/><circle cx="96" cy="18" r="4" fill="#fff6c0"/></svg>`;
+    fxEl('goat-rays', {}, '', 3400);
+    fxEl('goat-stage', {}, `<div class="goat-hop">${svg}<div class="goat-crown">${crown}</div><div class="goat-flash"></div></div>`, 3400);
+    fxEl('goat-title', {}, [...'G.O.A.T.'].map((c, i) => `<span style="--i:${i}">${c}</span>`).join('') + '<small>GREATEST OF ALL TIME</small>', 3400);
+    for (let i = 0; i < Math.round(26 + 24 * k); i++)
+      fxEl('goat-glit', { left: rnd(0, 100) + 'vw', '--d': rnd(.9, 2) + 's', '--x': rnd(-60, 60) + 'px', fontSize: rnd(.9, 2.1) + 'rem', animationDelay: rnd(.8, 1.8) + 's' }, ['✦', '👑', '✨', '🐐', '✦'][i % 5], 3400);
+    setTimeout(() => { try { sfx('legend'); } catch (e) {} document.body.classList.add('sn-shake'); setTimeout(() => document.body.classList.remove('sn-shake'), 500); }, 1250);
   },
 };
 

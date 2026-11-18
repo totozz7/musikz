@@ -144,7 +144,9 @@
       const z = 9 - 6.2 * ease(t), fx = r.fx.x / 100, fy = r.fx.y / 100;
       const sw = iw / z, sh = ih / z;
       const sx = Math.min(iw - sw, Math.max(0, fx * iw - sw / 2)), sy = Math.min(ih - sh, Math.max(0, fy * ih - sh / 2));
-      ctx.save(); if (t < .7) ctx.filter = 'grayscale(1) contrast(1.15)';
+      // noir et blanc pendant 10 s, puis la couleur revient en 2 s
+      const el = (now - r.startAt) / 1000, gray = Math.max(0, Math.min(1, (12 - el) / 2));
+      ctx.save(); if (gray > 0) ctx.filter = `grayscale(${gray.toFixed(2)}) contrast(${(1 + .15 * gray).toFixed(2)})`;
       const s2 = Math.min(W / sw, H / sh), w2 = sw * s2, h2 = sh * s2;
       ctx.drawImage(img, sx, sy, sw, sh, (W - w2) / 2, (H - h2) / 2, w2, h2);
       ctx.restore();

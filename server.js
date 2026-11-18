@@ -20,7 +20,7 @@ const io = new Server(server);
 const PUB = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : __dirname;
 const INDEX = path.join(PUB, 'index.html');
 const SHOP = require(path.join(PUB, 'shop.js'));
-for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js', 'client-draw.js', 'client-bac.js', 'client-bluff.js', 'client-punch.js', 'client-sem.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
+for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js', 'client-draw.js', 'client-bac.js', 'client-bluff.js', 'client-punch.js', 'client-top7.js', 'client-sem.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
 app.get('/', (req, res) => res.sendFile(INDEX));
 app.get('/r/:code', (req, res) => res.sendFile(INDEX));
 app.get('/health', (req, res) => res.send('ok'));
@@ -393,6 +393,7 @@ const GAMES = {
   bac: require('./game-bac')(gameCtx),
   bluff: require('./game-bluff')(gameCtx),
   punch: require('./game-punch')(gameCtx),
+  top7: require('./game-top7')(gameCtx),
   sem: require('./game-sem')(gameCtx),
 };
 // infos affichées sur l'écran de choix (nombre de joueurs !)
@@ -406,7 +407,7 @@ const GAME_INFO = {
   guess: { min: 1, max: GAMES.guess.max },
   primo: { min: 1, max: GAMES.primo.max },
   draw: { min: 2, max: GAMES.draw.max },
-  bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 },
+  bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 },
 };
 app.get('/api/guess-themes', (req, res) => res.json(GAMES.guess.themes));
 app.get('/api/games', (req, res) => res.json({ info: GAME_INFO, ucThemes: GAMES.undercover.themes() }));
@@ -768,7 +769,7 @@ io.on('connection', (socket) => {
   socket.on('create', ({ name, avatar, pid, game, ...look }, cb) => {
     const code = makeCode();
     room = { code, players: new Map(), hostId: pid, phase: 'lobby', settings: defaultSettings(), chat: [], history: [],
-      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults(), draw: GAMES.draw.defaults(), bac: GAMES.bac.defaults(), bluff: GAMES.bluff.defaults(), punch: GAMES.punch.defaults(), sem: GAMES.sem.defaults() }, gscores: {}, g: null };
+      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults(), draw: GAMES.draw.defaults(), bac: GAMES.bac.defaults(), bluff: GAMES.bluff.defaults(), punch: GAMES.punch.defaults(), sem: GAMES.sem.defaults(), top7: GAMES.top7.defaults() }, gscores: {}, g: null };
     rooms.set(code, room);
     join(room, { name, avatar, pid, ...look }, cb);
   });
@@ -857,7 +858,7 @@ io.on('connection', (socket) => {
   socket.on('setGame', (game) => {
     if (!isHost() || !['lobby', 'end'].includes(room.phase) || !GAME_INFO[game]) return;
     room.game = game; room.phase = 'lobby'; stopModuleGame(room);
-    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time', bac: '📋 Petit Bac', bluff: '🎭 Le Bluff', punch: '🎤 Punchline', sem: '🌡️ Ça chauffe !' }[game]}`);
+    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time', bac: '📋 Petit Bac', bluff: '🎭 Le Bluff', punch: '🎤 Punchline', sem: '🌡️ Ça chauffe !', top7: '7️⃣ Top 7' }[game]}`);
     broadcast(room);
   });
   socket.on('gsettings', (patch = {}) => {
@@ -1003,15 +1004,46 @@ io.on('connection', (socket) => {
   socket.on('modoGift', ({ to, coins } = {}, cb) => {
     if (!socket.data.modo) return cb?.({ error: 'Pas autorisé' });
     if (!room) return cb?.({ error: 'Rejoins un salon pour donner des pièces' });
-    const n = Math.max(1, Math.min(1000000, Math.round(+coins || 0)));
+    const n = Math.max(-1000000, Math.min(1000000, Math.round(+coins || 0))); if (!n) return cb?.({ error: 'Montant invalide' });
     const targets = to === '*' ? [...room.players.values()].filter(p => p.online && p.id !== me?.id) : [room.players.get(to)].filter(Boolean);
     if (!targets.length) return cb?.({ error: 'Joueur introuvable' });
     targets.forEach(p => io.to(p.socketId).emit('modoGift', { coins: n }));
     cb?.({ ok: true, n: targets.length });
   });
+  // 🛡️ modo : effets marrants sur l'écran des autres + pouvoirs de salon
+  const MODO_FX = ['flip', 'spin', 'disco', 'wobble', 'tiny', 'ducks', 'rain', 'msg', 'clown', 'dark', 'quake', 'horn', 'fakelegend', 'ghost', 'big', 'blur'];
+  const modoTargets = (to) => !room ? [] : to === '*' ? [...room.players.values()].filter(p => p.online && p.id !== me?.id) : [room.players.get(to)].filter(p => p && p.online);
+  socket.on('modoFx', ({ to, fx, text } = {}, cb) => {
+    if (!socket.data.modo) return cb?.({ error: 'Pas autorisé' });
+    if (!MODO_FX.includes(fx)) return cb?.({ error: 'Effet inconnu' });
+    const t = modoTargets(to); if (!t.length) return cb?.({ error: 'Personne à embêter 😇' });
+    const payload = { fx, text: String(text || '').slice(0, fx === 'rain' ? 8 : 120) };
+    t.forEach(p => io.to(p.socketId).emit('modoFx', payload));
+    cb?.({ ok: true, n: t.length });
+  });
+  socket.on('modoItem', ({ to, kind, id } = {}, cb) => {
+    if (!socket.data.modo) return cb?.({ error: 'Pas autorisé' });
+    if (!SHOP[kind] || !Array.isArray(SHOP[kind]) || !SHOP[kind].some(x => x.id === id)) return cb?.({ error: 'Objet inconnu' });
+    const t = modoTargets(to); if (!t.length) return cb?.({ error: 'Joueur introuvable' });
+    t.forEach(p => io.to(p.socketId).emit('modoItem', { kind, id }));
+    cb?.({ ok: true, n: t.length });
+  });
+  socket.on('modoAct', ({ act, to, name } = {}, cb) => {
+    if (!socket.data.modo) return cb?.({ error: 'Pas autorisé' });
+    if (!room || !me) return cb?.({ error: 'Rejoins un salon' });
+    const p = to ? room.players.get(to) : null;
+    if (act === 'host') { room.hostId = me.id; sysMsg(room, `👑 ${me.name} prend la main sur le salon`); broadcast(room); return cb?.({ ok: true }); }
+    if (act === 'lobby') { clearTimeout(room.timer); stopModuleGame(room); room.phase = 'lobby'; broadcast(room); sysMsg(room, '⏹️ Retour au salon (modo)'); return cb?.({ ok: true }); }
+    if (!p || p.id === me.id) return cb?.({ error: 'Joueur introuvable' });
+    if (act === 'kick') { room.players.delete(p.id); io.to(p.socketId).emit('kicked'); sysMsg(room, `🚪 ${p.name} a été exclu`); broadcast(room); return cb?.({ ok: true }); }
+    if (act === 'rename') { const n = String(name || '').trim().slice(0, 20); if (!n) return cb?.({ error: 'Nom vide' }); sysMsg(room, `✏️ ${p.name} s'appelle maintenant ${n}`); p.name = n; broadcast(room); return cb?.({ ok: true }); }
+    if (act === 'mute') { p.mutedUntil = p.mutedUntil > Date.now() ? 0 : Date.now() + 120000; io.to(p.socketId).emit('toast', { type: 'warn', text: p.mutedUntil ? '🤐 Le modo t\'a coupé le chat pendant 2 minutes' : '🗣️ Tu peux de nouveau parler' }); return cb?.({ ok: true, muted: !!p.mutedUntil }); }
+    cb?.({ error: 'Action inconnue' });
+  });
   socket.on('chat', (text) => {
     if (!room || !me) return;
     text = String(text || '').trim().slice(0, 200); if (!text) return;
+    if (me.mutedUntil > Date.now()) return socket.emit('toast', { type: 'warn', text: '🤐 Chat coupé par le modo…' });
     // pendant une manche, on évite qu'une bonne réponse fuite dans le chat
     if (room.phase === 'playing' && room.settings.mode === 'text') {
       const res = checkGuess(text, room.round.track);

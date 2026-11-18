@@ -157,9 +157,15 @@
               <p class="muted small hint2">En mode infini, l'hôte arrête la partie quand il veut.</p>
             </div>
             <div class="set-block">
-              <h4>💡 Indices</h4>
-              <div class="seg gseg" data-key="hints"><button data-v="true">Oui</button><button data-v="false">Non</button></div>
-              <p class="muted small hint2">Première lettre après 2 min, nombre de lettres après 4 min.</p>
+              <h4>💡 Indices & bonus <small class="muted">(décoche ceux que tu ne veux pas)</small></h4>
+              <div class="sx-togs">
+                <label class="tog"><input type="checkbox" class="gtog" data-key="h_letter"><span></span> 🔤 Première lettre <small>à 1 min</small></label>
+                <label class="tog"><input type="checkbox" class="gtog" data-key="h_near"><span></span> 🧭 Mots voisins <small>à 1 min 30, 3 min et 4 min 30, de plus en plus proches</small></label>
+                <label class="tog"><input type="checkbox" class="gtog" data-key="h_len"><span></span> 📏 Nombre de lettres <small>à 2 min</small></label>
+                <label class="tog"><input type="checkbox" class="gtog" data-key="h_last"><span></span> 🔚 Dernière lettre <small>à 3 min 30</small></label>
+                <label class="tog"><input type="checkbox" class="gtog" data-key="h_boost"><span></span> 🎯 Coup de pouce <small>2 par mot : te donne un mot plus proche que ton meilleur</small></label>
+                <label class="tog"><input type="checkbox" class="gtog" data-key="h_spy"><span></span> 🕵️ Espion <small>1 par mot : vois le meilleur mot du joueur le plus chaud</small></label>
+              </div>
             </div>
           </div>
           <div class="set-block rules"><h4>📜 Règles</h4><p>Un mot secret (simple !). Propose n'importe quel mot : la <b>température</b> te dit à quel point tu es proche par le sens (🥶 froid → 🔥 brûlant). Si tu es dans les 1 000 mots les plus proches, tu vois ton rang en ‰. Le <b>premier qui trouve</b> gagne la manche, puis un nouveau mot arrive. Tu vois la température max des autres, mais pas leurs mots !</p></div>
@@ -171,7 +177,7 @@
             <p class="muted small hint2">Fun : « une excuse pour être en retard », « un prénom de mamie », « un truc qui pue », « un super-pouvoir nul »…</p>
           </div>
           <div class="set-row">
-            <div class="set-block"><h4>🔤 Lettres</h4><div class="seg gseg" data-key="rounds"><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="8">8</button></div>
+            <div class="set-block"><h4>🔤 Lettres</h4><div class="seg gseg" data-key="rounds"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="8">8</button></div>
               <h4 style="margin-top:.8rem">📋 Catégories par grille</h4><div class="seg gseg" data-key="cats"><button data-v="5">5</button><button data-v="7">7</button><button data-v="9">9</button></div></div>
             <div class="set-block"><h4>⏱️ Temps par lettre</h4><div class="seg gseg" data-key="time"><button data-v="60">60 s</button><button data-v="90">90 s</button><button data-v="120">2 min</button><button data-v="180">3 min</button></div></div>
           </div>
@@ -183,6 +189,14 @@
             <div class="set-block"><h4>⏱️ Temps pour bluffer</h4><div class="seg gseg" data-key="time"><button data-v="40">40 s</button><button data-v="60">60 s</button><button data-v="90">90 s</button></div></div>
           </div>
           <div class="set-block rules"><h4>📜 Règles</h4><p>Une anecdote <b>vraie</b> s'affiche avec un trou. Invente une fausse réponse crédible. Ensuite, retrouve la vraie parmi tous les bluffs : <b>+100</b> si tu trouves, <b>+50</b> par joueur piégé par ton bluff. Dernière anecdote : points doublés !</p></div>
+        </div>
+        <div id="set-top7" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block"><h4>🗂️ Thèmes</h4><div class="seg gseg" data-key="rounds"><button data-v="3">3</button><button data-v="5">5</button><button data-v="8">8</button><button data-v="12">12</button></div></div>
+            <div class="set-block"><h4>🎯 Essais par joueur et par thème</h4><div class="seg gseg" data-key="tries"><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div></div>
+            <div class="set-block"><h4>⏱️ Temps pour répondre</h4><div class="seg gseg" data-key="time"><button data-v="15">15 s</button><button data-v="20">20 s</button><button data-v="30">30 s</button></div></div>
+          </div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>Un thème (« les sports préférés des Français »…) et les <b>7 réponses les plus citées</b>, cachées. Chacun son tour, propose une réponse : si elle est dans le top, tu marques <b>son rang</b>. La n°1 (la plus évidente) ne vaut que <b>1 point</b>, la n°7 (la plus rare) en vaut <b>7</b> ! Raté ou déjà trouvée = 0. Le thème s'arrête quand tout est trouvé ou que tout le monde a utilisé ses essais.</p></div>
         </div>
         <div id="set-punch" class="settings gset hidden">
           <div class="set-row">
@@ -248,7 +262,7 @@
             <div class="set-block">
               <h4>🔥 Difficulté</h4>
               <div class="seg gseg" data-key="level"><button data-v="1">😎 Facile</button><button data-v="2">🤔 Moyen</button><button data-v="3">💀 Très dur</button></div>
-              <p class="muted small hint2">Facile : images connues, la pixellisation disparaît vite + indice. Moyen : plus pointu, l'image reste pixelisée. Très dur : images rares, gros zoom en noir et blanc, aucun indice.</p>
+              <p class="muted small hint2">Facile : images connues, la pixellisation disparaît vite + indice. Moyen : plus pointu, l'image reste pixelisée. Très dur : images rares, gros zoom en noir et blanc (la couleur revient au bout de 10 s), aucun indice.</p>
             </div>
             <div class="set-block">
               <h4>🖼️ Images</h4>
@@ -451,6 +465,7 @@
       <div id="v-bac" class="view"></div>
       <div id="v-bluff" class="view"></div>
       <div id="v-punch" class="view"></div>
+      <div id="v-top7" class="view"></div>
       <!-- SPEED WORD -->
       <div id="v-word" class="view"></div>
 
@@ -621,5 +636,6 @@
 <script src="/client-bac.js"></script>
 <script src="/client-bluff.js"></script>
 <script src="/client-punch.js"></script>
+<script src="/client-top7.js"></script>
 </body>
 </html>

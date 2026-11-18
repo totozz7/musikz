@@ -175,7 +175,7 @@
       { id: 'hearts', name: 'Cœurs', emojis: '💖💘💕', price: 150 }, { id: 'pizza', name: 'Pizzas', emojis: '🍕🍕🧀', price: 250 },
       { id: 'ducks', name: 'Canards', emojis: '🦆🦆🐥', price: 350 }, { id: 'fire', name: 'Flammes', emojis: '🔥🔥💥', price: 500 },
       { id: 'money', name: 'Billets', emojis: '💸💵🪙', price: 900 }, { id: 'music', name: 'Notes', emojis: '🎵🎶🎸', price: 900 },
-      { id: 'goat', name: 'GOAT', emojis: '🐐👑🐐', price: 2500 },
+      { id: 'goat', name: 'G.O.A.T.', emojis: '🐐👑', kind: 'goat', price: 2500 },
       // célébrations animées (pas juste une pluie d'emojis)
       { id: 'comics', name: 'BAM ! POW !', emojis: '💥', kind: 'comics', price: 900 },
       { id: 'levelup', name: 'Level up', emojis: '⬆️', kind: 'levelup', price: 1000 },

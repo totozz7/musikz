@@ -9,7 +9,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
   function applySettings(room, p) {
     const s = room.gs.bac;
     if (['classic', 'fun', 'mix'].includes(p.mode)) s.mode = p.mode;
-    if ([3, 4, 5, 8].includes(+p.rounds)) s.rounds = +p.rounds;
+    if ([1, 2, 3, 4, 5, 8].includes(+p.rounds)) s.rounds = +p.rounds;
     if ([60, 90, 120, 180].includes(+p.time)) s.time = +p.time;
     if ([5, 7, 9].includes(+p.cats)) s.cats = +p.cats;
   }
@@ -30,7 +30,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
     };
     players(room).forEach(p => { room.g.scores[p.id] = 0; });
     room.phase = 'game';
-    sysMsg(room, `📝 Petit Bac — ${s.rounds} manches · ${cats.length} catégories · ${s.time} s par lettre`);
+    sysMsg(room, `📝 Petit Bac — ${s.rounds} manche${s.rounds > 1 ? "s" : ""} · ${cats.length} catégories · ${s.time} s par lettre`);
     broadcast(room);
     nextRound(room);
   }

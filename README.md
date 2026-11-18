@@ -38,7 +38,7 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 ### 🖼️ Guess Party (1 à 12 joueurs)
 - Une image apparaît brouillée : devine le dessin animé, le film, le pays… Pour les pochettes d'album : l'artiste ET l'album.
 - 12 thèmes (≈ 940 images) : dessins animés, Disney & Pixar, films, pochettes rap FR, rap US, pop & variété, animés japonais, séries, jeux vidéo, drapeaux, monuments, logos de clubs de foot. Plusieurs thèmes au choix.
-- 3 niveaux : 😎 facile (images connues, pixellisation qui disparaît vite + indice), 🤔 moyen (plus pointu, reste pixelisé), 💀 très dur (images rares, gros zoom en noir et blanc, aucun indice).
+- 3 niveaux : 😎 facile (images connues, pixellisation qui disparaît vite + indice), 🤔 moyen (plus pointu, reste pixelisé), 💀 très dur (images rares, gros zoom en noir et blanc (la couleur revient au bout de 10 s), aucun indice).
 - Images chargées à la volée : Wikipédia (affiches, jaquettes, logos, photos), Deezer (pochettes), flagcdn (drapeaux). Contenu dans `data-guess.js`.
 - Options : nombre d'images, temps par image, **pause entre deux images** (3, 6, 10 ou 15 s). L'image reste cachée pendant le compte à rebours.
 
@@ -49,12 +49,17 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 
 ### 🌡️ Ça chauffe ! (1 à 12 joueurs)
 - Trouve le **mot secret** : chaque proposition donne une **température** (°C) selon sa proximité de sens, et un score sur 1000 (‰) quand tu es dans les 1000 mots les plus proches. Tout le monde cherche le **même mot** en même temps, le premier qui trouve gagne la manche et on passe au suivant.
-- Mots secrets **faciles** (objets, animaux, nourriture…), 1 / 3 / 5 / 10 mots ou **à l'infini**. Indices automatiques (1re lettre à 2 min, longueur à 4 min) désactivables. Abandon d'un mot à la majorité.
+- Mots secrets **faciles** (objets, animaux, nourriture…), 1 / 3 / 5 / 10 mots ou **à l'infini**. Indices & bonus, tous cochés par défaut et décochables dans le salon : 🔤 1re lettre (1 min), 🧭 mots voisins (1 min 30, 3 min, 4 min 30), 📏 nombre de lettres (2 min), 🔚 dernière lettre (3 min 30), 🎯 coup de pouce (2 par mot, un mot plus proche que ton meilleur), 🕵️ espion (1 par mot, le meilleur mot du joueur le plus chaud). Abandon d'un mot à la majorité.
 - Fichiers nécessaires : `sem-vectors.bin` (15 Mo) + `sem-words.txt` (vocabulaire de 50 000 mots).
+
+### 7️⃣ Top 7 (1 à 10 joueurs)
+- Un thème (« les sports préférés des Français », « ce qu'on achète à la boulangerie »…) et ses **7 réponses les plus citées**, cachées sur un plateau télé. 83 thèmes dans `data-top7.js` (classements estimés, modifiables).
+- Chacun son tour, on propose une réponse : la n°1 (la plus évidente) vaut **1 point**… la n°7 (la plus rare) **7 points**. Raté, trop tard ou déjà trouvée = 0.
+- Réglages : nombre de thèmes (3 / 5 / 8 / 12), essais par joueur et par thème (2 / 3 / 4), temps pour répondre (15 / 20 / 30 s). Fautes de frappe, accents et pluriels tolérés.
 
 ### 📋 Petit Bac (1 à 12 joueurs)
 - Une lettre tirée au sort, une grille de catégories **classiques**, **fun** (« Une excuse pour être en retard », « Un truc qui pue », « Un super-pouvoir nul »…) ou **mélange**. Le premier qui a tout rempli crie **STOP** (+5 si tout est validé).
-- Puis on vérifie : clique sur une réponse pour la contester ; elle tombe si la majorité vote contre. Réponse unique 10 pts, partagée 5 pts.
+- Puis on vérifie : clique sur une réponse pour la contester ; elle tombe si la majorité vote contre. Réponse unique 10 pts, partagée 5 pts. De 1 à 8 lettres par partie.
 
 ### 🎭 Le Bluff (2 à 10 joueurs)
 - Une anecdote vraie avec un trou. Chacun **invente** une fausse réponse crédible, puis tout le monde doit retrouver **la vraie** parmi les bluffs.
@@ -159,4 +164,8 @@ developer.spotify.com et ajoute dans Render (Environment) les variables `SPOTIFY
 ## 🛡️ Mode modo (réservé au propriétaire)
 1. Sur Render : service → **Environment** → *Add Environment Variable* → clé `ADMIN_KEY`, valeur = ton code secret → *Save* (le site redémarre).
 2. Dans un salon, tape dans le chat : `/modo ton-code` (la commande n'est jamais envoyée aux autres).
-3. Un bouton 🛡️ apparaît : ajoute-toi des pièces (sans rien débloquer) ou donne des pièces à un joueur / à tout le salon. Le code est retenu sur ton appareil.
+3. Un bouton 🛡️ apparaît (le code est retenu sur ton appareil), avec 4 onglets. Chaque action vise un joueur ou tout le salon :
+   - 🪙 **Pièces** : t'en ajouter (sans rien débloquer), en donner ou en **voler**.
+   - 🎭 **Farces** sur l'écran des autres, pendant quelques secondes : écran à l'envers, toupie, disco, gelée, minuscule, zoom géant, flou, tremblement, lampe torche, invasion de canards, tout le monde en clown, « Bouh ! », corne de brume, faux objet légendaire, pluie d'emojis au choix, message géant.
+   - 🎁 **Objets** : offrir n'importe quel objet de la boutique.
+   - 🛠️ **Salon** : devenir l'hôte, stopper la partie, renommer, couper le chat 2 min, exclure.

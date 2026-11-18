@@ -25,6 +25,8 @@
           <aside class="sx-side">
             <h4>🏁 La course</h4>
             <div class="sx-race" id="sx-race"></div>
+            <div class="sx-helps" id="sx-helps"><button class="sx-help" id="sx-boost">🎯 Coup de pouce <b id="sx-boost-n"></b><small>un mot plus proche que ton meilleur</small></button><button class="sx-help spy" id="sx-spy">🕵️ Espion <b id="sx-spy-n"></b><small>vois le meilleur mot du plus chaud</small></button></div>
+            <div class="sx-spyres" id="sx-spyres"></div>
             <div class="sx-btns"><button class="btn btn-ghost btn-sm" id="sx-give">🏳️ Abandonner ce mot</button><button class="btn btn-ghost btn-sm hidden" id="sx-end">⏹ Terminer la partie</button></div>
             <div class="sx-scale"><span>🧊 &lt; 0 °C</span><span>🥶 froid</span><span>🌡️ tiède</span><span>😎 top 1000</span><span>🥵 top 100</span><span>🔥 top 10</span><span>😱 brûlant</span></div>
           </aside>
@@ -47,13 +49,25 @@
       else { msg('', ''); sfx(r.per >= 990 ? 'legend' : r.per >= 900 ? 'pop' : r.per > 0 ? 'pop' : 'tick', r.per > 0 ? .6 : .4); if (r.per >= 990) burst('fireworks', 10); }
       if (V) drawList(V);
     };
+    $('#sx-boost').onclick = async () => {
+      const r = await gAct('boost'); if (!r) return;
+      if (r.error) return msg(r.error, 'err');
+      last = r.w; msg(`🎯 Coup de pouce : « ${r.w} » (${r.t} °C)`, 'dup'); sfx('legend', .5); burst('fireworks', 8);
+      if (V) drawList(V);
+    };
+    $('#sx-spy').onclick = async () => {
+      const r = await gAct('spy'); if (!r) return;
+      if (r.error) return msg(r.error, 'err');
+      $('#sx-spyres').innerHTML = `🕵️ <b>${esc(r.name)}</b> a trouvé « <b>${esc(r.w)}</b> » <em style="--h:${heatCol(r.t)}">${r.t.toFixed(2)} °C${r.per ? ' · ' + r.per + '‰' : ''}</em>`;
+      $('#sx-spyres').classList.add('on'); sfx('card', .6);
+    };
     $('#sx-give').onclick = () => gAct('giveup');
     $('#sx-end').onclick = () => gAct('end');
   }
   function msg(t, cls) { const m = $('#sx-msg'); m.className = 'sx-msg ' + cls; m.textContent = t; clearTimeout(msg.t); if (t) msg.t = setTimeout(() => { m.textContent = ''; }, 3500); }
   function row(r, cls = '') {
     const w = Math.max(2, r.per / 10);
-    return `<li class="sx-row ${cls} ${r.per ? 'hot' : ''}" style="--h:${heatCol(r.t)}"><span class="n">${r.n}</span><span class="w">${esc(r.w)}</span><span class="t">${r.t.toFixed(2)}</span><span class="e">${emo(r)}</span>
+    return `<li class="sx-row ${cls} ${r.per ? 'hot' : ''} ${r.boost ? 'boost' : ''}" style="--h:${heatCol(r.t)}"><span class="n">${r.boost ? '🎯' : r.n}</span><span class="w">${esc(r.w)}</span><span class="t">${r.t.toFixed(2)}</span><span class="e">${emo(r)}</span>
       <span class="bar">${r.per ? `<i style="width:${w}%"></i><b>${r.per}‰</b>` : ''}</span></li>`;
   }
   function drawList(v) {
@@ -89,9 +103,19 @@
     v._rt = Date.now(); V = v;
     if (fresh) { key = v.gameKey; build(); round = null; lastStage = null; }
     $('#sx-count').textContent = `Mot ${v.n}${v.total ? ' / ' + v.total : ' · ♾️'}`;
-    $('#sx-hint').innerHTML = v.hint ? `💡 ${esc(v.hint)}` : '';
-    $('#sx-hint').classList.toggle('on', !!v.hint);
-    if (v.round !== round) { round = v.round; last = null; if (v.stage === 'play') { msg('', ''); intro(v); } }
+    const hs = v.hints || [];
+    const hk = hs.length + ':' + v.round;
+    if (hk !== render.hk) {
+      if (render.hk && render.hk.split(':').slice(1).join(':') === v.round && hs.length) { sfx('legend', .5); toast(`💡 Nouvel indice : ${hs[hs.length - 1].txt}`); }
+      render.hk = hk;
+      $('#sx-hint').innerHTML = hs.map((h, i) => `<span class="sx-hc k-${h.k}" style="--i:${i}">${h.e} ${esc(h.txt)}</span>`).join('');
+    }
+    $('#sx-hint').classList.toggle('on', hs.length > 0);
+    const H = v.helps || {}, U = v.used || {};
+    $('#sx-boost').classList.toggle('hidden', !H.h_boost); $('#sx-spy').classList.toggle('hidden', !H.h_spy || state.players.filter(p => p.online).length < 2);
+    $('#sx-boost-n').textContent = `${v.maxBoost - (U.boost || 0)}/${v.maxBoost}`; $('#sx-spy-n').textContent = `${v.maxSpy - (U.spy || 0)}/${v.maxSpy}`;
+    $('#sx-boost').disabled = v.stage !== 'play' || (U.boost || 0) >= v.maxBoost; $('#sx-spy').disabled = v.stage !== 'play' || (U.spy || 0) >= v.maxSpy;
+    if (v.round !== round) { round = v.round; last = null; $('#sx-spyres').classList.remove('on'); $('#sx-spyres').innerHTML = ''; if (v.stage === 'play') { msg('', ''); intro(v); } }
     drawList(v); drawRace(v); clock();
     $('#sx-form').classList.toggle('off', v.stage !== 'play');
     if (v.stage === 'reveal' && lastStage !== 'reveal') reveal(v);
