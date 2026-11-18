@@ -35,7 +35,7 @@ module.exports = ({ sysMsg, broadcast, pushState, reward, emit }) => {
   function progress(room) {
     const g = room.g, total = letterCells(g).length;
     return [...g.players.entries()].filter(([pid]) => room.players.get(pid)).map(([pid, p]) => ({
-      pid, filled: Math.round(100 * filledCount(g, p) / total), done: p.done,
+      pid, filled: Math.round(100 * correctCount(g, p) / total), done: p.done,
     }));
   }
   let progTimer = new Map();
@@ -97,14 +97,14 @@ module.exports = ({ sysMsg, broadcast, pushState, reward, emit }) => {
       const p = pl(room, me.id); if (p.done) return;
       if (p.hinted.includes(i)) return { ok: true, locked: true }; // lettre révélée : bloquée
       // mot déjà trouvé (en vert) : ses lettres ne peuvent plus être modifiées
-      if (g.hints && g.words.some(w => w.cells.includes(i) && w.cells.every(k => p.letters[k] === g.sol[k]))) return { ok: true, locked: true, solved: solvedWords(g, p) };
+      if (g.words.some(w => w.cells.includes(i) && w.cells.every(k => p.letters[k] === g.sol[k]))) return { ok: true, locked: true, solved: solvedWords(g, p) };
       ch = String(ch || '').toUpperCase().normalize('NFD').replace(/[^A-Z]/g, '').slice(0, 1);
       if (ch) p.letters[i] = ch; else delete p.letters[i];
       sendProgress(room);
       const allOk = letterCells(g).every(k => p.letters[k] === g.sol[k]);
       if (allOk) { p.done = true; p.doneAt = Date.now(); finish(room, me.id); return { done: true }; }
       const full = filledCount(g, p) === letterCells(g).length;
-      return { ok: true, solved: g.hints ? solvedWords(g, p) : null, full };
+      return { ok: true, solved: solvedWords(g, p), full };
     },
     hint(room, me, { i } = {}) {
       const g = room.g; if (g.stage !== 'play' || !g.hints) return;
@@ -137,7 +137,7 @@ module.exports = ({ sysMsg, broadcast, pushState, reward, emit }) => {
       game: id, stage: g.stage, level: g.level, levelName: `${L.emoji} ${L.name}`, hints: g.hints, multi: g.multi,
       W: g.W, H: g.H, cells: g.cells, words: g.words.map(w => ({ dir: w.dir, cells: w.cells, clue: w.clue, text: w.text, len: w.len })),
       gridId: g.startAt, startIn: g.startAt - Date.now(), elapsed: Date.now() - g.startAt,
-      my: { letters: p.letters, hintsLeft: p.hintsLeft, hinted: p.hinted, solved: g.hints ? solvedWords(g, p) : [], done: p.done },
+      my: { letters: p.letters, hintsLeft: p.hintsLeft, hinted: p.hinted, solved: solvedWords(g, p), done: p.done },
       progress: progress(room),
       sol: over ? g.sol : null, ranking: over ? g.ranking : null, winner: g.winner,
       duration: over ? g.endAt - g.startAt : null, coins: over ? g.coins?.[pid] || null : null,

@@ -8,7 +8,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
   const MIN = 1, MAX = 12;
   const UA = 'PlayZup/1.0 (jeu privé entre amis; https://github.com)';
   const MOCK = !!process.env.MOCK;
-  const defaults = () => ({ themes: ['cartoons', 'films', 'raprfr'], level: 1, rounds: 10, time: 30 });
+  const defaults = () => ({ themes: ['cartoons', 'films', 'raprfr'], level: 1, rounds: 10, time: 30, gap: 6 });
 
   function applySettings(room, p) {
     const s = room.gs.guess;
@@ -16,6 +16,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
     if ([1, 2, 3].includes(+p.level)) s.level = +p.level;
     if ([5, 10, 15, 20].includes(+p.rounds)) s.rounds = +p.rounds;
     if ([20, 30, 45].includes(+p.time)) s.time = +p.time;
+    if ([3, 6, 10, 15].includes(+p.gap)) s.gap = +p.gap;
   }
 
   // ── lecture des données ──
@@ -100,12 +101,12 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
     const s = room.gs.guess;
     if (!s.themes.length) throw new Error('Choisis au moins un thème');
     const players = [...room.players.values()].filter(p => p.online);
-    room.g = { game: id, stage: 'loading', gameKey: Date.now().toString(36), level: s.level, time: s.time * 1000, total: s.rounds,
+    room.g = { game: id, stage: 'loading', gameKey: Date.now().toString(36), level: s.level, time: s.time * 1000, gap: (s.gap || 6) * 1000, total: s.rounds,
       list: [], idx: -1, round: null, scores: {}, found: {}, feed: [], timer: null, deadline: 0, results: [] };
     players.forEach(p => { room.g.scores[p.id] = 0; });
     room.phase = 'game';
     const g = room.g;
-    sysMsg(room, `🖼️ Guess Party — ${s.rounds} images · niveau ${['', 'facile', 'moyen', 'très dur'][s.level]} · ${s.themes.map(t => THEMES.find(x => x.id === t).emoji).join(' ')}`);
+    sysMsg(room, `🖼️ Guess Party — ${s.rounds} images · niveau ${['', 'facile', 'moyen', 'très dur'][s.level]} · ${s.gap || 6} s entre les images · ${s.themes.map(t => THEMES.find(x => x.id === t).emoji).join(' ')}`);
     pushState(room);
     resolveAll(candidates(s, s.rounds * 2 + 4)).then(list => {
       if (room.g !== g) return;
@@ -148,7 +149,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
     const it = g.list[g.idx];
     g.results.push({ show: it.show, img: it.img, theme: it.theme, finders: Object.keys(g.found).filter(pid => Object.keys(g.found[pid]).length) });
     pushState(room);
-    later(room, 6500, () => nextRound(room));
+    later(room, g.gap, () => nextRound(room));
   }
 
   function finish(room) {

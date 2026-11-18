@@ -113,7 +113,7 @@
     // compte à rebours
     const pre = r.startAt - now;
     const intro = $('#gp-intro');
-    if (pre > 0) { const cd = $('#gp-cd'); const n = Math.ceil(pre / 800); if (cd && cd.textContent !== String(n)) { cd.textContent = n; cd.classList.remove('pop'); void cd.offsetWidth; cd.classList.add('pop'); sfx('tick', .8); } }
+    if (pre > 0) { const cd = $('#gp-cd'); const n = Math.min(3, Math.ceil(pre / 800)); if (cd && cd.textContent !== String(n)) { cd.textContent = n; cd.classList.remove('pop'); void cd.offsetWidth; cd.classList.add('pop'); sfx('tick', .8); } }
     else if (intro.classList.contains('on')) { intro.className = 'gp-intro'; sfx('legend', .4); }
     // anneau de temps
     const ring = $('#gp-ringc'), sec = $('#gp-sec');
@@ -122,12 +122,13 @@
     const ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
     ctx.fillStyle = '#140a24'; ctx.fillRect(0, 0, W, H);
     if (!img) { drawWait(ctx, W, H, now); return; }
+    if (v.stage === 'play' && pre > 0) { drawHidden(ctx, W, H, now); return; }
     if (img === 'err') { ctx.fillStyle = '#fff'; ctx.font = 'bold 28px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Image indisponible 😕', W / 2, H / 2); return; }
     const reveal = v.stage === 'reveal' || v.stage === 'over';
     // place l'image « contain » sur fond flou
     const iw = img.naturalWidth || 600, ih = img.naturalHeight || 600, sc = Math.min(W / iw, H / ih);
     const dw = iw * sc, dh = ih * sc, dx = (W - dw) / 2, dy = (H - dh) / 2;
-    if (pre > 0 && !reveal) { drawPix(ctx, img, 0, 0, iw, ih, dx, dy, dw, dh, 4); return; }
+    if (pre > 0 && !reveal) { drawHidden(ctx, W, H, now); return; } // rien de l'image tant que le chrono n'a pas démarré
     if (reveal) {
       ctx.save(); ctx.filter = 'blur(24px) brightness(.5)'; ctx.drawImage(img, -40, -40, W + 80, H + 80); ctx.restore();
       ctx.drawImage(img, dx, dy, dw, dh); return;
@@ -155,6 +156,14 @@
     const c2 = small.getContext('2d'); c2.imageSmoothingEnabled = true;
     c2.drawImage(im, sx, sy, sw, sh, 0, 0, rw, rh);
     ctx.save(); ctx.imageSmoothingEnabled = false; ctx.drawImage(small, 0, 0, rw, rh, dx, dy, dw, dh); ctx.restore();
+  }
+  function drawHidden(ctx, W, H, now) {
+    const g = ctx.createRadialGradient(W / 2, H / 2, 20, W / 2, H / 2, W * .7);
+    g.addColorStop(0, '#3a1d6e'); g.addColorStop(1, '#140a24');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.save(); ctx.translate(W / 2, H / 2); ctx.rotate(Math.sin(now / 500) * .08);
+    ctx.font = 'bold 220px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#ffffff14'; ctx.fillText('?', 0, 10);
+    ctx.restore();
   }
   function drawWait(ctx, W, H, now) {
     for (let i = 0; i < 6; i++) { const a = now / 400 + i; ctx.fillStyle = `hsla(${(i * 60 + now / 20) % 360},90%,60%,.5)`; ctx.beginPath(); ctx.arc(W / 2 + Math.cos(a) * 60, H / 2 + Math.sin(a) * 60, 12, 0, 7); ctx.fill(); }

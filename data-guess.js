@@ -314,3 +314,104 @@ module.exports = [
     },
   },
 ];
+
+// ───────────── Ajouts v21 : plus d'images dans chaque thème ─────────────
+const EXTRA = {
+  cartoons: {
+    1: ['Pat\' Patrouille|PAW Patrol|pat patrouille, paw patrol', 'Les Tortues Ninja|Teenage Mutant Ninja Turtles (1987 TV series)|tortues ninja, ninja turtles', 'Pokémon|Pokémon (TV series)|pokemon',
+      'Garfield|Garfield and Friends|', 'Les Lapins Crétins|Rabbids Invasion|lapins cretins, rabbids', 'Bluey|Bluey (2018 TV series)|', 'Masha et Michka|Masha and the Bear|masha et michka, masha',
+      'Les Pingouins de Madagascar|The Penguins of Madagascar|pingouins de madagascar', 'Ben 10|Ben 10 (2005 TV series)|ben ten', 'Spider-Man : New Generation|Spider-Man: Into the Spider-Verse|spider-verse, new generation'],
+    2: ['Kid Paddle|Kid Paddle (TV series)|', 'Galactik Football|Galactik Football|', 'Martin Mystère|Martin Mystery|martin mystere', 'W.I.T.C.H.|W.I.T.C.H. (TV series)|witch',
+      'Danny Fantôme|Danny Phantom|danny phantom, danny fantome', 'Mes parrains sont magiques|The Fairly OddParents|parrains magiques, fairly oddparents', 'Kim Possible|Kim Possible|',
+      'Foot 2 Rue|Foot 2 Rue|foot de rue', 'Les Zinzins de l\'espace|Space Goofs|zinzins de l espace, zinzins', 'Teen Titans|Teen Titans (TV series)|', 'Hey Arnold!|Hey Arnold!|hey arnold'],
+    3: ['Moomins|The Moomins (1990 TV series)|moomin, les moomins', 'Rahan|Rahan (TV series)|', 'Les Mondes engloutis|Les Mondes Engloutis|mondes engloutis',
+      'Le Petit Prince|The Little Prince (2015 film)|petit prince', 'Les Contes de la crypte|Tales from the Cryptkeeper|', 'Maya l\'abeille|Maya the Bee (1975 TV series)|maya l abeille, maya',
+      'Æon Flux|Æon Flux|aeon flux', 'Le Tableau|The Painting (2011 film)|le tableau',],
+  },
+  disney: {
+    1: ['Toy Story 2|Toy Story 2|', 'Cars 2|Cars 2|', 'La Reine des neiges 2|Frozen 2|frozen 2, reine des neiges 2', 'Le Livre de la jungle|The Jungle Book (1967 film)|livre de la jungle, jungle book',
+      'Les 101 Dalmatiens|One Hundred and One Dalmatians|101 dalmatiens', 'Peter Pan|Peter Pan (1953 film)|', 'Inside Out 2|Inside Out 2|vice versa 2', 'Moana 2|Moana 2|vaiana 2'],
+    2: ['Pocahontas|Pocahontas (1995 film)|', 'Le Bossu de Notre-Dame|The Hunchback of Notre Dame (1996 film)|bossu de notre dame', 'La Belle au bois dormant|Sleeping Beauty (1959 film)|belle au bois dormant',
+      'La Belle et le Clochard|Lady and the Tramp|belle et le clochard', 'Le Monde de Dory|Finding Dory|dory, finding dory', 'Monstres Academy|Monsters University|monsters university',
+      '1001 pattes|A Bug\'s Life|mille et une pattes, a bug s life', 'Alice au pays des merveilles|Alice in Wonderland (1951 film)|alice'],
+    3: ['Merlin l\'Enchanteur|The Sword in the Stone (1963 film)|merlin l enchanteur', 'Les Aventures de Bernard et Bianca|The Rescuers Down Under|bernard et bianca au pays des kangourous',
+      'Dinosaure|Dinosaur (2000 film)|', 'Lightyear|Lightyear (film)|', 'Mary Poppins|Mary Poppins (film)|', 'L\'Étrange Noël de monsieur Jack|The Nightmare Before Christmas|etrange noel de monsieur jack, nightmare before christmas',
+      'Les Trois Caballeros|The Three Caballeros|', 'Peter et Elliott le dragon|Pete\'s Dragon (1977 film)|peter et elliott'],
+  },
+  films: {
+    1: ['Le Seigneur des anneaux|The Lord of the Rings: The Fellowship of the Ring|seigneur des anneaux, lord of the rings', 'Le Roi lion (2019)|The Lion King (2019 film)|roi lion',
+      'Shrek 2|Shrek 2|', 'Spider-Man: No Way Home|Spider-Man: No Way Home|no way home', 'Avengers: Endgame|Avengers: Endgame|endgame', 'Black Panther|Black Panther (film)|',
+      'Les Minions|Minions (film)|minions', 'Le Monde de Narnia|The Chronicles of Narnia: The Lion, the Witch and the Wardrobe|narnia', 'Iron Man|Iron Man (2008 film)|', 'Twilight|Twilight (2008 film)|'],
+    2: ['Les Évadés|The Shawshank Redemption|les evades, shawshank redemption', 'Le Silence des agneaux|The Silence of the Lambs (film)|silence des agneaux', 'Alien|Alien (film)|',
+      'Terminator 2|Terminator 2: Judgment Day|terminator', 'Mad Max: Fury Road|Mad Max: Fury Road|mad max', 'La La Land|La La Land|', 'Le Grand Bleu|The Big Blue|grand bleu',
+      'Kill Bill|Kill Bill: Volume 1|', 'Les Tuche|Les Tuche|tuche', 'Qu\'est-ce qu\'on a fait au Bon Dieu ?|Serial (Bad) Weddings|qu est ce qu on a fait au bon dieu'],
+    3: ['Le Septième Sceau|The Seventh Seal|septieme sceau', 'Metropolis|Metropolis (1927 film)|', 'Les 400 Coups|The 400 Blows|400 coups, les quatre cents coups', 'À bout de souffle|Breathless (1960 film)|a bout de souffle',
+      'Psychose|Psycho (1960 film)|psycho', 'Vertigo|Vertigo (film)|sueurs froides', 'In the Mood for Love|In the Mood for Love|', 'Moonlight|Moonlight (2016 film)|', 'Her|Her (2013 film)|', 'Titane|Titane (film)|'],
+  },
+  raprfr: {
+    1: ['Ninho|Jefe||', 'Jul|C\'est pas des LOL||', 'Booba|Ultra||', 'PNL|Le monde Chico||', 'Gazo|La Mélo est Gangx||', 'SCH|A7||', 'Damso|QALF||', 'Nekfeu|Cyborg||', 'Aya Nakamura|DNK||', 'Bigflo & Oli|La cour des grands|bigflo et oli|'],
+    2: ['Hamza|Sincèrement||', 'Laylow|L\'étrange histoire de Mr. Anderson||', 'Kaaris|Dozo||', 'Niska|Zifukoro||', 'Lomepal|Flip||', 'Vald|Agartha||', 'Josman|M.A.N||', 'Alpha Wann|Don Dada Mixtape Vol. 1||', 'Sofiane|Affranchis||'],
+    3: ['La Fouine|Drôle de parcours||', 'Kery James|Si c\'était à refaire||', 'Médine|Prose élite||', 'Youssoupha|Noir désir||', 'Lino|Requiem||', 'Isha|La vie augmente, vol. 1||',],
+  },
+  rapus: {
+    1: ['Drake|Scorpion||', 'Travis Scott|Utopia||', 'Eminem|Recovery||', 'Kanye West|Donda||', 'Kendrick Lamar|GNX||', 'Post Malone|Beerbongs & Bentleys||', 'Doja Cat|Planet Her||', 'Lil Wayne|Tha Carter IV||'],
+    2: ['Tyler, The Creator|Flower Boy||', 'Kanye West|Yeezus||', 'J. Cole|KOD||', 'Metro Boomin|Heroes & Villains||', 'Lil Uzi Vert|Eternal Atake||', '21 Savage|Savage Mode II||', 'Young Thug|So Much Fun||', 'A$AP Rocky|Testing||'],
+    3: ['MF DOOM|Mm..Food||', 'Outkast|Aquemini||', 'Gang Starr|Moment of Truth||', 'Ghostface Killah|Supreme Clientele||', 'Kanye West|Late Registration||', 'Kendrick Lamar|Section.80||', 'Denzel Curry|Melt My Eyez See Your Future||', 'Mos Def|Black on Both Sides||'],
+  },
+  pop: {
+    1: ['Taylor Swift|Midnights||', 'Ed Sheeran|×||', 'Michael Jackson|Bad||', 'Rihanna|Anti||', 'Coldplay|A Rush of Blood to the Head||', 'Sabrina Carpenter|Short n\' Sweet||', 'Olivia Rodrigo|Sour||', 'Stromae|Multitude||'],
+    2: ['Lana Del Rey|Born to Die||', 'Arctic Monkeys|AM||', 'Oasis|(What\'s the Story) Morning Glory?||', 'Gorillaz|Demon Days||', 'Lorde|Melodrama||', 'Kendji Girac|Kendji||', 'M|Qui de nous deux||', 'Indochine|Paradize||'],
+    3: ['Françoise Hardy|Comment te dire adieu||', 'Étienne Daho|Pop Satori||', 'Noir Désir|666.667 Club||', 'The Strokes|Is This It||', 'Beach House|Bloom||', 'Tame Impala|Currents||', 'Portishead|Dummy||', 'Charlotte Gainsbourg|Rest||'],
+  },
+  anime: {
+    1: ['Naruto Shippuden|Naruto: Shippuden|naruto shippuden', 'Dragon Ball Super|Dragon Ball Super|', 'Le Château dans le ciel|Castle in the Sky|chateau dans le ciel, laputa', 'Ponyo sur la falaise|Ponyo|ponyo',
+      'Goldorak|UFO Robo Grendizer|grendizer', 'Captain Harlock|Space Pirate Captain Harlock|albator'],
+    2: ['Kiki la petite sorcière|Kiki\'s Delivery Service|kiki', 'Le Garçon et le Héron|The Boy and the Heron|garcon et le heron', 'Suzume|Suzume|', 'Sword Art Online|Sword Art Online|sao',
+      'Dr. Stone|Dr. Stone|dr stone', 'JoJo\'s Bizarre Adventure|JoJo\'s Bizarre Adventure (TV series)|jojo', 'Kaiju n° 8|Kaiju No. 8|kaiju no 8', 'Oshi no Ko|Oshi no Ko|'],
+    3: ['Porco Rosso|Porco Rosso|', 'Les Enfants loups|Wolf Children|enfants loups', 'Tokyo Godfathers|Tokyo Godfathers|', 'Cyberpunk: Edgerunners|Cyberpunk: Edgerunners|edgerunners',
+      'Devilman Crybaby|Devilman Crybaby|', 'Gurren Lagann|Gurren Lagann|', 'Samurai Champloo|Samurai Champloo|', 'Monster|Monster (manga)|'],
+  },
+  series: {
+    1: ['Lucifer|Lucifer (TV series)|', 'Emily in Paris|Emily in Paris|', 'Desperate Housewives|Desperate Housewives|', 'How I Met Your Mother|How I Met Your Mother|himym', 'Plus belle la vie|Plus belle la vie|pblv',
+      'Sex Education|Sex Education (TV series)|', 'Elite|Elite (TV series)|élite', 'One Piece (série)|One Piece (2023 TV series)|one piece'],
+    2: ['Arcane|Arcane (TV series)|', 'House of the Dragon|House of the Dragon|', 'Brooklyn Nine-Nine|Brooklyn Nine-Nine|brooklyn 99', 'Scrubs|Scrubs (TV series)|', 'Malcolm|Malcolm in the Middle|malcolm in the middle',
+      'Gossip Girl|Gossip Girl|', 'Les Experts|CSI: Crime Scene Investigation|csi', 'Dix pour cent|Call My Agent!|dix pour cent, call my agent'],
+    3: ['Twin Peaks: The Return|Twin Peaks (2017 TV series)|', 'Six Feet Under|Six Feet Under (TV series)|', 'Oz|Oz (TV series)|', 'Deadwood|Deadwood (TV series)|', 'Halt and Catch Fire|Halt and Catch Fire (TV series)|',
+      'Baron noir|Baron Noir|', 'Les Brigades du Tigre|Les Brigades du Tigre|', 'Andor|Andor (TV series)|'],
+  },
+  games: {
+    1: ['Super Mario Odyssey|Super Mario Odyssey|', 'Sonic the Hedgehog|Sonic the Hedgehog (1991 video game)|sonic', 'Roblox|Roblox|', 'Brawl Stars|Brawl Stars|', 'Candy Crush|Candy Crush Saga|candy crush',
+      'Les Sims|The Sims|sims, les sims', 'Angry Birds|Angry Birds (video game)|angry birds', 'Wii Sports|Wii Sports|'],
+    2: ['Crash Bandicoot|Crash Bandicoot (video game)|', 'Spyro|Spyro the Dragon (video game)|spyro', 'Half-Life 2|Half-Life 2|half life 2', 'Uncharted|Uncharted 4: A Thief\'s End|uncharted',
+      'Baldur\'s Gate 3|Baldur\'s Gate 3|baldurs gate', 'Splatoon|Splatoon (video game)|', 'Sekiro|Sekiro: Shadows Die Twice|', 'Ghost of Tsushima|Ghost of Tsushima|'],
+    3: ['Limbo|Limbo (video game)|', 'Braid|Braid (video game)|', 'Return of the Obra Dinn|Return of the Obra Dinn|obra dinn', 'Papers, Please|Papers, Please|papers please',
+      'Katamari Damacy|Katamari Damacy|katamari', 'Ico|Ico|', 'Planescape: Torment|Planescape: Torment|', 'Tunic|Tunic (video game)|'],
+  },
+  flags: {
+    1: ['Russie|ru|', 'Ukraine|ua|', 'Pays de Galles|gb-wls|galles', 'Écosse|gb-sct|ecosse', 'Inde|in|', 'Égypte|eg|egypte', 'Turquie|tr|', 'Grèce|gr|grece'],
+    2: ['Finlande|fi|', 'Danemark|dk|', 'Autriche|at|', 'Hongrie|hu|', 'Roumanie|ro|', 'Chili|cl|', 'Pérou|pe|perou', 'Vietnam|vn|viet nam', 'Thaïlande|th|thailande', 'Israël|il|israel', 'Liban|lb|', 'Nigeria|ng|', 'Mali|ml|', 'Haïti|ht|haiti'],
+    3: ['Tchad|td|', 'Monaco|mc|', 'Indonésie|id|indonesie', 'Bolivie|bo|', 'Paraguay|py|', 'Uruguay|uy|', 'Kazakhstan|kz|', 'Mongolie|mn|', 'Érythrée|er|erythree', 'Djibouti|dj|', 'Tuvalu|tv|', 'Palaos|pw|palau', 'Andorre|ad|', 'Liechtenstein|li|'],
+  },
+  monuments: {
+    1: ['Sacré-Cœur|Basilica of the Sacred Heart of Paris|sacre coeur, sacré coeur', 'Maison Blanche|White House|white house', 'Kremlin|Moscow Kremlin|', 'Empire State Building|Empire State Building|',
+      'Tour de Londres|Tower of London|tower of london', 'Fontaine de Trevi|Trevi Fountain|trevi'],
+    2: ['Panthéon de Rome|Pantheon, Rome|pantheon', 'Basilique Saint-Pierre|St. Peter\'s Basilica|saint pierre de rome', 'Cité interdite|Forbidden City|', 'Christ-Roi de Lisbonne|Sanctuary of Christ the King|',
+      'Space Needle|Space Needle|', 'Château de Prague|Prague Castle|', 'Pont Charles|Charles Bridge|', 'Palais du Parlement de Budapest|Hungarian Parliament Building|parlement de budapest'],
+    3: ['Ruines de Persépolis|Persepolis|persepolis', 'Grand Zimbabwe|Great Zimbabwe|', 'Ellora|Ellora Caves|grottes d ellora', 'Mont Nemrut|Mount Nemrut|nemrut', 'Mosquée bleue|Blue Mosque|sultan ahmet',
+      'Tikal|Tikal|', 'Mosquée Hassan-II|Hassan II Mosque|hassan 2', 'Pont du Gard|Pont du Gard|'],
+  },
+  foot: {
+    1: ['Napoli|SSC Napoli|naples', 'Atlético de Madrid|Atlético Madrid|atletico', 'Tottenham|Tottenham Hotspur F.C.|spurs', 'Bayer Leverkusen|Bayer 04 Leverkusen|leverkusen', 'Newcastle|Newcastle United F.C.|', 'Aston Villa|Aston Villa F.C.|'],
+    2: ['Stade de Reims|Stade de Reims|reims', 'RC Strasbourg|RC Strasbourg Alsace|strasbourg', 'FC Lorient|FC Lorient|lorient', 'Le Havre AC|Le Havre AC|le havre', 'AJ Auxerre|AJ Auxerre|auxerre',
+      'Real Sociedad|Real Sociedad|', 'Villarreal|Villarreal CF|', 'Lazio Rome|SS Lazio|lazio', 'Fiorentina|ACF Fiorentina|', 'Schalke 04|FC Schalke 04|schalke'],
+    3: ['SM Caen|Stade Malherbe Caen|caen', 'FC Metz|FC Metz|metz', 'EA Guingamp|En Avant Guingamp|guingamp', 'SC Bastia|SC Bastia|bastia', 'Red Bull Salzbourg|FC Red Bull Salzburg|salzbourg',
+      'Dinamo Zagreb|GNK Dinamo Zagreb|', 'Flamengo|CR Flamengo|', 'Al-Hilal|Al Hilal SFC|al hilal', 'Wydad Casablanca|Wydad AC|wydad', 'Espérance de Tunis|Espérance Sportive de Tunis|esperance'],
+  },
+};
+for (const c of module.exports) {
+  const seen = new Set(Object.values(c.items).flat().map(x => x.split('|').slice(0, 2).join('|').toLowerCase()));
+  for (const l of [1, 2, 3]) for (const x of EXTRA[c.id]?.[l] || []) {
+    const k = x.split('|').slice(0, 2).join('|').toLowerCase();
+    if (!seen.has(k)) { seen.add(k); c.items[l].push(x); }
+  }
+}

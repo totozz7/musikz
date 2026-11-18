@@ -21,7 +21,7 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 ### 🔤 Speed Word
 - Les grilles sont **générées automatiquement** à partir d'un dictionnaire maison de 400 mots (`data-words.js`, une ligne = `MOT | définition facile | définition difficile`) : chaque grille est nouvelle.
 - 4 niveaux : 🟢 Facile 9×9 · 🟡 Moyen 11×11 (définitions simples) · 🟠 Difficile 12×12 · 🔴 Expert 14×14 (définitions corsées).
-- **Avec indices** : les mots trouvés passent en vert et sont verrouillés (plus modifiables), 3 lettres à révéler (−2 🪙 chacune). **Sans indices** : aucune aide jusqu'à la fin.
+- Les mots justes passent toujours en vert et sont verrouillés. **Avec indices** : 3 lettres à révéler (−2 🪙 chacune). La barre de progression ne compte que les lettres justes.
 - Pièces pour une grille finie : 15 / 25 / 35 / 50 selon le niveau, +25 au vainqueur d'une course ; les autres gagnent selon leur % de lettres justes.
 - Clavier : flèches pour se déplacer, Espace pour changer de sens, Entrée pour passer au mot suivant. Record solo enregistré dans le navigateur.
 
@@ -37,9 +37,10 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 
 ### 🖼️ Guess Party (1 à 12 joueurs)
 - Une image apparaît brouillée : devine le dessin animé, le film, le pays… Pour les pochettes d'album : l'artiste ET l'album.
-- 12 thèmes (≈ 640 images) : dessins animés, Disney & Pixar, films, pochettes rap FR, rap US, pop & variété, animés japonais, séries, jeux vidéo, drapeaux, monuments, logos de clubs de foot. Plusieurs thèmes au choix.
+- 12 thèmes (≈ 940 images) : dessins animés, Disney & Pixar, films, pochettes rap FR, rap US, pop & variété, animés japonais, séries, jeux vidéo, drapeaux, monuments, logos de clubs de foot. Plusieurs thèmes au choix.
 - 3 niveaux : 😎 facile (images connues, pixellisation qui disparaît vite + indice), 🤔 moyen (plus pointu, reste pixelisé), 💀 très dur (images rares, gros zoom en noir et blanc, aucun indice).
 - Images chargées à la volée : Wikipédia (affiches, jaquettes, logos, photos), Deezer (pochettes), flagcdn (drapeaux). Contenu dans `data-guess.js`.
+- Options : nombre d'images, temps par image, **pause entre deux images** (3, 6, 10 ou 15 s). L'image reste cachée pendant le compte à rebours.
 
 ### 🃏 Bar des Menteurs (1 à 6 joueurs, robots possibles)
 - Chaque manche : 5 cartes chacun (Dames, Rois, As + Jokers qui valent tout) et une **carte du tour**. Pose 1 à 3 cartes face cachée en prétendant que ce sont des cartes du tour… ou crie **MENTEUR !** sur la pose précédente.
@@ -119,8 +120,8 @@ Rareté de chaque carte : **Commune 68 %**, **◆ Rare 23 %** (bleu), **✦ Épi
 | | Bonus (pour soi) | Malus (sur le joueur de son choix) |
 |---|---|---|
 | Communes | 🔤 Première lettre · 🧩 Pendu · 🖼️ Pochette floue · 📅 Année · 💰 ×2 · 👂 Avant-première · ⚡ Éclair (+50 si trouvé en 10 s) · ✂️ 50/50 (QCM) | 📢 Soundboard · 🙃 Tête en bas · 🧊 Gel · 🎚️ Volume yo-yo · 🕶️ Lunettes noires · 💩 Pluie d'emojis · 🦟 Moustique |
-| ◆ Rares | 💎 ×3 · 🛡️ Bouclier · 🔀 Anagramme | 🐿️ Chipmunk · 🐢 Ralenti · ⌨️ Clavier fou · 🔌 Coupures de courant |
-| ✦ Épiques | 🗣️ Le Souffleur · 🎰 Jackpot ×4 | 🎪 Le Grand Bazar · 💿 Disque rayé |
+| ◆ Rares | 💎 ×3 · 🛡️ Bouclier | 🐿️ Chipmunk · 🐢 Ralenti · ⌨️ Clavier fou · 🔌 Coupures de courant |
+| ✦ Épiques | 🔀 Anagramme · 🗣️ Le Souffleur · 🎰 Jackpot ×4 | 🎪 Le Grand Bazar · 💿 Disque rayé |
 | ★ Légendaires | ✍️ **La Plume Magique** : la réponse s'écrit toute seule | 🎭 **L'Imposteur** : la victime entend une AUTRE chanson, sans le savoir |
 
 ### Options de partie
@@ -151,7 +152,7 @@ L'import Spotify marche sans rien configurer. Si un jour Spotify bloque, crée u
 developer.spotify.com et ajoute dans Render (Environment) les variables `SPOTIFY_CLIENT_ID` et `SPOTIFY_CLIENT_SECRET`.
 
 ## 🎡 Roue de la chance & récompenses
-- Un tour = 200 🪙 : pièces (25 à 500) ou objet surprise que tu n'as pas encore (commun 28 %, rare 10 %, épique 1,5 %, légendaire 0,3 %). Chances affichées sous la roue, réglables dans `public/shop.js` (`wheel`).
+- Un tour = 200 🪙 : pièces (60 à 500) ou objet surprise que tu n'as pas encore (commun 40 %, rare 6 %, épique 1,5 %, légendaire 0,3 %). Les cases rares clignotent et brillent. Chances affichées sous la roue, réglables dans `public/shop.js` (`wheel`).
 - Boutique : un premier clic sur un objet pas encore acheté ouvre un **aperçu** (les animations se jouent), l'achat se fait avec le bouton « Acheter ».
 - Cadeau (10 min) et coffre (1 h) redessinés en SVG.
 

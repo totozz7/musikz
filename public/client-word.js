@@ -139,7 +139,7 @@
     if (!res) return;
     if (res.locked) return;
     if (res.solved) { const fresh = res.solved.filter(k => !solved.has(k)); solved = new Set(res.solved); paintSolved(); if (fresh.length) { sfx('pop'); wordFlash(fresh); } }
-    if (res.full && !V.hints) toast('🤔 Grille pleine… mais il reste des erreurs !', 'error');
+    if (res.full) toast('🤔 Grille pleine… mais il reste des erreurs !', 'error');
   }
   const locked = (i) => !!inputAt(i)?.readOnly;
   function paintSolved() {

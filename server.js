@@ -104,6 +104,7 @@ const COVER_WORDS = [
   'city of prague', 'hollywood studio', 'sounds unlimited', 'wonder band', 'hit crew', 'studio all stars', 'all stars',
   'kidz bop', 'vitamin string', 'piano guys', 'brooklyn duo', 'anime kei', 'the soundtrack orchestra', 'starlite',
   'party hits', 'hits all stars', 'chorus', 'versions', 'interpretation',
+  'remixed', 'remixes', 'rework', 'bootleg', 'vip mix', 'extended', 'club version', 'house version', 'techno version', 'hardstyle', 'phonk', 'mixed', 'mix cut', 'edit version', 'tiktok version', 'speed up', 'reverb',
 ];
 const COVER_RE = new RegExp('(?:^| )(' + COVER_WORDS.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')(?= |$)', 'g');
 const flat = (x) => String(x || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
@@ -511,7 +512,7 @@ const POWERS = {
   fifty:    { type: 'bonus', rarity: 'common', emoji: '✂️', name: '50/50', desc: 'Deux mauvaises réponses disparaissent', qcm: true },
   triple:   { type: 'bonus', rarity: 'rare', emoji: '💎', name: 'Points triplés', desc: 'Tes points comptent TRIPLE sur cet extrait' },
   shield:   { type: 'bonus', rarity: 'rare', emoji: '🛡️', name: 'Bouclier', desc: 'Tu es protégé de tous les malus (même légendaires)' },
-  anagram:  { type: 'bonus', rarity: 'rare', emoji: '🔀', name: 'Anagramme', desc: 'Tu vois toutes les lettres de la réponse… mélangées' },
+  anagram:  { type: 'bonus', rarity: 'epic', emoji: '🔀', name: 'Anagramme', desc: 'Tu vois toutes les lettres de la réponse… mélangées' },
   souffleur:{ type: 'bonus', rarity: 'epic', emoji: '🗣️', name: 'Le Souffleur', desc: "Une voix de robot te chuchote la réponse à l'oreille" },
   jackpot:  { type: 'bonus', rarity: 'epic', emoji: '🎰', name: 'Jackpot', desc: 'Tes points sont multipliés par 4 sur cet extrait' },
   plume:    { type: 'bonus', rarity: 'legendary', emoji: '✍️', name: 'La Plume Magique', desc: "La réponse s'écrit TOUTE SEULE. Tu n'as rien à faire. Savoure." },

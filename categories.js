@@ -65,6 +65,28 @@ Fifi et ses Floribelles|Fifi :: Fifi et les floribelles générique
 Kirikou :: Kirikou générique
 Les Lapins Crétins|Lapins crétins :: Les lapins crétins générique
 Pokémon|Pokemon :: Pokémon générique français
+Dragon Ball Z|DBZ :: Dragon Ball Z générique français
+One Piece :: One Piece générique français
+Les Razmoket|Razmoket :: Les Razmoket générique
+Arthur :: Arthur générique dessin animé
+Caillou :: Caillou générique
+Franklin :: Franklin générique
+Babar :: Babar générique
+Les Simpson|Simpsons :: Les Simpson générique
+Les Tortues Ninja|Tortues Ninja :: Les Tortues Ninja générique français
+Scooby-Doo|Scooby Doo :: Scooby-Doo générique
+Tom et Jerry|Tom & Jerry :: Tom et Jerry générique
+Bisounours :: Bisounours générique
+Il était une fois... la Vie|Il était une fois la vie :: Il était une fois la vie générique
+Spirou :: Spirou générique dessin animé
+Lady Oscar :: Lady Oscar générique
+Cédric|Cedric :: Cédric générique dessin animé
+Les Mystérieuses Cités d'or|Cités d'or :: Les mystérieuses cités d'or générique
+Pat' Patrouille|Pat Patrouille :: Pat Patrouille générique
+Miraculous :: Miraculous Ladybug générique français
+Peppa Pig :: Peppa Pig générique
+Oui-Oui|Oui Oui :: Oui-Oui générique
+Les Schtroumpfs|Schtroumpfs :: Les Schtroumpfs générique
 `});
 
 cat({ id: 'disney', name: 'Disney en VF', emoji: '🏰', group: 'Écrans', kind: 'work', label: 'Nom du film Disney', items: `
@@ -93,6 +115,24 @@ Zootopie|Zootopia :: Try Everything Shakira
 High School Musical :: Breaking Free High School Musical
 Ratatouille :: Le Festin Camille
 Lilo et Stitch :: Hawaiian Roller Coaster Ride Lilo Stitch
+Le Roi lion|Roi lion :: L'histoire de la vie Le Roi Lion
+Aladdin :: Prince Ali Aladdin
+La Petite Sirène|Petite Sirène :: Partir là-bas La Petite Sirène
+Le Livre de la jungle|Livre de la jungle :: Être un homme comme vous
+Hercule :: Je n'dirai pas que je l'aime Hercule
+Mulan :: Réflexion Mulan
+Peter Pan :: Tu t'envoles Peter Pan
+Les 101 Dalmatiens|101 Dalmatiens :: Cruella d'Enfer
+Robin des Bois :: Oo-de-lally Robin des Bois
+Dumbo :: Quand je vois un éléphant voler
+Pinocchio :: Quand on prie la bonne étoile
+Wish :: Un vœu Wish Disney
+La Princesse et la Grenouille|Princesse et la Grenouille :: Au bout du rêve Anika Noni Rose
+Là-haut|La-haut :: Married Life Michael Giacchino
+Le Monde de Nemo|Nemo :: Nemo Egg Thomas Newman
+Les Indestructibles|Indestructibles :: The Incredits Michael Giacchino
+Monstres et Cie|Monstres et compagnie :: If I Didn't Have You Monstres
+Vice-versa|Inside Out :: Bundle of Joy Michael Giacchino
 `});
 
 cat({ id: 'films', name: 'Musiques de films', emoji: '🎬', group: 'Écrans', kind: 'work', label: 'Nom du film', items: `
@@ -135,6 +175,27 @@ Requiem for a Dream :: Lux Aeterna Clint Mansell
 Forrest Gump :: Forrest Gump Suite Alan Silvestri
 Le Roi lion :: Circle of Life Elton John
 Pirates des Caraïbes :: Davy Jones Hans Zimmer
+Harry Potter :: Harry Potter Prologue John Williams
+Le Seigneur des anneaux|Seigneur des anneaux :: The Breaking of the Fellowship
+Le Grand Bleu :: Le Grand Bleu Eric Serra
+Les Bronzés font du ski|Bronzés :: Quand te reverrai-je Les bronzés font du ski
+La Boum :: Reality Richard Sanderson
+Le Professionnel :: Chi Mai Ennio Morricone
+Bienvenue chez les Ch'tis|Ch'tis :: Bienvenue chez les Ch'tis Philippe Rombi
+Les Visiteurs :: Les Visiteurs Eric Levi
+Avatar :: I See You Leona Lewis
+Hunger Games :: The Hanging Tree James Newton Howard
+Twilight :: Decode Paramore
+Batman :: The Dark Knight Why So Serious Hans Zimmer
+Pirates des Caraïbes|Pirates des Caraibes :: Up Is Down Hans Zimmer
+Les Gardiens de la Galaxie|Gardiens de la Galaxie :: Hooked on a Feeling Blue Swede
+Top Gun|Top Gun Maverick :: Take My Breath Away Berlin
+Footloose :: Footloose Kenny Loggins
+Flashdance :: Flashdance What a Feeling Irene Cara
+Le Flic de Beverly Hills|Beverly Hills Cop :: Axel F Harold Faltermeyer
+Oppenheimer :: Can You Hear the Music Ludwig Göransson
+Barbie :: What Was I Made For Billie Eilish
+Dune :: Dune Paul's Dream Hans Zimmer
 `});
 
 cat({ id: 'series', name: 'Génériques de séries', emoji: '📼', group: 'Écrans', kind: 'work', label: 'Nom de la série', items: `
@@ -172,6 +233,32 @@ Hannah Montana :: The Best of Both Worlds Hannah Montana
 Mercredi|Wednesday :: Wednesday main titles Danny Elfman
 Gossip Girl :: Gossip Girl theme
 Hélène et les garçons :: Hélène et les garçons générique
+Sous le soleil :: Sous le soleil générique
+Les Frères Scott|One Tree Hill :: I Don't Want to Be Gavin DeGraw
+Ma sorcière bien-aimée|Ma sorciere bien aimee :: Ma sorcière bien aimée générique
+La Famille Addams|Addams :: La famille Addams générique
+Columbo :: Columbo générique
+Magnum :: Magnum générique
+Mac Gyver|MacGyver :: MacGyver générique
+K 2000|Knight Rider :: K 2000 générique
+Alerte à Malibu|Baywatch :: Alerte à Malibu générique I'm Always Here
+Le Bureau des légendes :: Le bureau des légendes générique
+Sex Education :: Sex Education générique
+The Crown :: The Crown main title
+Bridgerton|La Chronique des Bridgerton :: Bridgerton main title
+How I Met Your Mother|HIMYM :: How I Met Your Mother theme Hey Beautiful
+The Mandalorian|Mandalorian :: The Mandalorian theme Ludwig Göransson
+Euphoria :: Euphoria All for Us Labrinth
+Arcane :: Enemy Imagine Dragons
+Les Feux de l'amour|Feux de l'amour :: Nadia's Theme
+Kaamelott :: Kaamelott thème principal Alexandre Astier
+Engrenages :: Engrenages générique
+Lupin :: Lupin Netflix générique
+Vikings :: If I Had a Heart Fever Ray
+True Detective :: Far from Any Road The Handsome Family
+Les Sopranos|Sopranos :: Woke Up This Morning Alabama 3
+Hartley cœurs à vif|Hartley :: Hartley coeurs à vif générique
+Code Quantum :: Code Quantum générique
 `});
 
 cat({ id: 'anime', name: 'Animés japonais', emoji: '🍥', group: 'Écrans', kind: 'work', label: 'Nom de l\'animé', items: `
@@ -205,6 +292,20 @@ Oshi no Ko :: Idol YOASOBI
 Frieren :: Yuusha YOASOBI
 Mob Psycho 100 :: 99 MOB CHOIR
 Dragon Ball Super :: Limit Break x Survivor Dragon Ball Super
+Nicky Larson|City Hunter :: Nicky Larson générique
+Naruto :: Haruka Kanata Asian Kung-Fu Generation
+L'Attaque des Titans|Attaque des Titans :: Shinzou wo Sasageyo
+Demon Slayer|Kimetsu no Yaiba :: Zankyou Sanka Aimer
+Jujutsu Kaisen :: Specialz King Gnu
+Dr. Stone|Dr Stone :: Good Morning World Burnout Syndromes
+Blue Lock :: Chaos ga Kiwameru Unison Square Garden
+Solo Leveling :: Level Hiroyuki Sawano
+Dandadan|Dan Da Dan :: Otonoke Creepy Nuts
+Mashle :: Bling-Bang-Bang-Born Creepy Nuts
+Pokémon|Pokemon :: Pokémon attrapez-les tous générique
+Goldorak :: Goldorak générique
+Albator :: Albator générique
+Candy :: Candy générique Dorothée
 `});
 
 cat({ id: 'jeux-video', name: 'Jeux vidéo', emoji: '🎮', group: 'Écrans', kind: 'work', label: 'Nom du jeu', items: `
@@ -237,6 +338,31 @@ Castlevania :: Bloody Tears Castlevania
 Crash Bandicoot :: Crash Bandicoot theme
 Pokémon Rouge et Bleu|Pokémon|Pokemon :: Pokemon Red Blue opening theme
 Fortnite :: Fortnite lobby music
+Rayman :: Rayman main theme
+Pokémon|Pokemon :: Pokemon Battle Wild Pokemon Red Blue
+Sonic :: Sonic 2 Chemical Plant Zone
+Final Fantasy :: One-Winged Angel
+The Witcher :: Geralt of Rivia Witcher 3 theme
+Super Mario 64|Mario 64 :: Super Mario 64 Bob-omb Battlefield
+Zelda: Ocarina of Time|Ocarina of Time|Zelda :: Song of Storms
+Zelda: Breath of the Wild|Breath of the Wild|Zelda :: Breath of the Wild main theme
+Donkey Kong Country|Donkey Kong :: DK Island Swing
+Super Mario Galaxy|Mario Galaxy :: Gusty Garden Galaxy
+Overwatch :: Overwatch main theme
+World of Warcraft|WoW :: Legends of Azeroth
+Mass Effect :: Vigil Mass Effect
+Dark Souls :: Gwyn Lord of Cinder
+Elden Ring :: Elden Ring main theme
+God of War :: God of War 2018 main theme Bear McCreary
+Celeste :: Resurrections Lena Raine
+Hollow Knight :: Hollow Knight Dirtmouth
+The Last of Us :: The Last of Us Gustavo Santaolalla
+Silent Hill :: Promise Silent Hill 2 Akira Yamaoka
+Resident Evil :: Resident Evil safe room save theme
+Persona 5|Persona :: Last Surprise Persona 5
+Splatoon :: Splattack Splatoon
+Gran Turismo :: Moon Over the Castle
+Tekken :: Tekken 3 main theme
 `});
 
 // ═════════════════════ FRANCOPHONE ═════════════════════
@@ -278,6 +404,13 @@ Louise Attaque — J't'emmène au vent
 Noir Désir — Le vent nous portera
 Desireless — Voyage voyage
 Jean-Louis Aubert — Temps à nouveau
+Jean-Jacques Goldman — Je te donne
+Daniel Balavoine — Le chanteur
+Michel Berger — Seras-tu là
+Jean-Louis Aubert — Voilà c'est fini
+Florent Pagny — Savoir aimer
+William Sheller — Un homme heureux
+Michel Fugain — Une belle histoire
 `});
 
 cat({ id: 'rap-fr', name: 'Rap français', emoji: '🎤', group: 'Francophone', items: `
@@ -314,6 +447,32 @@ Tiakola — Meuda
 Kaaris — Zoo
 Lacrim — Oh bah oui
 SCH — Champs-Élysées
+NTM — La fièvre
+Soprano — Clown
+Lomepal — Trop beau
+Aya Nakamura — Djadja
+Diam's — DJ
+IAM — Petit frère
+IAM — Demain c'est loin
+Suprême NTM — Seine-Saint-Denis Style
+MC Solaar — Bouge de là
+Booba — Mona Lisa
+Booba — Pitbull
+PNL — Le monde ou rien
+PNL — Deux frères
+Nekfeu — Ma dope
+Orelsan — La terre est ronde
+Orelsan — Tout va bien
+Ninho — Jefe
+Ninho — Goutte d'eau
+Naps — La kiffance
+Heuss l'Enfoiré — Khapta
+Freeze Corleone — Freeze Raël
+La Fouine — Ma meilleure
+Youssoupha — Dreamin
+Médine — Grand Paris
+Saïan Supa Crew — Angela
+Ärsenik — Boxe avec les mots
 `});
 
 cat({ id: 'pop-fr', name: 'Pop française', emoji: '🥖', group: 'Francophone', items: `
@@ -349,6 +508,34 @@ Jain — Makeba
 Vitaa — Avant toi
 Santa — Popcorn salé
 Pierre Garnier — Ceux qu'on était
+Christine and the Queens — Christine
+Louane — Avenir
+Vianney — Je m'en vais
+Julien Doré — Le lac
+Pomme — Je sais pas danser
+Slimane — Viens on s'aime
+M. Pokora — Juste un instant
+Louise Attaque — J't'emmène au vent
+Angèle — Bruxelles je t'aime
+Stromae — Formidable
+Stromae — Santé
+Clara Luciani — Respire encore
+Kendji Girac — Color Gitano
+Amir — On dirait
+Indila — Tourner dans le vide
+Zaz — On ira
+Slimane — Mon amour
+Pomme — Les cours d'eau
+Aya Nakamura — Copines
+Nolwenn Leroy — Juste pour me souvenir
+Calogero — Un jour au mauvais endroit
+M — Je dis aime
+Mylène Farmer — Libertine
+Jenifer — Notre idylle
+Charlotte Cardin — Main Girl
+Yseult — Corps
+Zaho de Sagazan — La symphonie des éclairs
+Joyce Jonathan — Ça ira
 `});
 
 cat({ id: 'annees-2000-fr', name: 'Années 2000 FR', emoji: '📀', group: 'Francophone', items: `
@@ -386,6 +573,36 @@ Christophe Willem — Double je
 Olivia Ruiz — J'traîne des pieds
 Kamini — Marly-Gomont
 Sinsemilia — Tout le bonheur du monde
+Diam's — La boulette
+Kyo — Le chemin
+Yannick Noah — Aux arbres citoyens
+Matt Pokora — Showbiz
+Sinik — Une époque formidable
+Mylène Farmer — C'est une belle journée
+Bénabar — Le dîner
+Les Fatals Picards — L'amour à la française
+Lorie — Sur un air latino
+Alizée — J'en ai marre !
+Amel Bent — Ne retiens pas tes larmes
+Superbus — Lola
+Christophe Maé — Il est où le bonheur
+Grégoire — Rue des étoiles
+Yannick Noah — Simon Papa Tara
+Tragédie — Sexy pour moi
+Corneille — Seul au monde
+Jenifer — J'attends l'amour
+Mylène Farmer — Dégénération
+Raphaël — Ne partons pas fâchés
+Magic System — Bouger bouger
+Sinik — Le toit du monde
+Leslie — Sobri (notre destin)
+K-Maro — Femme like U
+Mathieu Edward — Un monde à refaire
+Hélène Ségara — Il y a trop de gens qui t'aiment
+Garou — Seul
+Kenza Farah — Lettre du front
+Willy Denzey — Le mur du son
+Billy Crawford — Trackin'
 `});
 
 cat({ id: 'retro-fr', name: 'Chanson rétro', emoji: '🎩', group: 'Francophone', items: `
@@ -423,6 +640,39 @@ Hugues Aufray — Céline
 Jean Ferrat — La montagne
 Enrico Macias — Les filles de mon pays
 Michel Fugain — Une belle histoire
+Serge Gainsbourg — La javanaise
+Boby Lapointe — Ta Katie t'a quitté
+Sacha Distel — Scoubidou
+Hugues Aufray — Santiano
+Bourvil — La tactique du gendarme
+Charles Aznavour — For me formidable
+Charles Aznavour — Hier encore
+Jacques Brel — Quand on n'a que l'amour
+Jacques Brel — Les bonbons
+Georges Brassens — La mauvaise réputation
+Serge Gainsbourg — Je t'aime... moi non plus
+Serge Gainsbourg — Comic Strip
+Françoise Hardy — Le temps de l'amour
+Johnny Hallyday — Noir c'est noir
+Eddy Mitchell — La dernière séance
+Claude François — Le téléphone pleure
+Claude François — Belles belles belles
+Dalida — Gigi l'amoroso
+Dalida — Bambino
+Joe Dassin — Et si tu n'existais pas
+Joe Dassin — Salut les amoureux
+Jacques Dutronc — Et moi, et moi, et moi
+Sheila — Les rois mages
+Mireille Mathieu — Mille colombes
+Nana Mouskouri — Le temps des cerises
+Juliette Gréco — Déshabillez-moi
+Boris Vian — Le déserteur
+Annie Cordy — La bonne du curé
+Marcel Amont — Le mexicain
+Antoine — Les élucubrations d'Antoine
+Michel Polnareff — Love Me, Please Love Me
+Serge Reggiani — Il suffirait de presque rien
+Jean Sablon — Vous qui passez sans me voir
 `});
 
 // ═════════════════════ DÉCENNIES ═════════════════════
@@ -456,6 +706,34 @@ Bob Marley & The Wailers — No Woman, No Cry
 Barry White — You're the First, the Last, My Everything
 John Lennon — Imagine
 Kiss — I Was Made for Lovin' You
+Elton John — Crocodile Rock
+Donna Summer — I Feel Love
+Pink Floyd — Another Brick in the Wall
+The Jackson 5 — I Want You Back
+ABBA — Mamma Mia
+ABBA — Waterloo
+ABBA — Gimme! Gimme! Gimme! (A Man After Midnight)
+Bee Gees — Night Fever
+Bee Gees — How Deep Is Your Love
+Queen — Killer Queen
+Elton John — Your Song
+Rod Stewart — Da Ya Think I'm Sexy?
+The Rolling Stones — Angie
+Led Zeppelin — Whole Lotta Love
+Deep Purple — Smoke on the Water
+Marvin Gaye — What's Going On
+Al Green — Let's Stay Together
+The Doobie Brothers — Long Train Runnin'
+Electric Light Orchestra — Mr. Blue Sky
+Steely Dan — Do It Again
+Boney M. — Daddy Cool
+Boney M. — Rivers of Babylon
+Baccara — Yes Sir, I Can Boogie
+Hot Chocolate — You Sexy Thing
+Patrick Hernandez — Born to Be Alive
+The Police — Roxanne
+Sex Pistols — God Save the Queen
+Bruce Springsteen — Born to Run
 `});
 
 cat({ id: '80s', name: 'Années 80', emoji: '📼', group: 'Décennies', items: `
@@ -489,6 +767,35 @@ Simple Minds — Don't You (Forget About Me)
 Lionel Richie — All Night Long (All Night)
 Culture Club — Karma Chameleon
 Kool & The Gang — Celebration
+Whitney Houston — I Wanna Dance with Somebody
+Kim Wilde — Cambodia
+Eurythmics — Sweet Dreams
+Pat Benatar — Love Is a Battlefield
+Desireless — Voyage voyage
+Images — Les démons de minuit
+Michael Jackson — Beat It
+Michael Jackson — Thriller
+Madonna — Material Girl
+Madonna — La Isla Bonita
+Prince — Kiss
+Queen — Under Pressure
+Queen — Radio Ga Ga
+Kim Carnes — Bette Davis Eyes
+The Human League — Don't You Want Me
+Soft Cell — Tainted Love
+Depeche Mode — Enjoy the Silence
+New Order — Blue Monday
+Spandau Ballet — True
+Phil Collins — In the Air Tonight
+Starship — We Built This City
+Van Halen — Jump
+Joan Jett & The Blackhearts — I Love Rock 'n' Roll
+Kajagoogoo — Too Shy
+Men at Work — Down Under
+Billy Idol — White Wedding
+Frankie Goes to Hollywood — Relax
+Rick Astley — Together Forever
+Kylie Minogue — The Loco-Motion
 `});
 
 cat({ id: '90s', name: 'Années 90', emoji: '💿', group: 'Décennies', items: `
@@ -522,6 +829,33 @@ Will Smith — Men in Black
 Snap! — Rhythm Is a Dancer
 Blur — Song 2
 Radiohead — Creep
+Las Ketchup — Asereje
+MC Hammer — U Can't Touch This
+Vanilla Ice — Ice Ice Baby
+Mariah Carey — Fantasy
+Celine Dion — My Heart Will Go On
+Bryan Adams — (Everything I Do) I Do It for You
+Prince — The Most Beautiful Girl in the World
+Madonna — Vogue
+Michael Jackson — Black or White
+Bon Jovi — Always
+Seal — Kiss from a Rose
+Natalie Imbruglia — Torn
+Savage Garden — Truly Madly Deeply
+Hanson — MMMBop
+Backstreet Boys — Everybody (Backstreet's Back)
+NSYNC — Bye Bye Bye
+Spice Girls — Say You'll Be There
+La Bouche — Be My Lover
+Corona — The Rhythm of the Night
+Culture Beat — Mr. Vain
+Gala — Freed from Desire
+Robert Miles — Children
+Mr. President — Coco Jamboo
+Boyz II Men — End of the Road
+Chumbawamba — Tubthumping
+Cher — Believe
+Fatboy Slim — The Rockafeller Skank
 `});
 
 cat({ id: '2000s', name: 'Années 2000', emoji: '📱', group: 'Décennies', items: `
@@ -555,6 +889,35 @@ Kelly Clarkson — Since U Been Gone
 Leona Lewis — Bleeding Love
 Sean Paul — Get Busy
 Akon — Lonely
+Daniel Powter — Bad Day
+Nelly — Dilemma
+Eminem — Lose Yourself
+Black Eyed Peas — Where Is the Love?
+Shakira — Whenever, Wherever
+Christina Aguilera — Genie in a Bottle
+Christina Aguilera — Dirrty
+Pink — Get the Party Started
+Destiny's Child — Survivor
+Missy Elliott — Work It
+Timbaland — Apologize
+Mika — Grace Kelly
+Kanye West — Gold Digger
+Flo Rida — Low
+Britney Spears — Womanizer
+Lady Gaga — Just Dance
+Pussycat Dolls — Don't Cha
+Sean Kingston — Beautiful Girls
+Akon — Smack That
+Chris Brown — With You
+T.I. — Whatever You Like
+Ciara — Goodies
+Fergie — Glamorous
+Corinne Bailey Rae — Put Your Records On
+Jason Mraz — I'm Yours
+Basshunter — Now You're Gone
+Eric Prydz — Call on Me
+Alice Deejay — Better Off Alone
+Kesha — TiK ToK
 `});
 
 cat({ id: '2010s', name: 'Années 2010', emoji: '🎧', group: 'Décennies', items: `
@@ -588,6 +951,36 @@ Lady Gaga — Shallow
 OneRepublic — Counting Stars
 Dua Lipa — New Rules
 Macklemore & Ryan Lewis — Thrift Shop
+Bruno Mars — Just the Way You Are
+Bruno Mars — Grenade
+Adele — Hello
+Ed Sheeran — Thinking Out Loud
+Katy Perry — Firework
+Katy Perry — Dark Horse
+Rihanna — We Found Love
+Rihanna — Work
+Lady Gaga — Bad Romance
+Ariana Grande — 7 rings
+Ariana Grande — thank u, next
+Taylor Swift — Blank Space
+Selena Gomez — Lose You to Love Me
+Shawn Mendes — Treat You Better
+Camila Cabello — Havana
+Post Malone — Circles
+The Chainsmokers — Closer
+Clean Bandit — Rockabye
+Hozier — Take Me to Church
+Kygo — Firestone
+Ellie Goulding — Love Me Like You Do
+Meghan Trainor — All About That Bass
+Pitbull — Timber
+Wiz Khalifa — See You Again
+Imagine Dragons — Radioactive
+Twenty One Pilots — Stressed Out
+Portugal. The Man — Feel It Still
+Sia — Cheap Thrills
+Justin Timberlake — Can't Stop the Feeling!
+Lewis Capaldi — Someone You Loved
 `});
 
 // ═════════════════════ GENRES ═════════════════════
@@ -622,6 +1015,32 @@ Imagine Dragons — Radioactive
 Téléphone — Ça (c'est vraiment toi)
 Noir Désir — Tostaky
 Indochine — 3e sexe
+AC/DC — Highway to Hell
+Guns N' Roses — Sweet Child O' Mine
+Red Hot Chili Peppers — Californication
+The Beatles — Hey Jude
+Kiss — I Was Made for Lovin' You
+Téléphone — Un autre monde
+Queen — Bohemian Rhapsody
+The Rolling Stones — Paint It Black
+The Doors — Light My Fire
+Jimi Hendrix — Purple Haze
+Led Zeppelin — Immigrant Song
+Aerosmith — I Don't Want to Miss a Thing
+Bruce Springsteen — Born in the U.S.A.
+U2 — With or Without You
+U2 — Sunday Bloody Sunday
+Pearl Jam — Alive
+The Black Keys — Lonely Boy
+Queens of the Stone Age — No One Knows
+Linkin Park — Somewhere I Belong
+Muse — Plug In Baby
+Noir Désir — Le vent nous portera
+Noir Désir — L'homme pressé
+Trust — Antisocial
+Louise Attaque — Ton invitation
+Shaka Ponk — My Name Is Stain
+Blur — Girls & Boys
 `});
 
 cat({ id: 'metal', name: 'Metal', emoji: '🤘', group: 'Genres', items: `
@@ -651,6 +1070,29 @@ Bring Me The Horizon — Throne
 Mötley Crüe — Kickstart My Heart
 Deftones — Change (In the House of Flies)
 Ghost — Square Hammer
+Linkin Park — Numb
+Metallica — Master of Puppets
+Metallica — One
+Iron Maiden — Run to the Hills
+Iron Maiden — Fear of the Dark
+Black Sabbath — Iron Man
+System of a Down — Toxicity
+Slipknot — Psychosocial
+Rammstein — Sonne
+Rammstein — Engel
+Dio — Holy Diver
+Avenged Sevenfold — Nightmare
+Bullet for My Valentine — Tears Don't Fall
+Trivium — In Waves
+Mastodon — Blood and Thunder
+Lamb of God — Redneck
+Within Temptation — Ice Queen
+Powerwolf — Demons Are a Girl's Best Friend
+Alestorm — Drink
+Amon Amarth — Guardians of Asgaard
+Five Finger Death Punch — Wrong Side of Heaven
+Papa Roach — Last Resort
+Limp Bizkit — Break Stuff
 `});
 
 cat({ id: 'hiphop-us', name: 'Hip-hop US', emoji: '🗽', group: 'Genres', items: `
@@ -681,6 +1123,40 @@ Nicki Minaj — Super Bass
 Lil Wayne — Lollipop
 Juice WRLD — Lucid Dreams
 The Sugarhill Gang — Rapper's Delight
+50 Cent — In da Club
+Kanye West — Stronger
+Nas — N.Y. State of Mind
+Lil Nas X — Old Town Road
+Eminem — Mockingbird
+Eminem — Stan
+Dr. Dre — Forgot About Dre
+Dr. Dre — The Next Episode
+2Pac — Changes
+The Notorious B.I.G. — Hypnotize
+Kendrick Lamar — Swimming Pools (Drank)
+Kendrick Lamar — Alright
+Drake — Hotline Bling
+Drake — Started from the Bottom
+Travis Scott — goosebumps
+Kanye West — Heartless
+Jay-Z — 99 Problems
+Jay-Z — Run This Town
+J. Cole — No Role Modelz
+Future — Mask Off
+Migos — Bad and Boujee
+A$AP Rocky — Praise the Lord (Da Shine)
+Tyler, The Creator — EARFQUAKE
+Mac Miller — Self Care
+Coolio — Gangsta's Paradise
+DMX — X Gon' Give It to Ya
+Ludacris — Move Bitch
+Warren G — Regulate
+Naughty by Nature — Hip Hop Hooray
+Lil Jon & The East Side Boyz — Get Low
+Doja Cat — Paint the Town Red
+Megan Thee Stallion — Savage
+Childish Gambino — This Is America
+Eminem — Rap God
 `});
 
 cat({ id: 'rnb', name: 'R&B / Soul', emoji: '💜', group: 'Genres', items: `
@@ -710,6 +1186,35 @@ Ray Charles — Hit the Road Jack
 Sam Cooke — A Change Is Gonna Come
 Ne-Yo — So Sick
 Craig David — 7 Days
+Marvin Gaye — Let's Get It On
+Whitney Houston — I Will Always Love You
+Usher — U Remind Me
+Mariah Carey — We Belong Together
+Erykah Badu — On & On
+Frank Ocean — Thinkin Bout You
+The Weeknd — Earned It
+Rihanna — Diamonds
+Beyoncé — Irreplaceable
+Alicia Keys — No One
+Alicia Keys — If I Ain't Got You
+Destiny's Child — Bills, Bills, Bills
+Aaliyah — Try Again
+Brandy & Monica — The Boy Is Mine
+Lauryn Hill — Ex-Factor
+Ginuwine — Pony
+Jagged Edge — Where the Party At
+Ashanti — Foolish
+Mariah Carey — Fantasy
+Chris Brown — Forever
+Sade — Smooth Operator
+Sade — No Ordinary Love
+The Temptations — My Girl
+Ray Charles — I Got a Woman
+Amy Winehouse — Valerie
+Daniel Caesar — Best Part
+H.E.R. — Focus
+Summer Walker — Girls Need Love
+Jorja Smith — Blue Lights
 `});
 
 cat({ id: 'electro', name: 'Électro / Dance', emoji: '⚡', group: 'Genres', items: `
@@ -741,6 +1246,33 @@ Kavinsky — Nightcall
 Martin Solveig — Hello
 Klingande — Jubel
 Mr. Oizo — Flat Beat
+Daft Punk — One More Time
+Calvin Harris — Summer
+Bob Sinclar — Love Generation
+The Chemical Brothers — Galvanize
+Alan Walker — Faded
+Moby — Porcelain
+Daft Punk — Harder, Better, Faster, Stronger
+David Guetta — When Love Takes Over
+David Guetta — Memories
+Calvin Harris — This Is What You Came For
+Avicii — The Nights
+Avicii — Hey Brother
+Swedish House Mafia — One (Your Name)
+Cassius — Feeling for You
+Laurent Garnier — The Man with the Red Face
+The Prodigy — Breathe
+Eric Prydz — Pjanoo
+Deadmau5 — Ghosts 'n' Stuff
+Skrillex — Bangarang
+Zedd — Clarity
+Fred again.. — Marea (We've Lost Dancing)
+Kygo — Firestone
+Armin van Buuren — This Is What It Feels Like
+Tiësto — Adagio for Strings
+Gigi D'Agostino — Bla Bla Bla
+Basement Jaxx — Where's Your Head At
+Daft Punk — Da Funk
 `});
 
 cat({ id: 'disco-funk', name: 'Disco / Funk', emoji: '🪩', group: 'Genres', items: `
@@ -769,6 +1301,31 @@ Anita Ward — Ring My Bell
 Lipps Inc. — Funkytown
 The Weather Girls — It's Raining Men
 Dua Lipa — Don't Start Now
+Kool & the Gang — Celebration
+James Brown — I Got You (I Feel Good)
+James Brown — Sex Machine
+Michael Jackson — Don't Stop 'Til You Get Enough
+Gloria Gaynor — I Will Survive
+Parliament — Give Up the Funk
+Wild Cherry — Play That Funky Music
+Donna Summer — Hot Stuff
+Village People — In the Navy
+Earth, Wind & Fire — Boogie Wonderland
+Kool & the Gang — Ladies' Night
+Diana Ross — I'm Coming Out
+Sylvester — You Make Me Feel (Mighty Real)
+Prince — Kiss
+Chaka Khan — I'm Every Woman
+The Gap Band — Oops Upside Your Head
+Zapp — More Bounce to the Ounce
+Shalamar — A Night to Remember
+Cheryl Lynn — Got to Be Real
+The Jacksons — Can You Feel It
+Daft Punk — Get Lucky
+Dua Lipa — Physical
+Bruno Mars — 24K Magic
+Jamiroquai — Cosmic Girl
+Ottawan — D.I.S.C.O.
 `});
 
 cat({ id: 'reggae', name: 'Reggae', emoji: '🇯🇲', group: 'Genres', items: `
@@ -794,6 +1351,31 @@ Chronixx — Here Comes Trouble
 Gregory Isaacs — Night Nurse
 Desmond Dekker — Israelites
 Ziggy Marley — Tomorrow People
+Bob Marley & The Wailers — Jamming
+Jimmy Cliff — I Can See Clearly Now
+Toots and the Maytals — Pressure Drop
+Alpha Blondy — Jerusalem
+Dub Inc — Rude Boy
+Bob Marley & The Wailers — One Love
+Bob Marley & The Wailers — Get Up, Stand Up
+Bob Marley & The Wailers — Buffalo Soldier
+Bob Marley & The Wailers — Redemption Song
+Bob Marley & The Wailers — Waiting in Vain
+UB40 — Kingston Town
+UB40 — Can't Help Falling in Love
+Shaggy — Angel
+Sean Paul — No Lie
+Sean Paul — She Doesn't Mind
+Eddy Grant — Electric Avenue
+Ini Kamoze — Here Comes the Hotstepper
+Musical Youth — Pass the Dutchie
+Steel Pulse — Your House
+Burning Spear — Marcus Garvey
+Max Romeo — Chase the Devil
+Junior Kelly — Love So Nice
+Koffee — Toast
+Nneka — Heartbeat
+Sinsemilia — Tout le bonheur du monde
 `});
 
 cat({ id: 'jazz', name: 'Jazz', emoji: '🎷', group: 'Genres', items: `
@@ -820,6 +1402,27 @@ Django Reinhardt — Minor Swing
 Sidney Bechet — Petite fleur
 Nat King Cole — L-O-V-E
 Ray Charles — Georgia on My Mind
+John Coltrane — My Favorite Things
+Etta James — At Last
+Louis Armstrong — Hello, Dolly!
+Louis Armstrong — La vie en rose
+Frank Sinatra — My Way
+Frank Sinatra — Strangers in the Night
+Ella Fitzgerald — Dream a Little Dream of Me
+Nina Simone — My Baby Just Cares for Me
+Nina Simone — Sinnerman
+Dizzy Gillespie — A Night in Tunisia
+Bill Evans — Waltz for Debby
+Peggy Lee — Fever
+Sarah Vaughan — Misty
+Count Basie — One O'Clock Jump
+Diana Krall — The Look of Love
+Gregory Porter — Liquid Spirit
+Wes Montgomery — Bumpin' on Sunset
+Ahmad Jamal — Poinciana
+Michel Petrucciani — Looking Up
+Stéphane Grappelli — Nuages
+Vince Guaraldi Trio — Linus and Lucy
 `});
 
 cat({ id: 'classique', name: 'Classique', emoji: '🎻', group: 'Genres', allowCovers: true, items: `
@@ -852,6 +1455,32 @@ Elgar — Pomp and Circumstance :: Elgar Pomp and Circumstance March No. 1
 Barber — Adagio pour cordes :: Barber Adagio for Strings
 Khatchatourian — Danse du sabre :: Khachaturian Sabre Dance
 Delibes — Lakmé : Duo des fleurs :: Lakme Flower Duet
+Ludwig van Beethoven — Für Elise
+Wolfgang Amadeus Mozart — Eine kleine Nachtmusik :: Mozart Eine kleine Nachtmusik Allegro
+Antonio Vivaldi — Les Quatre Saisons : L'Hiver :: Vivaldi Winter Four Seasons
+Carl Orff — O Fortuna :: Carmina Burana O Fortuna
+Georges Bizet — Carmen : Habanera :: Carmen Habanera Bizet
+Giuseppe Verdi — La traviata : Brindisi :: Libiamo ne' lieti calici
+Jacques Offenbach — French cancan :: Offenbach Galop infernal Orphée aux enfers
+Camille Saint-Saëns — Danse macabre :: Saint-Saëns Danse macabre
+Giacomo Puccini — Nessun dorma :: Nessun dorma Pavarotti
+Wolfgang Amadeus Mozart — La Flûte enchantée : Air de la Reine de la nuit :: Queen of the Night aria Mozart
+Wolfgang Amadeus Mozart — Marche turque :: Mozart Rondo alla turca
+Ludwig van Beethoven — Symphonie n° 9 : Ode à la joie :: Beethoven Symphony 9 Ode to Joy
+Ludwig van Beethoven — Sonate au clair de lune :: Moonlight Sonata Beethoven
+Johann Sebastian Bach — Suite pour violoncelle n° 1 : Prélude :: Bach Cello Suite No 1 Prelude
+Johann Sebastian Bach — Air sur la corde de sol :: Bach Air on the G String
+Georg Friedrich Haendel — Alléluia (Le Messie) :: Handel Messiah Hallelujah
+Georg Friedrich Haendel — Sarabande :: Handel Sarabande
+Pyotr Ilyich Tchaikovsky — Concerto pour piano n° 1 :: Tchaikovsky Piano Concerto No 1
+Giuseppe Verdi — Nabucco : Va, pensiero :: Va pensiero Nabucco
+Gustav Holst — Les Planètes : Mars :: Holst Mars the Bringer of War
+Modeste Moussorgski — Une nuit sur le mont Chauve :: Night on Bald Mountain
+Johannes Brahms — Danse hongroise n° 5 :: Brahms Hungarian Dance No 5
+Franz Schubert — Ave Maria :: Schubert Ave Maria
+Felix Mendelssohn — Marche nuptiale :: Mendelssohn Wedding March
+Sergueï Prokofiev — Roméo et Juliette : Danse des chevaliers :: Dance of the Knights Prokofiev
+Jules Massenet — Méditation de Thaïs :: Meditation Thais Massenet
 `});
 
 cat({ id: 'country', name: 'Country', emoji: '🤠', group: 'Genres', items: `
@@ -873,6 +1502,29 @@ Glen Campbell — Rhinestone Cowboy
 Lady A — Need You Now
 Beyoncé — TEXAS HOLD 'EM
 Tim McGraw — Live Like You Were Dying
+Johnny Cash — Folsom Prison Blues
+Dolly Parton — 9 to 5
+Lil Nas X — Old Town Road
+Dolly Parton — Islands in the Stream
+Johnny Cash — Hurt
+Johnny Cash — I Walk the Line
+Hank Williams — Your Cheatin' Heart
+Waylon Jennings — Mammas Don't Let Your Babies Grow Up to Be Cowboys
+Tammy Wynette — Stand by Your Man
+Brooks & Dunn — Boot Scootin' Boogie
+Faith Hill — Breathe
+Florida Georgia Line — Cruise
+Kacey Musgraves — Rainbow
+Chris Stapleton — Tennessee Whiskey
+Dixie Chicks — Wide Open Spaces
+Rascal Flatts — Life Is a Highway
+Keith Urban — Somebody Like You
+Kenny Chesney — When the Sun Goes Down
+Blake Shelton — God's Country
+Shaboozey — A Bar Song (Tipsy)
+Post Malone — I Had Some Help
+Jason Aldean — Dirt Road Anthem
+Alan Jackson — Chattahoochee
 `});
 
 // ═════════════════════ MONDE ═════════════════════
@@ -899,6 +1551,36 @@ Camila Cabello — Havana
 Kaoma — Lambada
 Los Lobos — La Bamba
 Manu Chao — Me gustas tú
+Luis Fonsi — Despacito
+Shakira — Hips Don't Lie
+Shakira — Waka Waka (This Time for Africa)
+Ricky Martin — Livin' la Vida Loca
+Gente de Zona — La Gozadera
+Carlos Vives — La Bicicleta
+Maluma — Hawái
+Pitbull — Give Me Everything
+Santana — Smooth
+Shakira — Ojos Así
+Bad Bunny — Me Porto Bonito
+Bad Bunny — DtMF
+J Balvin — Ay Vamos
+Daddy Yankee — Dura
+Don Omar — Danza Kuduro
+Prince Royce — Darte un Beso
+Romeo Santos — Propuesta Indecente
+Aventura — Obsesión
+Juan Luis Guerra — Burbujas de Amor
+Ricky Martin — María
+Jennifer Lopez — On the Floor
+Becky G — Mayores
+Natti Natasha — Sin Pijama
+Feid — Normal
+Peso Pluma — Ella Baila Sola
+Ozuna — Se Preparó
+Nicky Jam — El Perdón
+Camila Cabello — Señorita
+Selena — Bidi Bidi Bom Bom
+Chayanne — Torero
 `});
 
 cat({ id: 'kpop', name: 'K-pop', emoji: '🇰🇷', group: 'Monde', items: `
@@ -924,6 +1606,39 @@ LE SSERAFIM — ANTIFRAGILE
 (G)I-DLE — Queencard
 SHINee — Ring Ding Dong
 JENNIE — SOLO
+PSY — Gangnam Style
+BIGBANG — Fantastic Baby
+ITZY — Dalla Dalla
+BTS — Boy With Luv
+BTS — Fake Love
+BTS — DNA
+BLACKPINK — Kill This Love
+BLACKPINK — Pink Venom
+BLACKPINK — As If It's Your Last
+TWICE — Fancy
+TWICE — What Is Love?
+Stray Kids — S-Class
+Stray Kids — MANIAC
+NewJeans — Ditto
+NewJeans — OMG
+aespa — Supernova
+aespa — Whiplash
+IVE — After LIKE
+LE SSERAFIM — Perfect Night
+ILLIT — Magnetic
+KISS OF LIFE — Midas Touch
+ENHYPEN — Bite Me
+TOMORROW X TOGETHER — Sugar Rush Ride
+Jimin — Like Crazy
+LISA — MONEY
+IU — Good Day
+Girls' Generation — I Got a Boy
+2NE1 — I Am the Best
+Wonder Girls — Nobody
+EXO — Love Shot
+NCT 127 — Kick It
+MAMAMOO — HIP
+Sunmi — Gashina
 `});
 
 cat({ id: 'afro', name: 'Afro / Afrobeats', emoji: '🌍', group: 'Monde', items: `
@@ -946,6 +1661,35 @@ Asake — Lonely At The Top
 Ayra Starr — Rush
 Kizz Daniel — Buga
 Tems — Free Mind
+CKay — Love Nwantiti
+Fireboy DML — Peru
+Mr Eazi — Leg Over
+Aya Nakamura — Pookie
+Tiwa Savage — Koroba
+Asake — Joha
+Burna Boy — Ye
+Burna Boy — On the Low
+Wizkid — Ojuelegba
+Wizkid — Come Closer
+Davido — If
+Davido — Unavailable
+Rema — Dumebi
+Tyla — Water
+Ayra Starr — Sability
+Omah Lay — Godly
+Joeboy — Baby
+Uncle Waffles — Tanzania
+Black Coffee — Superman
+Fally Ipupa — Associé
+Koffi Olomidé — Loi
+Magic System — 1er Gaou
+Toofan — Gweta
+DJ Arafat — Moto Moto
+Serge Beynaud — Okéninkpin
+Salif Keita — Madan
+Oumou Sangaré — Moussolou
+Cesária Évora — Sodade
+Johnny Clegg — Asimbonanga
 `});
 
 cat({ id: 'uk', name: 'Britannique', emoji: '🇬🇧', group: 'Monde', items: `
@@ -973,6 +1717,39 @@ George Michael — Careless Whisper
 Lily Allen — Smile
 Kaiser Chiefs — Ruby
 Pulp — Common People
+The Beatles — Let It Be
+Queen — Somebody to Love
+David Bowie — Starman
+Coldplay — Viva la Vida
+Amy Winehouse — Back to Black
+Blur — Song 2
+The Police — Every Breath You Take
+Spice Girls — Spice Up Your Life
+Radiohead — Creep
+Dua Lipa — Don't Start Now
+Harry Styles — Watermelon Sugar
+The Verve — Bitter Sweet Symphony
+Duffy — Mercy
+Queen — I Want to Break Free
+The Beatles — Here Comes the Sun
+The Rolling Stones — Start Me Up
+Pink Floyd — Wish You Were Here
+The Kinks — You Really Got Me
+The Smiths — There Is a Light That Never Goes Out
+The Cure — Friday I'm in Love
+Joy Division — Love Will Tear Us Apart
+Oasis — Champagne Supernova
+Arctic Monkeys — 505
+Adele — Skyfall
+Ed Sheeran — The A Team
+Elton John — I'm Still Standing
+Eurythmics — Sweet Dreams (Are Made of This)
+Robbie Williams — Angels
+Take That — Back for Good
+Jessie J — Price Tag
+Little Mix — Black Magic
+Stormzy — Shut Up
+Central Cee — Doja
 `});
 
 cat({ id: 'italie', name: 'Italienne', emoji: '🇮🇹', group: 'Monde', items: `
@@ -995,6 +1772,30 @@ Gianna Nannini — Bello e impossibile
 Lucio Dalla — Caruso
 Vasco Rossi — Albachiara
 Mina — Parole parole
+Umberto Tozzi — Gloria
+Måneskin — Beggin'
+Gigi D'Agostino — L'amour toujours
+Gabry Ponte — Geordie
+Ricchi e Poveri — Mamma Maria
+Laura Pausini — Strani amori
+Eros Ramazzotti — Terra promessa
+Eros Ramazzotti — Se bastasse una canzone
+Adriano Celentano — Il ragazzo della via Gluck
+Adriano Celentano — Prisencolinensinainciusol
+Riccardo Cocciante — Margherita
+Gianni Morandi — Fatti mandare dalla mamma
+Nek — Laura non c'è
+Lunapop — 50 Special
+Eiffel 65 — Blue (Da Ba Dee)
+Francesco Gabbani — Occidentali's Karma
+Mahmood & Blanco — Brividi
+Angelina Mango — La noia
+Annalisa — Mon Amour
+Ultimo — Pianeti
+Marco Mengoni — Due vite
+Fred Buscaglione — Che bambola
+Renato Carosone — Tu vuò fà l'americano
+Dean Martin — That's Amore
 `});
 
 cat({ id: 'espagne', name: 'Espagnole', emoji: '🇪🇸', group: 'Monde', items: `
@@ -1013,6 +1814,38 @@ David Bisbal — Ave María
 Camilo Sesto — Vivir así es morir de amor
 Joaquín Sabina — 19 días y 500 noches
 El Canto del Loco — Zapatillas
+Rosalía — Con altura
+Enrique Iglesias — Bailamos
+Gipsy Kings — Bamboléo
+Gipsy Kings — Volare
+Estopa — La raja de tu falda
+Aitana — Mon Amour
+Quevedo — Columbia
+David Bisbal — Bulería
+Rosalía — Despechá
+Rosalía — Saoko
+Enrique Iglesias — Hero
+Enrique Iglesias — Escapar
+Gipsy Kings — Djobi Djoba
+Julio Iglesias — Hey!
+Raphael — Escándalo
+Mecano — Me cuesta tanto olvidarte
+Héroes del Silencio — Entre dos tierras
+Camela — Cuando zarpa el barco
+Amaral — Sin ti no soy nada
+Shakira — Bzrp Music Sessions, Vol. 53
+Bizarrap — Quevedo: Bzrp Music Sessions, Vol. 52
+C. Tangana — Tú me dejaste de querer
+Manu Chao — Bongo Bong
+Ketama — No estamos lokos
+Juanes — La Camisa Negra
+Álvaro Soler — Sofia
+Álvaro Soler — El mismo sol
+Chanel — SloMo
+Lola Índigo — Mujer bruja
+Bebe — Malo
+Melendi — Tu jardín con enanitos
+Fito y Fitipaldis — Soldadito marinero
 `});
 
 cat({ id: 'arabe', name: 'Raï / Oriental', emoji: '🌙', group: 'Monde', items: `
@@ -1030,6 +1863,32 @@ Saad Lamjarred — LM3ALLEM
 L'Algérino — Les menottes
 Balti — Ya Lili
 Sting — Desert Rose
+Cheb Mami — Parisien du Nord
+Oum Kalthoum — Enta Omri
+Fairuz — Li Beirut
+Cheb Hasni — Baida mon amour
+Rim'K — Air Max
+Haifa Wehbe — Boos El Wawa
+Khaled — Abdel Kader
+Khaled — Wahran Wahran
+Cheb Mami — Meli Meli
+Rachid Taha — Rock el Casbah
+Faudel — Mon pays
+Cheb Bilal — Saragtou galbi
+Zouhair Bahaoui — Hasta Luego
+Saad Lamjarred — Enty
+Saad Lamjarred — Ghaltana
+Amr Diab — Nour El Ein
+Nancy Ajram — Akhasmak Ah
+Elissa — Aa Bali Habibi
+Mohamed Ramadan — Number One
+Wegz — El Bakht
+Mohamed Mounir — Ya Ahl El Arab
+Souad Massi — Raoui
+Idir — A Vava Inouva
+Cheb Khaled — El Harba Wayn
+Soolking — Liberté
+Lartiste — Chocolat
 `});
 
 
@@ -1068,6 +1927,22 @@ Ottawan — T'es OK
 Boney M. — Rasputin
 Village People — Y.M.C.A.
 Las Ketchup — The Ketchup Song (Aserejé)
+Magic System — Premier gaou
+Patrick Sébastien — Le petit bonhomme en mousse
+Les Musclés — La fête au village
+Gilbert Montagné — On va s'aimer
+Larusso — Tu m'oublieras
+Jean-Jacques Goldman — Au bout de mes rêves
+Indochine — J'ai demandé à la lune
+Michel Sardou — En chantant
+Claude François — Cette année-là
+Céline Dion — On ne change pas
+Joe Dassin — Siffler sur la colline
+Dalida — Laissez-moi danser
+Kendji Girac — Color Gitano
+Bob Sinclar — World Hold On
+Lou Bega — Mambo No. 5
+Gala — Freed from Desire
 `});
 
 cat({ id: 'ete', name: "Tubes de l'été", emoji: '🏖️', group: 'Fun', items: `
@@ -1101,6 +1976,35 @@ Kungs — This Girl
 Lost Frequencies — Are You With Me
 Mr. Probz — Waves
 Sean Paul — Temperature
+Las Ketchup — Aserejé
+Lou Bega — Mambo No. 5
+Crazy Frog — Axel F
+Yannick — Ces soirées-là
+Alexandra Stan — Mr. Saxobeat
+Mika — Relax, Take It Easy
+Kendji Girac — Andalouse
+Mylène Farmer — Désenchantée
+Aqua — Doctor Jones
+Will Smith — Men in Black
+Michel Teló — Ai Se Eu Te Pego
+Black Eyed Peas — Pump It
+Daddy Yankee — Con Calma
+Kungs — Never Going Home
+Robin Schulz — Sugar
+OMI — Cheerleader
+Kygo — Stole the Show
+Felix Jaehn — Ain't Nobody (Loves Me Better)
+Imany — Don't Be So Shy
+Calvin Harris — Feel So Close
+Bob Sinclar — Rock This Party (Everybody Dance Now)
+Inna — Hot
+Edward Maya — Stereo Love
+Major Lazer — Light It Up
+Jason Derulo — Talk Dirty
+Stromae — Alors on danse
+Shakira — Chantaje
+Ofenbach — Be Mine
+Nicky Jam — X (Equis)
 `});
 
 cat({ id: 'stade', name: 'Hymnes de stade', emoji: '🏟️', group: 'Fun', items: `
@@ -1108,7 +2012,6 @@ The White Stripes — Seven Nation Army
 Queen — We Will Rock You
 Queen — We Are the Champions
 Gala — Freed from Desire
-Kernkraft 400 — Zombie Nation
 Opus — Live Is Life
 Europe — The Final Countdown
 Survivor — Eye of the Tiger
@@ -1130,6 +2033,27 @@ Gigi D'Agostino — L'Amour Toujours
 Darude — Sandstorm
 Imagine Dragons — Believer
 Vangelis — Conquest of Paradise
+Ricky Martin — The Cup of Life
+Zombie Nation — Kernkraft 400
+The Killers — Mr. Brightside
+Tina Turner — The Best
+Village People — Y.M.C.A.
+House of Pain — Jump Around
+Bon Jovi — Livin' on a Prayer
+Joe Dassin — Les Champs-Élysées
+Imagine Dragons — Radioactive
+Shakira — La La La (Brazil 2014)
+K'naan — Wavin' Flag
+Pitbull — We Are One (Ole Ola)
+Dua Lipa — One Kiss
+The Black Eyed Peas — Let's Get It Started
+Queen — Another One Bites the Dust
+Joan Jett & The Blackhearts — I Love Rock 'n' Roll
+Baha Men — Who Let the Dogs Out
+Gerry and the Pacemakers — You'll Never Walk Alone
+Les Rita Mitsouko — Marcia Baila
+Patrick Hernandez — Born to Be Alive
+DJ Snake — Turn Down for What
 `});
 
 cat({ id: 'noel', name: 'Chansons de Noël', emoji: '🎄', group: 'Fun', items: `
@@ -1159,6 +2083,24 @@ Elvis Presley — Blue Christmas
 Melanie Thornton — Wonderful Dream (Holidays Are Coming)
 Sia — Snowman
 Mariah Carey — Santa Claus Is Comin' to Town
+Chuck Berry — Run Rudolph Run
+Dean Martin — Baby, It's Cold Outside
+Mariah Carey — Joy to the World
+Bing Crosby — Silent Night
+Nat King Cole — The Christmas Song
+Andy Williams — It's the Most Wonderful Time of the Year
+Burl Ives — A Holly Jolly Christmas
+Gene Autry — Rudolph the Red-Nosed Reindeer
+The Ronettes — Sleigh Ride
+Tom Jones — Santa Claus Is Back in Town
+Pentatonix — Little Drummer Boy
+Mariah Carey — O Holy Night
+Jackson 5 — I Saw Mommy Kissing Santa Claus
+Coldplay — Christmas Lights
+Ed Sheeran — Merry Christmas
+Mariah Carey — Oh Santa!
+Tino Rossi — Noël blanc
+Georges Brassens — Le père Noël et la petite fille
 `});
 
 cat({ id: 'disney-channel', name: 'Années Disney Channel', emoji: '✨', group: 'Fun', items: `
@@ -1184,20 +2126,38 @@ Zendaya — Replay
 Olivia Rodrigo — drivers license
 Dove Cameron — Rotten to the Core
 Sabrina Carpenter — Thumbs
+Miley Cyrus — See You Again
+Camp Rock — We Rock :: Camp Rock We Rock
+Bella Thorne — Watch Me
+Teen Beach Movie — Surf's Up :: Teen Beach Movie Surf's Up
+Hannah Montana — He Could Be the One
+Miley Cyrus — 7 Things
+Jonas Brothers — S.O.S.
+Jonas Brothers — Year 3000
+Demi Lovato — La La Land
+Selena Gomez & The Scene — Love You Like a Love Song
+Selena Gomez & The Scene — Who Says
+Hilary Duff — Come Clean
+Hilary Duff — Wake Up
+Ashley Tisdale — Be Good to Me
+High School Musical Cast — What Time Is It
+Sharpay & Ryan — Fabulous :: High School Musical 2 Fabulous
+Bridgit Mendler — Hurricane
+China Anne McClain — Calling All the Monsters
+Ross Lynch — Heard It on the Radio
+Dove Cameron — If Only
+Sabrina Carpenter — Can't Blame a Girl for Trying
+Debby Ryan — We Got the Beat
+Olivia Holt — Phenomenal
 `});
 
 cat({ id: 'comedies-musicales', name: 'Comédies musicales', emoji: '🎭', group: 'Fun', kind: 'work', label: 'Nom de la comédie musicale', items: `
 Notre-Dame de Paris :: Belle Garou Daniel Lavoie Patrick Fiori
-Notre-Dame de Paris :: Le temps des cathédrales Bruno Pelletier
 Les Dix Commandements|10 commandements :: L'envie d'aimer Daniel Lévi
 Le Roi Soleil :: Être à la hauteur Emmanuel Moire
-Le Roi Soleil :: Je fais de toi mon essentiel Emmanuel Moire
 Mozart, l'opéra rock|Mozart :: Tatoue-moi Mikelangelo Loconte
-Mozart, l'opéra rock|Mozart :: Vivre à en crever Mozart opéra rock
 Roméo et Juliette :: Les rois du monde Roméo et Juliette
-Roméo et Juliette :: Aimer Roméo et Juliette
 Starmania :: Le blues du businessman Claude Dubois
-Starmania :: Les uns contre les autres Fabienne Thibeault
 1789, les amants de la Bastille|1789 :: Pour la peine 1789 les amants de la Bastille
 Cats :: Memory Elaine Paige
 Le Fantôme de l'Opéra|Phantom of the Opera :: The Phantom of the Opera Sarah Brightman Michael Crawford
@@ -1207,6 +2167,37 @@ Hamilton :: My Shot Hamilton
 Grease :: Summer Nights Grease
 Le Roi Lion|Roi Lion :: Circle of Life Elton John
 The Greatest Showman :: The Greatest Show Hugh Jackman
+La La Land :: City of Stars
+West Side Story :: America West Side Story
+Chicago :: All That Jazz Chicago
+Le Magicien d'Oz|Magicien d'Oz :: Over the Rainbow Judy Garland
+Hairspray :: You Can't Stop the Beat
+Les Demoiselles de Rochefort|Demoiselles de Rochefort :: Chanson des jumelles
+Notre-Dame de Paris :: Le temps des cathédrales Bruno Pelletier
+Le Roi Soleil :: Je fais de toi mon essentiel Emmanuel Moire
+Mozart, l'opéra rock|Mozart :: Vivre à en crever Mozart opéra rock
+Roméo et Juliette :: Aimer Roméo et Juliette
+Starmania :: Les uns contre les autres Fabienne Thibeault
+Notre-Dame de Paris :: Vivre Hélène Ségara
+Les Dix Commandements|Dix Commandements :: Mon frère Daniel Lévi
+Le Roi Soleil :: Le ciel ne m'aime pas Christophe Maé
+Mozart, l'opéra rock|Mozart :: Tatoue-moi Mozart opéra rock
+Roméo et Juliette :: Le poète Roméo et Juliette
+Starmania :: SOS d'un terrien en détresse
+1789, les Amants de la Bastille|1789 :: Pour la peine 1789
+Robin des Bois :: Ce que l'on vit Robin des Bois M Pokora
+Le Roi Lion|Roi Lion musical :: L'histoire de la vie Roi Lion comédie musicale
+Grease :: Grease is the word Frankie Valli
+Mamma Mia! :: Gimme Gimme Gimme Mamma Mia film
+Les Misérables|Misérables :: Do You Hear the People Sing
+Wicked :: Defying Gravity Idina Menzel
+Rent :: Seasons of Love Rent
+Moulin Rouge :: Lady Marmalade Moulin Rouge
+Cabaret :: Willkommen Cabaret Liza Minnelli
+Mary Poppins :: Chem Cheminée Mary Poppins
+The Rocky Horror Picture Show|Rocky Horror :: Time Warp
+Les Parapluies de Cherbourg|Parapluies de Cherbourg :: Je ne pourrai jamais vivre sans toi
+Saturday Night Fever|La Fièvre du samedi soir :: Night Fever Bee Gees
 `});
 
 cat({ id: 'emissions', name: 'Émissions télé', emoji: '📡', group: 'Fun', kind: 'work', label: 'Nom de l\'émission', items: `
@@ -1233,6 +2224,33 @@ Tout le monde veut prendre sa place :: Tout le monde veut prendre sa place gén�
 Club Dorothée :: Club Dorothée générique
 Les Feux de l'amour|Feux de l'amour :: Nadia's Theme Feux de l'amour
 Télématin :: Télématin générique
+Loft Story :: Loft Story générique
+La Roue de la fortune|Roue de la fortune :: La roue de la fortune générique
+Taratata :: Taratata générique
+Le Bigdil :: Le Bigdil générique
+Les Z'amours|Z'amours :: Les Z'amours générique
+Pyramide :: Pyramide générique jeu télé
+Slam :: Slam France 3 générique
+La Carte aux trésors|Carte aux trésors :: La carte aux trésors générique
+Vidéo Gag|Video Gag :: Vidéo gag générique
+Les Enfants du Rock :: Les enfants du rock générique
+Nulle part ailleurs :: Nulle part ailleurs générique
+Le Jeu de la mort|Jeu de la mort :: Le jeu de la mort générique
+Faites entrer l'accusé :: Faites entrer l'accusé générique
+Les Reines du shopping|Reines du shopping :: Les reines du shopping générique
+Pékin Express|Pekin Express :: Pékin Express générique
+L'amour est dans le pré|Amour est dans le pré :: L'amour est dans le pré générique
+Un dîner presque parfait|Diner presque parfait :: Un dîner presque parfait générique
+The Voice :: The Voice France générique
+La France a un incroyable talent|Incroyable talent :: La France a un incroyable talent générique
+Danse avec les stars :: Danse avec les stars générique
+Zone interdite :: Zone interdite générique
+Envoyé spécial|Envoye special :: Envoyé spécial générique
+Le Journal de 20h|JT TF1 :: TF1 journal 20h générique
+Capital :: Capital M6 générique
+Les Marseillais|Marseillais :: Les Marseillais générique
+Quotidien :: Quotidien générique
+Le Grand Concours|Grand Concours :: Le grand concours générique
 `});
 
 cat({ id: '2020s', name: 'Années 2020 / TikTok', emoji: '📲', group: 'Décennies', items: `
@@ -1264,6 +2282,20 @@ Pierre Garnier — Ceux qu'on était
 Måneskin — Beggin'
 Jason Derulo — Savage Love (Laxed - Siren Beat)
 Lil Nas X — MONTERO (Call Me By Your Name)
+Doja Cat — Say So
+The Kid LAROI — Stay
+Tones and I — Dance Monkey
+SZA — Kill Bill
+Taylor Swift — Anti-Hero
+Billie Eilish — What Was I Made For?
+Tate McRae — greedy
+Ed Sheeran — Bad Habits
+Elton John — Cold Heart
+Rema — Calm Down
+Hozier — Too Sweet
+Doechii — Anxiety
+Kenya Grace — Strangers
+Jack Harlow — First Class
 `});
 
 // ───────── parsing ─────────

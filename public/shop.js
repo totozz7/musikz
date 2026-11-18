@@ -17,13 +17,13 @@
     wheel: {
       cost: 200,
       odds: [
-        { id: 'c25', p: 24, coins: 25 }, { id: 'c60', p: 20, coins: 60 }, { id: 'c120', p: 10, coins: 120 },
-        { id: 'c250', p: 5, coins: 250 }, { id: 'c500', p: 1.2, coins: 500 },
-        { id: 'common', p: 28, rar: 'common' }, { id: 'rare', p: 10, rar: 'rare' }, { id: 'epic', p: 1.5, rar: 'epic' }, { id: 'legendary', p: 0.3, rar: 'legendary' },
+        { id: 'c60', p: 29, coins: 60 }, { id: 'c120', p: 16, coins: 120 },
+        { id: 'c250', p: 6, coins: 250 }, { id: 'c500', p: 1.2, coins: 500 },
+        { id: 'common', p: 40, rar: 'common' }, { id: 'rare', p: 6, rar: 'rare' }, { id: 'epic', p: 1.5, rar: 'epic' }, { id: 'legendary', p: 0.3, rar: 'legendary' },
       ],
       // si tu possèdes déjà tout dans cette rareté : pièces de consolation
       fallback: { common: 120, rare: 400, epic: 1000, legendary: 2500 },
-      slices: ['c25', 'common', 'c60', 'rare', 'c120', 'common', 'epic', 'c60', 'c250', 'common', 'c500', 'legendary'],
+      slices: ['c60', 'common', 'c120', 'rare', 'c60', 'common', 'epic', 'c120', 'c250', 'common', 'c500', 'legendary'],
       kinds: ['icons', 'colors', 'frames', 'nameFx', 'titles', 'winFx', 'pawns', 'boards', 'pcfx', 'cardbacks'],
     },
     icons: [

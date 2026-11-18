@@ -1129,77 +1129,105 @@ function tickRewards() {
 // ── dessins du cadeau et du coffre (SVG faits main, un jeu d'ids par exemplaire) ──
 const ART = (() => {
   let n = 0;
-  const giftBody = (u) => `<svg viewBox="0 0 160 118" class="art"><defs>
-    <linearGradient id="gp${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6b97"/><stop offset=".5" stop-color="#e8174f"/><stop offset="1" stop-color="#9c0b35"/></linearGradient>
-    <pattern id="gd${u}" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="2.4" fill="#fff" opacity=".35"/><path d="M19 13l1.7 3.6 3.9.5-2.9 2.6.8 3.9-3.5-2-3.5 2 .8-3.9-2.9-2.6 3.9-.5z" fill="#ffe27a" opacity=".6"/></pattern>
-    <linearGradient id="gr${u}" x1="0" x2="1"><stop offset="0" stop-color="#b37400"/><stop offset=".3" stop-color="#ffe680"/><stop offset=".6" stop-color="#ffc21a"/><stop offset="1" stop-color="#a86a00"/></linearGradient>
-    <linearGradient id="gs${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></linearGradient></defs>
-    <rect x="4" y="2" width="152" height="114" rx="12" fill="url(#gp${u})"/>
-    <rect x="4" y="2" width="152" height="114" rx="12" fill="url(#gd${u})"/>
-    <rect x="68" y="2" width="24" height="114" fill="url(#gr${u})"/><rect x="72" y="2" width="4" height="114" fill="#fff" opacity=".5"/>
-    <rect x="4" y="2" width="152" height="114" rx="12" fill="url(#gs${u})"/>
-    <rect x="12" y="12" width="9" height="92" rx="4.5" fill="#fff" opacity=".2"/>
-    <rect x="4" y="2" width="152" height="9" fill="#000" opacity=".22"/>
-    <rect x="4" y="2" width="152" height="114" rx="12" fill="none" stroke="#5c0420" stroke-opacity=".5" stroke-width="2"/></svg>`;
-  const giftLid = (u) => `<svg viewBox="0 0 176 96" class="art"><defs>
-    <linearGradient id="lp${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7ea3"/><stop offset="1" stop-color="#d81447"/></linearGradient>
-    <linearGradient id="lr${u}" x1="0" x2="1"><stop offset="0" stop-color="#b37400"/><stop offset=".35" stop-color="#fff0a0"/><stop offset=".65" stop-color="#ffc21a"/><stop offset="1" stop-color="#a86a00"/></linearGradient>
-    <radialGradient id="lk${u}" cx=".4" cy=".35"><stop offset="0" stop-color="#fff3b0"/><stop offset=".6" stop-color="#ffc21a"/><stop offset="1" stop-color="#9a6200"/></radialGradient></defs>
-    <path d="M86 58 L66 92 L76 87 L80 96 L92 62Z M90 58 L110 92 L100 87 L96 96 L84 62Z" fill="url(#lr${u})" stroke="#7a4a00" stroke-width="1.5"/>
-    <rect x="2" y="56" width="172" height="36" rx="9" fill="url(#lp${u})" stroke="#5c0420" stroke-opacity=".5" stroke-width="2"/>
-    <rect x="76" y="56" width="24" height="36" fill="url(#lr${u})"/><rect x="80" y="56" width="4" height="36" fill="#fff" opacity=".5"/>
-    <rect x="10" y="61" width="156" height="6" rx="3" fill="#fff" opacity=".28"/>
-    <path d="M88 52 C 62 14, 22 26, 38 54 C 48 70, 74 62, 88 52Z" fill="url(#lr${u})" stroke="#7a4a00" stroke-width="2"/>
-    <path d="M86 50 C 66 26, 40 32, 48 50 C 54 60, 72 56, 86 50Z" fill="#a86a00" opacity=".55"/>
-    <path d="M88 52 C 114 14, 154 26, 138 54 C 128 70, 102 62, 88 52Z" fill="url(#lr${u})" stroke="#7a4a00" stroke-width="2"/>
-    <path d="M90 50 C 110 26, 136 32, 128 50 C 122 60, 104 56, 90 50Z" fill="#a86a00" opacity=".55"/>
-    <path d="M44 40 C 52 28, 66 30, 74 40" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"/>
-    <ellipse cx="88" cy="53" rx="13" ry="11" fill="url(#lk${u})" stroke="#7a4a00" stroke-width="2"/>
-    <ellipse cx="84" cy="49" rx="4" ry="3" fill="#fff" opacity=".7"/></svg>`;
-  const chestBody = (u) => `<svg viewBox="0 0 200 104" class="art"><defs>
-    <linearGradient id="cw${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a8602c"/><stop offset="1" stop-color="#5a2a0e"/></linearGradient>
-    <linearGradient id="cg${u}" x1="0" x2="1"><stop offset="0" stop-color="#8a5a00"/><stop offset=".3" stop-color="#ffe680"/><stop offset=".55" stop-color="#f0b429"/><stop offset="1" stop-color="#7a4a00"/></linearGradient>
-    <linearGradient id="cv${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#f0b429"/><stop offset="1" stop-color="#8a5a00"/></linearGradient>
-    <filter id="cn${u}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.32" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 .22  0 0 0 0 .1  0 0 0 0 .03  0 0 0 .6 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>
-    <radialGradient id="cj${u}" cx=".35" cy=".3"><stop offset="0" stop-color="#ffd1dc"/><stop offset=".4" stop-color="#ff2e4d"/><stop offset="1" stop-color="#7a0018"/></radialGradient></defs>
-    <rect x="2" y="2" width="196" height="100" rx="8" fill="url(#cw${u})"/>
-    <rect x="2" y="2" width="196" height="100" rx="8" fill="#000" filter="url(#cn${u})"/>
-    <path d="M2 36 H198 M2 70 H198" stroke="#2a1004" stroke-width="2.5" opacity=".7"/>
-    <path d="M2 38 H198 M2 72 H198" stroke="#fff" stroke-width="1" opacity=".12"/>
-    <rect x="24" y="2" width="22" height="100" fill="url(#cg${u})" stroke="#5a3a00" stroke-width="1.5"/>
-    <rect x="154" y="2" width="22" height="100" fill="url(#cg${u})" stroke="#5a3a00" stroke-width="1.5"/>
-    ${[14, 52, 90].map(y => `<circle cx="35" cy="${y}" r="3.4" fill="#fff4c2" stroke="#5a3a00"/><circle cx="165" cy="${y}" r="3.4" fill="#fff4c2" stroke="#5a3a00"/>`).join('')}
-    <rect x="2" y="2" width="196" height="8" fill="url(#cg${u})"/><rect x="2" y="94" width="196" height="8" rx="3" fill="url(#cg${u})"/>
-    <path d="M2 2 h16 v8 h-8 v16 h-8z M198 2 h-16 v8 h8 v16 h8z M2 102 h16 v-8 h-8 v-16 h-8z M198 102 h-16 v-8 h8 v-16 h8z" fill="url(#cv${u})" stroke="#5a3a00" stroke-width="1.2"/>
-    <path d="M82 4 h36 v28 q0 16 -18 24 q-18 -8 -18 -24z" fill="url(#cv${u})" stroke="#5a3a00" stroke-width="2"/>
-    <circle cx="100" cy="14" r="5.5" fill="url(#cj${u})" stroke="#5a0010"/>
-    <circle cx="100" cy="30" r="5" fill="#2a1600"/><path d="M97 32 h6 l2 12 h-10z" fill="#2a1600"/>
-    <rect x="2" y="2" width="196" height="100" rx="8" fill="none" stroke="#2a1004" stroke-width="2.5"/></svg>`;
-  const chestLid = (u) => `<svg viewBox="0 0 204 68" class="art"><defs>
-    <linearGradient id="kw${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c4773a"/><stop offset="1" stop-color="#7a3a14"/></linearGradient>
-    <linearGradient id="kg${u}" x1="0" x2="1"><stop offset="0" stop-color="#8a5a00"/><stop offset=".3" stop-color="#ffe680"/><stop offset=".55" stop-color="#f0b429"/><stop offset="1" stop-color="#7a4a00"/></linearGradient>
-    <filter id="kn${u}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.3" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 .22  0 0 0 0 .1  0 0 0 0 .03  0 0 0 .55 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>
-    <clipPath id="kc${u}"><path d="M2 66 V30 Q2 2 102 2 Q202 2 202 30 V66Z"/></clipPath></defs>
-    <g clip-path="url(#kc${u})">
-      <rect width="204" height="68" fill="url(#kw${u})"/><rect width="204" height="68" fill="#000" filter="url(#kn${u})"/>
-      <path d="M2 30 Q102 4 202 30" fill="none" stroke="#2a1004" stroke-width="2.5" opacity=".7"/>
-      <path d="M10 22 Q102 0 194 22" fill="none" stroke="#fff" stroke-width="3" opacity=".22"/>
-      <rect x="26" width="22" height="68" fill="url(#kg${u})" stroke="#5a3a00" stroke-width="1.5"/><rect x="156" width="22" height="68" fill="url(#kg${u})" stroke="#5a3a00" stroke-width="1.5"/>
-      ${[22, 46].map(y => `<circle cx="37" cy="${y}" r="3.4" fill="#fff4c2" stroke="#5a3a00"/><circle cx="167" cy="${y}" r="3.4" fill="#fff4c2" stroke="#5a3a00"/>`).join('')}
-      <rect y="58" width="204" height="10" fill="url(#kg${u})"/>
-    </g>
-    <path d="M2 66 V30 Q2 2 102 2 Q202 2 202 30 V66Z" fill="none" stroke="#2a1004" stroke-width="2.5"/>
-    <path d="M88 58 h28 v8 h-28z" fill="url(#kg${u})" stroke="#5a3a00" stroke-width="1.5"/></svg>`;
-  const treasure = (u) => `<svg viewBox="0 0 180 70" class="art"><defs>
+  // ── 🎁 cadeau vu de 3/4 : papier bleu nuit étoilé, ruban doré, gros nœud brillant ──
+  const giftBody = (u) => `<svg viewBox="0 0 220 220" class="art"><defs>
+    <linearGradient id="gf${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b3cff"/><stop offset="1" stop-color="#2a118f"/></linearGradient>
+    <linearGradient id="gs${u}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a118f"/><stop offset="1" stop-color="#170960"/></linearGradient>
+    <linearGradient id="gr${u}" x1="0" x2="1"><stop offset="0" stop-color="#b37400"/><stop offset=".35" stop-color="#fff2a8"/><stop offset=".6" stop-color="#ffc21a"/><stop offset="1" stop-color="#9a6200"/></linearGradient>
+    <pattern id="gt${u}" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M6 3l1.3 2.8 3 .4-2.2 2 .6 3-2.7-1.5-2.7 1.5.6-3-2.2-2 3-.4z" fill="#ffe27a" opacity=".75"/><circle cx="17" cy="15" r="1.6" fill="#fff" opacity=".55"/></pattern></defs>
+    <ellipse cx="112" cy="204" rx="92" ry="11" fill="#000" opacity=".4"/>
+    <path d="M30 104H152V202H30Z" fill="url(#gf${u})"/><path d="M30 104H152V202H30Z" fill="url(#gt${u})"/>
+    <path d="M152 104L192 84V182L152 202Z" fill="url(#gs${u})"/><path d="M152 104L192 84V182L152 202Z" fill="url(#gt${u})" opacity=".5"/>
+    <rect x="82" y="104" width="18" height="98" fill="url(#gr${u})"/><rect x="86" y="104" width="3" height="98" fill="#fff" opacity=".6"/>
+    <path d="M168 96L178 91V189L168 194Z" fill="#c48a00"/><path d="M170 95L172 94V192L170 193Z" fill="#fff3b0" opacity=".6"/>
+    <path d="M34 110V196" stroke="#fff" stroke-opacity=".25" stroke-width="5" stroke-linecap="round"/>
+    <path d="M30 104H152V202H30ZM152 104L192 84V182L152 202" fill="none" stroke="#0d0440" stroke-width="2.5" stroke-linejoin="round"/></svg>`;
+  const giftLid = (u) => `<svg viewBox="0 0 220 220" class="art"><defs>
+    <linearGradient id="lf${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6d50ff"/><stop offset="1" stop-color="#3a1fc0"/></linearGradient>
+    <linearGradient id="lt${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9d8bff"/><stop offset="1" stop-color="#5b3cff"/></linearGradient>
+    <linearGradient id="lr${u}" x1="0" x2="1"><stop offset="0" stop-color="#b37400"/><stop offset=".35" stop-color="#fff2a8"/><stop offset=".6" stop-color="#ffc21a"/><stop offset="1" stop-color="#9a6200"/></linearGradient>
+    <radialGradient id="lk${u}" cx=".35" cy=".3"><stop offset="0" stop-color="#fffbe0"/><stop offset=".5" stop-color="#ffc21a"/><stop offset="1" stop-color="#8a5200"/></radialGradient>
+    <pattern id="lp${u}" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M6 3l1.3 2.8 3 .4-2.2 2 .6 3-2.7-1.5-2.7 1.5.6-3-2.2-2 3-.4z" fill="#ffe27a" opacity=".75"/></pattern></defs>
+    <path d="M22 98L64 76H200L158 98Z" fill="url(#lt${u})"/><path d="M22 98L64 76H200L158 98Z" fill="url(#lp${u})" opacity=".6"/>
+    <path d="M22 98H158V122H22Z" fill="url(#lf${u})"/><path d="M22 98H158V122H22Z" fill="url(#lp${u})"/>
+    <path d="M158 98L200 76V100L158 122Z" fill="#2a118f"/>
+    <path d="M34 92L170 92L182 86L46 86Z" fill="url(#lr${u})"/>
+    <path d="M82 98H100L142 76H124Z" fill="url(#lr${u})"/>
+    <rect x="82" y="98" width="18" height="24" fill="url(#lr${u})"/><rect x="86" y="98" width="3" height="24" fill="#fff" opacity=".6"/>
+    <path d="M176 110L186 105V81L176 86Z" fill="#c48a00"/>
+    <path d="M22 98L64 76H200L158 98ZM22 98H158V122H22ZM158 122L200 100V76" fill="none" stroke="#0d0440" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M30 102H150" stroke="#fff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>
+    <g class="gf-bowg">
+      <path d="M112 84C120 108 132 120 140 128L132 124L130 134C120 120 112 104 108 88Z" fill="url(#lr${u})" stroke="#7a4a00" stroke-width="1.5"/>
+      <path d="M108 84C96 106 86 118 76 124L86 122L86 132C98 120 106 104 112 88Z" fill="url(#lr${u})" stroke="#7a4a00" stroke-width="1.5"/>
+      <path d="M110 82C88 40 42 46 56 74C64 92 92 92 110 82Z" fill="url(#lr${u})" stroke="#7a4a00" stroke-width="2"/>
+      <path d="M106 80C90 54 64 56 68 72C72 84 92 84 106 80Z" fill="#a86a00" opacity=".55"/>
+      <path d="M112 82C134 40 180 46 166 74C158 92 130 92 112 82Z" fill="url(#lr${u})" stroke="#7a4a00" stroke-width="2"/>
+      <path d="M116 80C132 54 158 56 154 72C150 84 130 84 116 80Z" fill="#a86a00" opacity=".55"/>
+      <path d="M62 62C68 52 82 52 90 60" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3.5" stroke-linecap="round"/>
+      <ellipse cx="111" cy="82" rx="14" ry="12" fill="url(#lk${u})" stroke="#7a4a00" stroke-width="2"/>
+      <ellipse cx="106" cy="77" rx="4.5" ry="3" fill="#fff" opacity=".85"/>
+    </g></svg>`;
+  // ── 💰 coffre de pirate vu de 3/4 : bois, ferrures dorées, cadenas, trésor ──
+  const chestBody = (u) => `<svg viewBox="0 0 240 220" class="art"><defs>
+    <linearGradient id="cw${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8692e"/><stop offset="1" stop-color="#6a3010"/></linearGradient>
+    <linearGradient id="cs${u}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6a3010"/><stop offset="1" stop-color="#3e1a06"/></linearGradient>
+    <linearGradient id="cg${u}" x1="0" x2="1"><stop offset="0" stop-color="#8a5a00"/><stop offset=".3" stop-color="#fff0a0"/><stop offset=".55" stop-color="#f0b429"/><stop offset="1" stop-color="#7a4a00"/></linearGradient>
+    <linearGradient id="ci${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#140600"/><stop offset="1" stop-color="#3a1806"/></linearGradient>
+    <filter id="cn${u}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.01 0.35" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 .2  0 0 0 0 .08  0 0 0 0 .02  0 0 0 .55 0"/><feComposite in2="SourceGraphic" operator="in"/></filter></defs>
+    <ellipse cx="120" cy="206" rx="100" ry="11" fill="#000" opacity=".45"/>
+    <path d="M26 120L64 98H214L176 120Z" fill="url(#ci${u})"/>
+    <path d="M26 120H176V202H26Z" fill="url(#cw${u})"/><path d="M26 120H176V202H26Z" fill="#000" filter="url(#cn${u})"/>
+    <path d="M176 120L214 98V180L176 202Z" fill="url(#cs${u})"/><path d="M176 120L214 98V180L176 202Z" fill="#000" filter="url(#cn${u})" opacity=".7"/>
+    <path d="M26 147H176M26 174H176M176 147L214 125M176 174L214 152" stroke="#2a0f02" stroke-width="2.5" opacity=".7"/>
+    <path d="M26 149H176M26 176H176" stroke="#fff" stroke-width="1" opacity=".12"/>
+    <rect x="44" y="120" width="16" height="82" fill="url(#cg${u})" stroke="#5a3a00" stroke-width="1.5"/>
+    <rect x="142" y="120" width="16" height="82" fill="url(#cg${u})" stroke="#5a3a00" stroke-width="1.5"/>
+    <path d="M190 106L200 100V182L190 188Z" fill="url(#cg${u})" stroke="#5a3a00" stroke-width="1.5"/>
+    ${[132, 160, 188].map(y => `<circle cx="52" cy="${y}" r="3" fill="#fff4c2" stroke="#5a3a00"/><circle cx="150" cy="${y}" r="3" fill="#fff4c2" stroke="#5a3a00"/>`).join('')}
+    <path d="M26 194H176V202H26ZM176 194L214 172V180L176 202Z" fill="url(#cg${u})" stroke="#5a3a00" stroke-width="1.2"/>
+    <path d="M26 120h14v8h-6v12h-8zM26 202h14v-8h-6v-12h-8zM176 120h-14v8h6v12h8zM176 202h-14v-8h6v-12h8z" fill="url(#cg${u})" stroke="#5a3a00" stroke-width="1.2"/>
+    <path d="M26 120H176V202H26ZM176 120L214 98V180L176 202" fill="none" stroke="#1e0a00" stroke-width="2.5" stroke-linejoin="round"/></svg>`;
+  const chestLid = (u) => `<svg viewBox="0 0 240 220" class="art"><defs>
+    <linearGradient id="kw${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d0843e"/><stop offset="1" stop-color="#8a4418"/></linearGradient>
+    <linearGradient id="kt${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e09a55"/><stop offset="1" stop-color="#9a5020"/></linearGradient>
+    <linearGradient id="kg${u}" x1="0" x2="1"><stop offset="0" stop-color="#8a5a00"/><stop offset=".3" stop-color="#fff0a0"/><stop offset=".55" stop-color="#f0b429"/><stop offset="1" stop-color="#7a4a00"/></linearGradient>
+    <filter id="kn${u}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.01 0.3" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 .2  0 0 0 0 .08  0 0 0 0 .02  0 0 0 .5 0"/><feComposite in2="SourceGraphic" operator="in"/></filter></defs>
+    <path d="M24 100Q24 64 101 60Q178 64 178 100L216 78Q216 42 139 38Q62 42 62 78Z" fill="url(#kt${u})"/>
+    <path d="M178 100V122L216 100V78Z" fill="#5a2608"/>
+    <path d="M24 122V100Q24 64 101 60Q178 64 178 100V122Z" fill="url(#kw${u})"/><path d="M24 122V100Q24 64 101 60Q178 64 178 100V122Z" fill="#000" filter="url(#kn${u})"/>
+    <path d="M26 100Q28 70 101 66Q174 70 176 100" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="3"/>
+    <path d="M42 122V80Q46 70 56 68V122Z" fill="url(#kg${u})" stroke="#5a3a00" stroke-width="1.5"/>
+    <path d="M144 122V68Q156 70 160 80V122Z" fill="url(#kg${u})" stroke="#5a3a00" stroke-width="1.5"/>
+    <path d="M44 74Q50 66 58 66L98 44Q88 44 82 52Z" fill="url(#kg${u})" stroke="#5a3a00" stroke-width="1.2"/>
+    <path d="M144 66Q154 66 160 74L198 52Q192 44 182 44Z" fill="url(#kg${u})" stroke="#5a3a00" stroke-width="1.2"/>
+    <path d="M22 114H180V124H22Z" fill="url(#kg${u})" stroke="#5a3a00" stroke-width="1.2"/><path d="M180 114L218 92V102L180 124Z" fill="#b07a10" stroke="#5a3a00" stroke-width="1.2"/>
+    <path d="M24 100Q24 64 101 60Q178 64 178 100L216 78Q216 42 139 38Q62 42 62 78ZM24 122V100M178 100V122" fill="none" stroke="#1e0a00" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M89 112h24v14h-24z" fill="url(#kg${u})" stroke="#5a3a00" stroke-width="1.5"/></svg>`;
+  const chestLidOpen = (u) => `<svg viewBox="0 0 240 220" class="art"><defs>
+    <linearGradient id="ko${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a2608"/><stop offset="1" stop-color="#2a0e02"/></linearGradient>
+    <linearGradient id="kq${u}" x1="0" x2="1"><stop offset="0" stop-color="#8a5a00"/><stop offset=".3" stop-color="#fff0a0"/><stop offset=".55" stop-color="#f0b429"/><stop offset="1" stop-color="#7a4a00"/></linearGradient></defs>
+    <path d="M62 100V46Q62 8 139 4Q216 8 216 46V100Z" fill="url(#ko${u})" stroke="#1e0a00" stroke-width="2.5"/>
+    <path d="M70 100V48Q72 16 139 12Q206 16 208 48V100" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="5"/>
+    <path d="M62 92H216V100H62Z" fill="url(#kq${u})" stroke="#5a3a00" stroke-width="1.2"/>
+    <path d="M80 100V30M198 100V30" stroke="url(#kq${u})" stroke-width="10"/></svg>`;
+  const treasure = (u) => `<svg viewBox="0 0 240 220" class="art"><defs>
     <radialGradient id="tc${u}" cx=".35" cy=".3"><stop offset="0" stop-color="#fff6c4"/><stop offset=".55" stop-color="#ffc21a"/><stop offset="1" stop-color="#a86a00"/></radialGradient></defs>
-    <path d="M6 70 Q20 26 60 30 Q90 4 122 28 Q164 22 174 70Z" fill="url(#tc${u})" stroke="#8a5a00" stroke-width="2"/>
-    ${[[30, 44], [52, 36], [74, 22], [98, 16], [120, 28], [144, 38], [40, 56], [86, 40], [130, 52], [110, 50], [64, 52]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="5" fill="url(#tc${u})" stroke="#8a5a00" stroke-width="1.5"/>`).join('')}
-    <path d="M58 22 l8 -10 l8 10 l-8 8z" fill="#2fd3ff" stroke="#0a5a7a" stroke-width="1.5"/><path d="M126 18 l9 -9 l9 9 l-9 9z" fill="#ff2e6e" stroke="#7a0030" stroke-width="1.5"/>
-    <path d="M92 6 l7 -6 l7 6 l-7 9z" fill="#3dff8e" stroke="#0a6a30" stroke-width="1.5"/>
-    <path d="M84 28 l6 -12 l6 8 l6 -10 l6 10 l6 -8 l6 12z" fill="url(#tc${u})" stroke="#8a5a00" stroke-width="1.5"/></svg>`;
+    <path d="M30 120Q44 82 84 86Q110 60 140 80Q178 70 210 100L176 120Z" fill="url(#tc${u})" stroke="#8a5a00" stroke-width="2"/>
+    ${[[56, 102], [78, 92], [100, 80], [124, 74], [148, 82], [172, 90], [190, 98], [66, 112], [112, 96], [150, 104], [134, 110], [92, 108]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="5" fill="url(#tc${u})" stroke="#8a5a00" stroke-width="1.5"/>`).join('')}
+    <path d="M84 74l8-11 8 11-8 9z" fill="#2fd3ff" stroke="#0a5a7a" stroke-width="1.5"/><path d="M160 70l9-9 9 9-9 9z" fill="#ff2e6e" stroke="#7a0030" stroke-width="1.5"/>
+    <path d="M122 60l7-7 7 7-7 10z" fill="#3dff8e" stroke="#0a6a30" stroke-width="1.5"/>
+    <path d="M108 80l6-13 6 8 6-11 6 11 6-8 6 13z" fill="url(#tc${u})" stroke="#8a5a00" stroke-width="1.5"/>
+    <circle cx="96" cy="66" r="2" fill="#fff"/><circle cx="170" cy="62" r="2" fill="#fff"/></svg>`;
+  const lock = (u) => `<svg viewBox="0 0 240 220" class="art"><defs>
+    <linearGradient id="lg${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#f0b429"/><stop offset="1" stop-color="#8a5a00"/></linearGradient></defs>
+    <path d="M91 124V114Q91 102 101 102Q111 102 111 114V124" fill="none" stroke="#c9c9c9" stroke-width="5"/>
+    <rect x="84" y="122" width="34" height="30" rx="6" fill="url(#lg${u})" stroke="#5a3a00" stroke-width="2"/>
+    <circle cx="101" cy="134" r="4.5" fill="#2a1600"/><path d="M98.5 136h5l1.5 9h-8z" fill="#2a1600"/>
+    <circle cx="90" cy="127" r="2" fill="#fff" opacity=".8"/></svg>`;
   return {
-    gift: () => { const u = 'g' + n++; return `<div class="gf-lid">${giftLid(u)}</div><div class="gf-body">${giftBody(u)}</div><div class="gf-shine"></div>`; },
-    chest: () => { const u = 'c' + n++; return `<div class="c-glow"></div><div class="c-gold">${treasure(u)}</div><div class="c-body">${chestBody(u)}</div><div class="c-lid">${chestLid(u)}</div>`; },
+    gift: () => { const u = 'g' + n++; return `<div class="gf-halo"></div><div class="gf-shine"></div><div class="gf-body">${giftBody(u)}</div><div class="gf-lid">${giftLid(u)}</div>`; },
+    chest: () => { const u = 'c' + n++; return `<div class="c-glow"></div><div class="c-lido">${chestLidOpen(u)}</div><div class="c-body">${chestBody(u)}</div><div class="c-gold">${treasure(u)}</div><div class="c-lid">${chestLid(u)}</div><div class="c-lock">${lock(u)}</div>`; },
   };
 })();
 $('#op-box .gift3d').innerHTML = ART.gift();
@@ -1213,11 +1241,12 @@ window.WHEEL = (() => {
   const W = SHOP.wheel, N = W.slices.length, A = 360 / N;
   const KIND_LABEL = { icons: 'Icône', colors: 'Couleur de pseudo', frames: 'Cadre', nameFx: 'Effet de pseudo', titles: 'Titre', winFx: 'Célébration', pawns: 'Pion', boards: 'Plateau', pcfx: 'Animation chevaux', cardbacks: 'Dos de cartes' };
   const SL = {
-    c25: { t: '25', e: '🪙', c: '#ffcf3d', c2: '#f0a400' }, c60: { t: '60', e: '🪙', c: '#ffb12b', c2: '#e07b00' }, c120: { t: '120', e: '💰', c: '#ffd84d', c2: '#e3a300' },
+    c60: { t: '60', e: '🪙', c: '#ffb12b', c2: '#e07b00' }, c120: { t: '120', e: '💰', c: '#ffd84d', c2: '#e3a300' },
     c250: { t: '250', e: '💰', c: '#ff9a1f', c2: '#d96500' }, c500: { t: '500', e: '💎', c: '#ff5aa0', c2: '#c4126a' },
     common: { t: 'COMMUN', e: '🎁', c: '#a9bccf', c2: '#6f859b' }, rare: { t: 'RARE', e: '🔷', c: '#3b95ff', c2: '#1356c4' },
     epic: { t: 'ÉPIQUE', e: '🔮', c: '#ab64ff', c2: '#6a1fc9' }, legendary: { t: 'LÉGENDE', e: '👑', c: 'url(#wRain)', c2: '#000' },
   };
+  const FX = { rare: 1, epic: 1, legendary: 1, c500: 1 };
   let rot = 0, spinning = false;
   function wheelSVG() {
     const R = 150, cx = 160, cy = 160;
@@ -1227,7 +1256,8 @@ window.WHEEL = (() => {
       const [tx, ty] = pt(mid, R * .68), [ex, ey] = pt(mid, R * .87);
       return `<path d="M${cx} ${cy} L${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1}Z" fill="${s.c}" stroke="#2a1600" stroke-width="2"/>
         <path d="M${cx} ${cy} L${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1}Z" fill="url(#wShade)"/>
-        <text x="${ex}" y="${ey}" font-size="20" text-anchor="middle" dominant-baseline="central" transform="rotate(${mid} ${ex} ${ey})">${s.e}</text>
+        ${FX[id] ? `<path d="M${cx} ${cy} L${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1}Z" class="wh-flash f-${id}"/><path d="M${cx} ${cy} L${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1}Z" class="wh-edge f-${id}"/>${[.45, .62, .8].map((r, j) => { const [sx, sy] = pt(a0 + A * (.25 + j * .25), R * r); return `<text x="${sx}" y="${sy}" class="wh-spark s${j} f-${id}" text-anchor="middle" dominant-baseline="central">✦</text>`; }).join('')}` : ''}
+        <text x="${ex}" y="${ey}" font-size="20" text-anchor="middle" dominant-baseline="central" transform="rotate(${mid} ${ex} ${ey})" class="${FX[id] ? 'wh-em f-' + id : ''}" style="transform-box:fill-box;transform-origin:center">${s.e}</text>
         <text x="${tx}" y="${ty}" class="wl ${id.startsWith('c') ? 'coin' : ''}" text-anchor="middle" dominant-baseline="central" transform="rotate(${mid + 90} ${tx} ${ty})">${s.t}</text>`;
     }).join('');
     const bulbs = Array.from({ length: 24 }, (_, i) => { const [x, y] = pt(i * 15, R + 13); return `<circle cx="${x}" cy="${y}" r="4.5" class="bulb b${i % 2}"/>`; }).join('');
@@ -1363,7 +1393,15 @@ $('#op-box').onclick = () => {
     ov.classList.remove('shaking'); ov.classList.add('open'); if (jackpot) ov.classList.add('jackpot');
     sfx('legend'); setTimeout(() => sfx('legend'), 250);
     coinFountain(kind === 'chest' ? (jackpot ? 70 : 45) : 22);
-    if (kind === 'chest') burst(jackpot ? 'supernova' : 'fireworks', 22);
+    if (kind === 'chest') burst(jackpot ? 'supernova' : 'fireworks', 22); else burst('party', 14);
+    const box = $('#op-box');
+    for (let i = 0; i < 18; i++) {
+      const s = document.createElement('i'); s.className = 'op-spark';
+      const a = -Math.PI / 2 + (Math.random() - .5) * 2.4, d = 120 + Math.random() * 160;
+      s.style.setProperty('--x', Math.cos(a) * d + 'px'); s.style.setProperty('--y', Math.sin(a) * d + 'px');
+      s.style.animationDelay = (kind === 'chest' ? 300 : 120) + i * 15 + 'ms';
+      box.appendChild(s); setTimeout(() => s.remove(), 1600);
+    }
     $('#op-title').textContent = jackpot ? '🌟 JACKPOT ! Coffre doré ×2 !' : kind === 'gift' ? '🎉 Bravo !' : '💰 Trésor trouvé !';
     countUp($('#op-amount'), amount);
     setTimeout(() => { renderProfile(); $('#op-close').classList.remove('hidden'); }, 900);

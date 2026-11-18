@@ -255,6 +255,8 @@
               <div class="seg gseg" data-key="rounds"><button data-v="5">5</button><button data-v="10">10</button><button data-v="15">15</button><button data-v="20">20</button></div>
               <h4 style="margin-top:.8rem">⏱️ Temps par image</h4>
               <div class="seg gseg" data-key="time"><button data-v="20">20 s</button><button data-v="30">30 s</button><button data-v="45">45 s</button></div>
+              <h4 style="margin-top:.8rem">⏸️ Pause entre deux images</h4>
+              <div class="seg gseg" data-key="gap"><button data-v="3">3 s</button><button data-v="6">6 s</button><button data-v="10">10 s</button><button data-v="15">15 s</button></div>
             </div>
           </div>
           <div class="set-block rules">
@@ -335,7 +337,7 @@
           <div class="set-block">
             <h4>Indices</h4>
             <div class="seg gseg" data-key="hints"><button data-v="true">💡 Avec indices</button><button data-v="false">🚫 Sans indices</button></div>
-            <p class="muted small hint2">Avec indices : les mots trouvés passent en vert et chacun peut révéler 3 lettres (−2 🪙 chacune). Sans indices : aucune aide jusqu'à la fin.</p>
+            <p class="muted small hint2">Les mots justes passent toujours en vert et sont verrouillés. Avec indices : chacun peut en plus révéler 3 lettres (−2 🪙 chacune). Sans indices : pas de lettres à révéler.</p>
           </div>
           <div class="set-block rules">
             <h4>📜 Règles</h4>
@@ -566,8 +568,8 @@
   <div class="op-stage">
     <p class="op-title" id="op-title">Touche pour ouvrir !</p>
     <div class="op-box" id="op-box">
-      <div class="gift3d"><div class="gf-lid"><span class="gf-bow">🎀</span></div><div class="gf-body"></div></div>
-      <div class="chest3d"><div class="c-lid"></div><div class="c-body"><span class="c-lock"></span></div><div class="c-glow"></div></div>
+      <div class="gift3d"></div>
+      <div class="chest3d"></div>
     </div>
     <p class="op-amount" id="op-amount"></p>
     <button class="btn btn-primary hidden" id="op-close">Super ! 🤑</button>
