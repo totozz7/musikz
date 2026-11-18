@@ -1080,7 +1080,11 @@ function whisper(text) {
 // 🎉 Effet de victoire choisi dans la boutique : pluie d'emojis ou célébration animée
 function burst(fxId, n = 16) {
   const fx = SHOP.winFx.find(x => x.id === fxId) || SHOP.winFx[0];
-  if (fx.kind && CELEBRATIONS[fx.kind]) return CELEBRATIONS[fx.kind](Math.min(1.3, Math.max(.45, n / 22)));
+  if (fx.kind && CELEBRATIONS[fx.kind]) {
+    if (Date.now() < burst.lock) return; // une célébration animée à la fois
+    burst.lock = Date.now() + (fx.kind === 'goat' ? 3200 : 1800);
+    return CELEBRATIONS[fx.kind](Math.min(1.3, Math.max(.45, n / 22)));
+  }
   const em = [...fx.emojis];
   for (let i = 0; i < n; i++) {
     const el = document.createElement('div');
@@ -1191,9 +1195,9 @@ const CELEBRATIONS = {
     fxEl('goat-rays', {}, '', 3400);
     fxEl('goat-stage', {}, `<div class="goat-hop">${svg}<div class="goat-crown">${crown}</div><div class="goat-flash"></div></div>`, 3400);
     fxEl('goat-title', {}, [...'G.O.A.T.'].map((c, i) => `<span style="--i:${i}">${c}</span>`).join('') + '<small>GREATEST OF ALL TIME</small>', 3400);
-    for (let i = 0; i < Math.round(26 + 24 * k); i++)
+    for (let i = 0; i < Math.round((innerWidth < 700 ? 14 : 26) + (innerWidth < 700 ? 10 : 24) * k); i++)
       fxEl('goat-glit', { left: rnd(0, 100) + 'vw', '--d': rnd(.9, 2) + 's', '--x': rnd(-60, 60) + 'px', fontSize: rnd(.9, 2.1) + 'rem', animationDelay: rnd(.8, 1.8) + 's' }, ['✦', '👑', '✨', '🐐', '✦'][i % 5], 3400);
-    setTimeout(() => { try { sfx('legend'); } catch (e) {} document.body.classList.add('sn-shake'); setTimeout(() => document.body.classList.remove('sn-shake'), 500); }, 1250);
+    setTimeout(() => { try { sfx('legend'); } catch (e) {} if (!$('#shop').classList.contains('hidden')) return; document.body.classList.add('sn-shake'); setTimeout(() => document.body.classList.remove('sn-shake'), 500); }, 1250);
   },
 };
 
@@ -1501,6 +1505,7 @@ function openReward(kind) {
 }
 $('#rw-gift').onclick = () => openReward('gift');
 $('#rw-wheel').onclick = () => window.WHEEL.open();
+$('#shop-wheel').onclick = () => { $('#shop').classList.add('hidden'); window.WHEEL.open(); };
 $('#rw-chest').onclick = () => openReward('chest');
 $('#op-box').onclick = () => {
   if (!opening || opening.opened) return;

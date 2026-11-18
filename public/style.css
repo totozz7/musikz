@@ -2495,7 +2495,7 @@ body .cb-prev.cb-classic .pm-card.back::after,body .cb-prev.cb-classic .lb-card.
 .sx-row.boost{background:linear-gradient(90deg,#ff8a0033,#0006)}
 
 /* 🐐👑 G.O.A.T. */
-.goat-rays{position:fixed;left:50%;top:48%;width:180vmax;height:180vmax;margin:-90vmax;background:repeating-conic-gradient(from 0deg,#ffd84d33 0 8deg,#0000 8deg 18deg);border-radius:50%;mask:radial-gradient(closest-side,#000 20%,#0000 70%);animation:goatrays 3.4s linear forwards;pointer-events:none}
+.goat-rays{position:fixed;left:50%;top:48%;width:120vmax;height:120vmax;margin:-60vmax;will-change:transform,opacity;background:repeating-conic-gradient(from 0deg,#ffd84d33 0 8deg,#0000 8deg 18deg);border-radius:50%;-webkit-mask:radial-gradient(closest-side,#000 20%,#0000 70%);mask:radial-gradient(closest-side,#000 20%,#0000 70%);animation:goatrays 3.4s linear forwards;pointer-events:none}
 @keyframes goatrays{0%{opacity:0;transform:rotate(0) scale(.4)}12%{opacity:1}80%{opacity:1}100%{opacity:0;transform:rotate(80deg) scale(1)}}
 .goat-stage{position:fixed;left:50%;top:50%;width:min(62vmin,420px);aspect-ratio:1;transform:translate(-50%,-55%);pointer-events:none;filter:drop-shadow(0 20px 30px #0009);animation:goatstage 3.4s ease forwards}
 @keyframes goatstage{0%,88%{opacity:1}100%{opacity:0;transform:translate(-50%,-55%) scale(.85)}}
@@ -2664,3 +2664,19 @@ body.pr-clown .avi:after{content:"🤡";font-size:calc(var(--s,36px) * .62)}
 .t7-card em{font-style:normal;color:#c7d2fe;font-size:.85rem}
 .t7-room.over .t7-main,.t7-room.over .t7-theme{display:none}
 .t7-endc{border-color:#ffc21a;background:#0a0630ee}
+
+#reactions-layer *{pointer-events:none!important}
+/* 🎡 roue mise en avant en haut de la boutique */
+.shop-wheel{display:flex;align-items:center;gap:.8rem;width:100%;margin:0 0 .8rem;padding:.6rem .9rem;border:0;border-radius:18px;cursor:pointer;text-align:left;color:#fff;
+  background:linear-gradient(110deg,#ff2e9a,#ff8a00 45%,#ffc21a);box-shadow:0 5px 0 #8a2a00,0 10px 26px #ff5a0055;position:relative;overflow:hidden;transition:transform .12s}
+.shop-wheel:before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,#0000 35%,#fff6 50%,#0000 65%);background-size:250% 100%;animation:cbshine 3s ease-in-out infinite}
+.shop-wheel:hover{transform:translateY(-2px)}.shop-wheel:active{transform:translateY(3px);box-shadow:0 2px 0 #8a2a00}
+.sw-ico .mini-wheel{width:46px;height:46px;animation-duration:3s}
+.shop-wheel:hover .mini-wheel{animation-duration:.6s}
+.sw-txt{flex:1;display:flex;flex-direction:column;line-height:1.2}.sw-txt b{font-family:'Bungee',sans-serif;font-size:1.05rem;text-shadow:0 2px 0 #0004}.sw-txt small{font-weight:700;opacity:.9}
+.sw-go{background:#fff;color:#c2410c;font-weight:900;border-radius:99px;padding:.35rem .9rem;white-space:nowrap;box-shadow:0 3px 0 #0003}
+@media (max-width:480px){.sw-go{display:none}}
+/* Petit Bac : boutons « fantôme » lisibles sur le cahier */
+.bc-room .btn-ghost{background:#1d4ed8!important;color:#fff!important;border:0!important;box-shadow:0 4px 0 #1e3a8a!important}
+.bc-room .btn-ghost:hover{background:#2563eb!important}
+.bc-endc .gp-coins{color:#b45309!important;text-shadow:none!important}
