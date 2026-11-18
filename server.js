@@ -20,7 +20,7 @@ const io = new Server(server);
 const PUB = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : __dirname;
 const INDEX = path.join(PUB, 'index.html');
 const SHOP = require(path.join(PUB, 'shop.js'));
-for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js', 'client-draw.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
+for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js', 'client-draw.js', 'client-bac.js', 'client-bluff.js', 'client-punch.js', 'client-sem.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
 app.get('/', (req, res) => res.sendFile(INDEX));
 app.get('/r/:code', (req, res) => res.sendFile(INDEX));
 app.get('/health', (req, res) => res.send('ok'));
@@ -389,6 +389,10 @@ const GAMES = {
   guess: require('./game-guess')(gameCtx),
   primo: require('./game-primo')(gameCtx),
   draw: require('./game-draw')(gameCtx),
+  bac: require('./game-bac')(gameCtx),
+  bluff: require('./game-bluff')(gameCtx),
+  punch: require('./game-punch')(gameCtx),
+  sem: require('./game-sem')(gameCtx),
 };
 // infos affichées sur l'écran de choix (nombre de joueurs !)
 const GAME_INFO = {
@@ -401,6 +405,7 @@ const GAME_INFO = {
   guess: { min: 1, max: GAMES.guess.max },
   primo: { min: 1, max: GAMES.primo.max },
   draw: { min: 2, max: GAMES.draw.max },
+  bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 },
 };
 app.get('/api/guess-themes', (req, res) => res.json(GAMES.guess.themes));
 app.get('/api/games', (req, res) => res.json({ info: GAME_INFO, ucThemes: GAMES.undercover.themes() }));
@@ -762,7 +767,7 @@ io.on('connection', (socket) => {
   socket.on('create', ({ name, avatar, pid, game, ...look }, cb) => {
     const code = makeCode();
     room = { code, players: new Map(), hostId: pid, phase: 'lobby', settings: defaultSettings(), chat: [], history: [],
-      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults(), draw: GAMES.draw.defaults() }, gscores: {}, g: null };
+      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults(), draw: GAMES.draw.defaults(), bac: GAMES.bac.defaults(), bluff: GAMES.bluff.defaults(), punch: GAMES.punch.defaults(), sem: GAMES.sem.defaults() }, gscores: {}, g: null };
     rooms.set(code, room);
     join(room, { name, avatar, pid, ...look }, cb);
   });
@@ -851,7 +856,7 @@ io.on('connection', (socket) => {
   socket.on('setGame', (game) => {
     if (!isHost() || !['lobby', 'end'].includes(room.phase) || !GAME_INFO[game]) return;
     room.game = game; room.phase = 'lobby'; stopModuleGame(room);
-    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time' }[game]}`);
+    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time', bac: '📋 Petit Bac', bluff: '🎭 Le Bluff', punch: '🎤 Punchline', sem: '🌡️ Ça chauffe !' }[game]}`);
     broadcast(room);
   });
   socket.on('gsettings', (patch = {}) => {

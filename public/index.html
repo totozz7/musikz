@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>PlayZup — Jeux entre potes</title>
+<meta name="theme-color" content="#16070b">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='6' y='6' width='88' height='88' rx='24' fill='%23ff2e4d'/><text x='50' y='68' font-size='52' text-anchor='middle' font-family='Arial Black' fill='%23ffc21a'>P</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&family=Bangers&family=Caveat:wght@600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Special+Elite&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="bg-stripes"></div>
+<div id="reactions-layer"></div>
+<div id="freeze-layer" class="freeze-layer hidden"><div>🧊<b>GELÉ !</b><span id="freeze-count"></span></div></div>
+<div id="toasts"></div>
+
+<!-- ───────── ACCUEIL ───────── -->
+<section id="home" class="screen active">
+  <div class="home-wrap wide">
+    <div class="logo-block">
+      <h1 class="logo">PLAY<span>ZUP</span></h1>
+      <p class="tagline">Les jeux de soirée entre potes. Un lien, tes amis, et c'est parti.</p>
+    </div>
+
+    <div class="home-grid">
+      <div class="card home-card">
+        <div class="profile-preview">
+          <span id="pv-avatar"></span>
+          <div class="pv-txt">
+            <div id="pv-name" class="pv-name">Ton pseudo</div>
+            <div id="pv-title" class="pv-title"></div>
+          </div>
+          <div class="wallet" title="Tes pièces"><span>🪙</span><b class="coins-n">0</b></div>
+        </div>
+        <label class="lbl">Ton pseudo</label>
+        <input id="name" class="input" maxlength="18" placeholder="Ex. Zuppy" autocomplete="off">
+        <button id="btn-shop" class="btn btn-shop" type="button">🎨 Personnaliser &amp; Boutique</button>
+        <p class="muted small center-txt">Gagne des 🪙 dans tous les jeux pour débloquer cadres, effets, titres…</p>
+        <div class="or"><span>tu as un code ?</span></div>
+        <div class="join-row">
+          <input id="code" class="input code-input" maxlength="5" placeholder="CODE" autocomplete="off">
+          <button id="btn-join" class="btn btn-yellow">Rejoindre</button>
+        </div>
+        <p id="home-err" class="err"></p>
+      </div>
+
+      <div class="games-col">
+        <h2 class="pick-title">🎮 Choisis ton jeu</h2>
+        <div id="games" class="games"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── SALON / JEU ───────── -->
+<section id="room" class="screen">
+  <header class="topbar">
+    <div class="logo small">PLAY<span>ZUP</span></div>
+    <span id="game-badge" class="game-badge"></span>
+    <div class="room-code" id="room-code-box" title="Copier le lien d'invitation">
+      <span class="muted">Salon</span> <b id="room-code">-----</b> <span class="copy">🔗 Copier le lien</span>
+    </div>
+    <div class="top-actions">
+      <button class="btn btn-shop btn-sm" id="btn-shop2" title="Boutique et personnalisation">🎨 <span class="hide-sm">Boutique</span> <b>🪙 <span class="coins-n">0</span></b></button>
+      <div class="vol"><span>🔊</span><input type="range" id="volume" min="0" max="100" value="80"></div>
+      <button class="btn btn-sm btn-modo hidden" id="btn-modo" title="Mode modérateur">🛡️</button>
+      <button class="btn btn-ghost btn-sm" id="btn-chat-toggle">💬</button>
+      <button class="btn btn-ghost btn-sm" id="btn-leave">Quitter</button>
+    </div>
+  </header>
+
+  <div class="room-grid">
+    <aside class="players-panel card">
+      <h3>Joueurs <span id="player-count" class="pill">0</span></h3>
+      <ul id="players" class="players"></ul>
+    </aside>
+
+    <main class="stage">
+      <!-- LOBBY -->
+      <div id="v-lobby" class="view">
+        <div id="game-switch" class="game-switch"></div>
+        <div class="lobby-head">
+          <h2 id="lobby-title">Préparez vos oreilles 🎧</h2>
+          <p class="muted" id="lobby-sub">Invite tes potes avec le lien, choisis les catégories et lance la partie.</p>
+          <p id="lobby-count" class="lobby-count"></p>
+        </div>
+
+        <!-- réglages Undercover -->
+        <div id="set-undercover" class="settings gset hidden">
+          <div class="set-block">
+            <h4>Thème des mots</h4>
+            <div id="uc-themes" class="uc-themes"></div>
+          </div>
+          <div class="set-row">
+            <div class="set-block">
+              <h4>Undercovers</h4>
+              <div class="seg gseg" data-key="undercovers"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button></div>
+              <p class="muted small hint2">Ajusté automatiquement selon le nombre de joueurs (2 dès 5 joueurs, 3 dès 8).</p>
+            </div>
+            <div class="set-block">
+              <h4>Mr. White 👻</h4>
+              <label class="tog"><input type="checkbox" class="gtog" data-key="mrWhite"><span></span> Ajouter un Mr. White <small>il n'a aucun mot (dès 4 joueurs)</small></label>
+            </div>
+          </div>
+          <div class="set-row">
+            <div class="set-block">
+              <h4>Indices</h4>
+              <div class="seg gseg" data-key="mode"><button data-v="written">✍️ Écrits dans le jeu</button><button data-v="oral">🎙️ À l'oral</button></div>
+            </div>
+            <div class="set-block">
+              <h4>Tours d'indices avant le vote</h4>
+              <div class="seg gseg" data-key="clueRounds"><button data-v="1">1 tour</button><button data-v="2">2 tours</button></div>
+            </div>
+          </div>
+          <div class="set-block">
+            <h4>Temps pour donner son indice</h4>
+            <div class="seg gseg" data-key="clueTime"><button data-v="20">20 s</button><button data-v="30">30 s</button><button data-v="40">40 s</button><button data-v="60">60 s</button></div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>Les <b>civils</b> ont tous le même mot. L'<b>undercover</b> a un mot proche… sans savoir qu'il est undercover.
+            <b>Mr. White</b> n'a aucun mot et doit bluffer. Chacun donne un indice à tour de rôle, puis on vote pour éliminer un suspect.
+            Si Mr. White est éliminé, il peut gagner en devinant le mot des civils !</p>
+          </div>
+        </div>
+
+        <!-- réglages Jeu de la Note -->
+        <div id="set-note" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block">
+              <h4>Nombre de passages</h4>
+              <div class="seg gseg" data-key="tours"><button data-v="1">1 fois chacun</button><button data-v="2">2 fois</button><button data-v="3">3 fois</button></div>
+            </div>
+            <div class="set-block">
+              <h4>Temps pour répondre</h4>
+              <div class="seg gseg" data-key="answerTime"><button data-v="60">1 min</button><button data-v="90">1 min 30</button><button data-v="120">2 min</button><button data-v="180">3 min</button></div>
+            </div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>À chaque manche, un joueur reçoit une <b>note secrète de 1 à 10</b>. Un autre joueur lui choisit <b>3 thèmes</b>
+            (un film, un plat, un animal…). Il doit répondre à chaque thème par quelque chose qui « vaut » sa note :
+            note 1 → le pire, note 10 → le meilleur. Les autres devinent la note.</p>
+            <p class="muted small">🎯 Note exacte = 3 pts · à 1 près = 2 pts · à 2 près = 1 pt. Le répondeur gagne 1 pt par joueur qui tombe à 1 près.</p>
+          </div>
+        </div>
+
+        <!-- réglages Petits chevaux -->
+        <div id="set-sem" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block">
+              <h4>🔁 Nombre de mots</h4>
+              <div class="seg gseg" data-key="words"><button data-v="1">1</button><button data-v="3">3</button><button data-v="5">5</button><button data-v="10">10</button><button data-v="0">♾️ Infini</button></div>
+              <p class="muted small hint2">En mode infini, l'hôte arrête la partie quand il veut.</p>
+            </div>
+            <div class="set-block">
+              <h4>💡 Indices</h4>
+              <div class="seg gseg" data-key="hints"><button data-v="true">Oui</button><button data-v="false">Non</button></div>
+              <p class="muted small hint2">Première lettre après 2 min, nombre de lettres après 4 min.</p>
+            </div>
+          </div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>Un mot secret (simple !). Propose n'importe quel mot : la <b>température</b> te dit à quel point tu es proche par le sens (🥶 froid → 🔥 brûlant). Si tu es dans les 1 000 mots les plus proches, tu vois ton rang en ‰. Le <b>premier qui trouve</b> gagne la manche, puis un nouveau mot arrive. Tu vois la température max des autres, mais pas leurs mots !</p></div>
+        </div>
+        <div id="set-bac" class="settings gset hidden">
+          <div class="set-block">
+            <h4>🗂️ Catégories</h4>
+            <div class="seg gseg" data-key="mode"><button data-v="classic">📚 Classiques</button><button data-v="fun">😂 Fun</button><button data-v="mix">🎲 Mélange</button></div>
+            <p class="muted small hint2">Fun : « une excuse pour être en retard », « un prénom de mamie », « un truc qui pue », « un super-pouvoir nul »…</p>
+          </div>
+          <div class="set-row">
+            <div class="set-block"><h4>🔤 Lettres</h4><div class="seg gseg" data-key="rounds"><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="8">8</button></div>
+              <h4 style="margin-top:.8rem">📋 Catégories par grille</h4><div class="seg gseg" data-key="cats"><button data-v="5">5</button><button data-v="7">7</button><button data-v="9">9</button></div></div>
+            <div class="set-block"><h4>⏱️ Temps par lettre</h4><div class="seg gseg" data-key="time"><button data-v="60">60 s</button><button data-v="90">90 s</button><button data-v="120">2 min</button><button data-v="180">3 min</button></div></div>
+          </div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>Une lettre tombe : trouve un mot par catégorie. Quand tu as tout rempli, crie <b>STOP !</b> (+5 pts si tout est validé). Ensuite chacun vote ❌ contre les réponses douteuses des autres. Réponse unique = <b>10 pts</b>, même réponse qu'un autre = <b>5 pts</b>.</p></div>
+        </div>
+        <div id="set-bluff" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block"><h4>🎭 Anecdotes</h4><div class="seg gseg" data-key="rounds"><button data-v="4">4</button><button data-v="6">6</button><button data-v="8">8</button><button data-v="10">10</button></div></div>
+            <div class="set-block"><h4>⏱️ Temps pour bluffer</h4><div class="seg gseg" data-key="time"><button data-v="40">40 s</button><button data-v="60">60 s</button><button data-v="90">90 s</button></div></div>
+          </div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>Une anecdote <b>vraie</b> s'affiche avec un trou. Invente une fausse réponse crédible. Ensuite, retrouve la vraie parmi tous les bluffs : <b>+100</b> si tu trouves, <b>+50</b> par joueur piégé par ton bluff. Dernière anecdote : points doublés !</p></div>
+        </div>
+        <div id="set-punch" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block"><h4>🎤 Manches</h4><div class="seg gseg" data-key="rounds"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button></div><p class="muted small hint2">+ « le mot de la fin » où tout le monde répond au même sujet.</p></div>
+            <div class="set-block"><h4>⏱️ Temps pour écrire</h4><div class="seg gseg" data-key="time"><button data-v="45">45 s</button><button data-v="75">75 s</button><button data-v="100">100 s</button></div></div>
+          </div>
+          <div class="set-block rules"><h4>📜 Règles (3 joueurs minimum)</h4><p>Chacun reçoit 2 sujets (« le pire nom pour un chien »…) et écrit la réponse la plus drôle. Sur chaque sujet, deux joueurs s'affrontent en duel anonyme et les autres votent. Tous les votes pour toi = <b>PUNCHLINE !</b> (gros bonus). Points ×2 en manche 2, ×3 pour le mot de la fin.</p></div>
+        </div>
+        <div id="set-draw" class="settings gset hidden">
+          <div class="set-block">
+            <h4>💬 Les mots</h4>
+            <div class="seg gseg" data-key="words"><button data-v="classic">✏️ Classiques</button><button data-v="fun">😂 Marrants</button><button data-v="spicy">🌶️ Pimentés</button><button data-v="mix">🎲 Tout mélangé</button></div>
+            <p class="muted small hint2">Classiques : faciles à dessiner (chat, volcan…). Marrants : « slip sur la tête », « dragon enrhumé »… Pimentés : « ex toxique », « gueule de bois », « pet foireux »… 😇</p>
+          </div>
+          <div class="set-row">
+            <div class="set-block">
+              <h4>🔁 Manches</h4>
+              <div class="seg gseg" data-key="rounds"><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button></div>
+              <p class="muted small hint2">Chaque joueur dessine une fois par manche.</p>
+            </div>
+            <div class="set-block">
+              <h4>⏱️ Temps pour dessiner</h4>
+              <div class="seg gseg" data-key="time"><button data-v="60">60 s</button><button data-v="80">80 s</button><button data-v="100">100 s</button><button data-v="120">120 s</button></div>
+              <h4 style="margin-top:.8rem">💡 Lettres dévoilées</h4>
+              <div class="seg gseg" data-key="hints"><button data-v="0">0</button><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button></div>
+            </div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>À tour de rôle, un joueur choisit un mot parmi 3 et le <b>dessine</b>. Les autres tapent leurs propositions : plus tu trouves vite, plus tu marques (bonus au premier !). Le dessinateur gagne des points pour chaque joueur qui trouve. Interdit d'écrire le mot sur le dessin 😉</p>
+          </div>
+        </div>
+        <div id="set-primo" class="settings gset hidden">
+          <div class="set-block">
+            <h4>🎴 Mode de jeu</h4>
+            <div class="seg gseg pm-modes" data-key="mode"><button data-v="classic">🃏 Classique</button><button data-v="chaos">🤪 Pagaille</button></div>
+            <p class="muted small hint2">Pagaille : en plus des cartes normales, le paquet contient 38 cartes vicieuses — 🔄 Échange de mains, 🌪️ Tornade, 🎁 Cadeau piégé, 💣 Bombe, 🎯 Sniper, 🧊 Congélo, 🪞 Miroir, 🍀 Trèfle, 🧨 Dynamite, 🧹 Grand ménage, 🎰 Roulette, 👁️ Espion, 🤲 Charité, 👑 Encore !, 🧤 Pickpocket et le terrible 🔥 +6.</p>
+          </div>
+          <div class="set-row">
+            <div class="set-block">
+              <h4>🤖 Robots</h4>
+              <div class="seg gseg" data-key="bots"><button data-v="0">Aucun</button><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="5">5</button></div>
+            </div>
+            <div class="set-block">
+              <h4>➕ Cumul des +2 / +4</h4>
+              <div class="seg gseg" data-key="stack"><button data-v="true">Oui</button><button data-v="false">Non</button></div>
+              <h4 style="margin-top:.8rem">⏱️ Temps par tour</h4>
+              <div class="seg gseg" data-key="time"><button data-v="15">15 s</button><button data-v="25">25 s</button><button data-v="40">40 s</button></div>
+            </div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>Pose une carte de la <b>même couleur</b>, du <b>même chiffre</b> ou du <b>même symbole</b>. Sinon, pioche. ⊘ Passe, ⇄ Inversion, +2, Joker (choix de la couleur), Joker +4. Avec le cumul, on peut répondre à un +2/+4 par un autre +2/+4 : le suivant prend tout !
+            Quand il te reste <b>une carte</b>, clique <b>PRIMO !</b> — sinon un autre joueur peut te dénoncer et tu pioches 2. Le premier qui n'a plus de cartes gagne.</p>
+          </div>
+        </div>
+        <div id="set-guess" class="settings gset hidden">
+          <div class="set-block">
+            <h4>🗂️ Thèmes <small class="muted">(plusieurs au choix)</small></h4>
+            <div class="cats" id="gp-themes"></div>
+          </div>
+          <div class="set-row">
+            <div class="set-block">
+              <h4>🔥 Difficulté</h4>
+              <div class="seg gseg" data-key="level"><button data-v="1">😎 Facile</button><button data-v="2">🤔 Moyen</button><button data-v="3">💀 Très dur</button></div>
+              <p class="muted small hint2">Facile : images connues, la pixellisation disparaît vite + indice. Moyen : plus pointu, l'image reste pixelisée. Très dur : images rares, gros zoom en noir et blanc, aucun indice.</p>
+            </div>
+            <div class="set-block">
+              <h4>🖼️ Images</h4>
+              <div class="seg gseg" data-key="rounds"><button data-v="5">5</button><button data-v="10">10</button><button data-v="15">15</button><button data-v="20">20</button></div>
+              <h4 style="margin-top:.8rem">⏱️ Temps par image</h4>
+              <div class="seg gseg" data-key="time"><button data-v="20">20 s</button><button data-v="30">30 s</button><button data-v="45">45 s</button></div>
+            </div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>Une image apparaît, brouillée. Tape ta réponse : le nom du dessin animé, du film, du pays… Pour les <b>pochettes d'album</b>, il faut l'<b>artiste ET l'album</b> (deux réponses séparées). Plus tu trouves vite, plus tu marques, +25 pts au premier qui trouve.</p>
+          </div>
+        </div>
+        <div id="set-liar" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block">
+              <h4>🤖 Robots au comptoir</h4>
+              <div class="seg gseg" data-key="bots"><button data-v="0">Aucun</button><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="5">Plein</button></div>
+              <p class="muted small hint2">Des robots bluffeurs complètent la table (6 places max). Seul, ajoute au moins 1 robot.</p>
+            </div>
+            <div class="set-block">
+              <h4>⏱️ Temps pour jouer</h4>
+              <div class="seg gseg" data-key="time"><button data-v="20">20 s</button><button data-v="30">30 s</button><button data-v="45">45 s</button></div>
+            </div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>Chaque manche, une <b>carte du tour</b> (Dame, Roi ou As). Pose <b>1 à 3 cartes face cachée</b> en prétendant que ce sont des cartes du tour — les <b>Jokers</b> valent tout. Le suivant te croit… ou crie <b>MENTEUR !</b>
+            Le perdant tente sa chance au <b>pistolet à bouchon</b> : 6 chambres, 1 seul bouchon, le risque monte à chaque tir. Dernier debout = gagnant.</p>
+          </div>
+        </div>
+        <div id="set-horses" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block">
+              <h4>Déplacements</h4>
+              <div class="seg gseg" data-key="mode"><button data-v="choice">🧠 Je choisis mon cheval</button><button data-v="auto">🎲 100 % hasard</button></div>
+              <p class="muted small hint2">Par défaut tu choisis quel cheval avancer. En 100 % hasard, le jeu le déplace tout seul.</p>
+            </div>
+            <div class="set-block">
+              <h4>Chevaux par joueur</h4>
+              <div class="seg gseg" data-key="horses"><button data-v="2">2 · rapide</button><button data-v="3">3</button><button data-v="4">4 · classique</button></div>
+            </div>
+          </div>
+          <div class="set-block">
+            <h4>Camps sur le plateau</h4>
+            <div class="seg gseg" data-key="seats"><button data-v="0">Juste nous</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div>
+            <p class="muted small hint2">🤖 Les places vides sont prises par des robots. Seul, tu joues toujours contre au moins un robot.</p>
+          </div>
+          <div class="set-block">
+            <h4>🪜 Rentrer au centre</h4>
+            <div class="seg gseg" data-key="ladder"><button data-v="false">🏁 Chiffre exact</button><button data-v="true">🪜 Échelle 1 → 6 puis 6</button></div>
+            <p class="muted small hint2">Échelle : tu t'arrêtes pile au pied de ton escalier, puis il faut faire <b>1</b>, puis <b>2</b>, <b>3</b>, <b>4</b>, <b>5</b>, <b>6</b> pour monter chaque marche, et encore un <b>6</b> pour rentrer. Plus long, plus de suspense (2 chevaux conseillés).</p>
+          </div>
+          <div class="set-block spicy-box">
+            <h4>🌶️ Pimenter la partie</h4>
+            <div class="spice-row"><span>✨ Cases spéciales</span><div class="seg gseg" data-key="specials"><button data-v="false">Non</button><button data-v="true">Oui</button></div></div>
+            <p class="muted small hint2">12 cases surprises posées au hasard : 🚀 turbo +3 · 🍌 peau de banane −3 · 🌀 2 portails reliés · 🛡️ bouclier anti-capture · 🎲 rejoue · 🕳️ trou (retour à l'écurie) · ⭐ +5 🪙.</p>
+            <div class="spice-row"><span>🚪 Sortir de l'écurie</span><div class="seg gseg" data-key="exit"><button data-v="6">Sur un 6</button><button data-v="16">Sur un 1 ou un 6</button></div></div>
+            <div class="spice-row"><span>🔁 Relances par joueur</span><div class="seg gseg" data-key="rerolls"><button data-v="0">0</button><button data-v="1">1</button><button data-v="3">3</button></div></div>
+            <p class="muted small hint2">Un lancer qui ne te plaît pas ? Tu peux relancer le dé (même quand aucun cheval ne peut bouger).</p>
+            <div class="spice-row"><span>💥 Manger un cheval fait rejouer</span><div class="seg gseg" data-key="capReplay"><button data-v="false">Non</button><button data-v="true">Oui</button></div></div>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>Il faut un <b>6</b> pour sortir un cheval de l'écurie, et un 6 fait <b>rejouer</b>. Tomber sur un adversaire le <b>renvoie à l'écurie</b> 💥
+            (sauf sur les cases ★ de départ, protégées). Après un tour du plateau, on remonte le couloir de sa couleur : il faut le <b>chiffre exact</b> pour arriver au centre.
+            Le premier qui rentre tous ses chevaux gagne !</p>
+            <p class="muted small">🪙 Pièces selon la durée de la partie (≈ 4 à 7 par minute), +2 par cheval rentré et par capture, gros bonus au vainqueur.
+            Pions, plateaux et animations de capture se trouvent dans la boutique.</p>
+          </div>
+        </div>
+
+        <!-- réglages Speed Word -->
+        <div id="set-word" class="settings gset hidden">
+          <div class="set-block">
+            <h4>Difficulté</h4>
+            <div class="seg gseg wd-levels" data-key="level">
+              <button data-v="1">🟢 Facile<small>9×9 · définitions simples</small></button>
+              <button data-v="2">🟡 Moyen<small>11×11 · définitions simples</small></button>
+              <button data-v="3">🟠 Difficile<small>12×12 · définitions corsées</small></button>
+              <button data-v="4">🔴 Expert<small>14×14 · définitions corsées</small></button>
+            </div>
+          </div>
+          <div class="set-block">
+            <h4>Indices</h4>
+            <div class="seg gseg" data-key="hints"><button data-v="true">💡 Avec indices</button><button data-v="false">🚫 Sans indices</button></div>
+            <p class="muted small hint2">Avec indices : les mots trouvés passent en vert et chacun peut révéler 3 lettres (−2 🪙 chacune). Sans indices : aucune aide jusqu'à la fin.</p>
+          </div>
+          <div class="set-block rules">
+            <h4>📜 Règles</h4>
+            <p>Une grille de <b>mots fléchés inédite</b> à chaque partie. Lis la définition dans la case colorée, la flèche indique le sens du mot (▶ ou ▼).
+            <b>Seul</b>, bats ton record. <b>À plusieurs</b>, tout le monde a la même grille : <b>le premier qui la termine gagne</b> !</p>
+            <p class="muted small">🪙 Grille finie : Facile 15 · Moyen 25 · Difficile 35 · Expert 50, +25 pour le vainqueur d'une course. Les autres gagnent selon leur % de lettres justes.</p>
+          </div>
+        </div>
+
+        <div id="settings" class="settings">
+          <div class="set-block">
+            <h4>Catégories <span class="muted" id="cat-count"></span></h4>
+            <p class="muted small hint">📺 Écrans, émissions et comédies musicales : on devine le nom de l'œuvre. Les autres : artiste et titre.</p>
+            <div class="cat-tools">
+              <button class="chip-btn" data-catsel="all">Tout</button>
+              <button class="chip-btn" data-catsel="none">Rien</button>
+              <button class="chip-btn" data-catsel="random">🎲 Surprise</button>
+            </div>
+            <div id="cats"></div>
+          </div>
+
+          <div class="set-row">
+            <div class="set-block">
+              <h4>Mode de réponse</h4>
+              <div class="seg" data-key="mode">
+                <button data-v="text">⌨️ Saisie libre</button>
+                <button data-v="qcm">🔘 QCM (4 choix)</button>
+              </div>
+            </div>
+            <div class="set-block" id="answer-block">
+              <h4>À deviner <span class="muted small">(catégories musique)</span></h4>
+              <div class="seg" data-key="answer">
+                <button data-v="both">Artiste + titre</button>
+                <button data-v="title">Titre</button>
+                <button data-v="artist">Artiste</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="set-row">
+            <div class="set-block">
+              <h4>Nombre d'extraits</h4>
+              <div class="seg" data-key="rounds">
+                <button data-v="5">5</button><button data-v="10">10</button><button data-v="15">15</button>
+                <button data-v="20">20</button><button data-v="30">30</button><button data-v="50">50</button>
+              </div>
+            </div>
+            <div class="set-block">
+              <h4>Durée d'écoute</h4>
+              <div class="seg" data-key="duration">
+                <button data-v="10">10 s</button><button data-v="15">15 s</button><button data-v="20">20 s</button>
+                <button data-v="25">25 s</button><button data-v="30">30 s</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="set-block">
+            <h4>Temps entre deux extraits</h4>
+            <div class="seg" data-key="pause">
+              <button data-v="3">3 s</button><button data-v="5">5 s</button><button data-v="8">8 s</button>
+              <button data-v="12">12 s</button><button data-v="0">✋ Manuel</button>
+            </div>
+            <p class="muted small hint">Après chaque réponse, on passe tout seul au morceau suivant. En « Manuel », l'hôte clique sur « Suivant ».</p>
+          </div>
+
+          <div class="set-block zizanie-block">
+            <h4>🃏 Mode Zizanie</h4>
+            <label class="tog"><input type="checkbox" data-key="funMode"><span></span> Activer le mode Zizanie <small>avant chaque extrait, chacun choisit une carte</small></label>
+            <p class="muted small hint">🎁 Bonus pour toi : première lettre, pendu, pochette floue, année, points ×2, bouclier…<br>
+            😈 Malus pour l'adversaire de ton choix : soundboard (buzzers, klaxons, canards), écran à l'envers, voix de chipmunk, gel, volume yo-yo, lunettes noires…</p>
+          </div>
+
+          <div class="set-block">
+            <h4>Bonus</h4>
+            <div class="toggles">
+              <label class="tog"><input type="checkbox" data-key="speedBonus"><span></span> ⚡ Points de vitesse <small>50 à 100 pts selon ta rapidité</small></label>
+              <label class="tog"><input type="checkbox" data-key="firstBonus"><span></span> 🥇 Premier qui trouve <small>+20 pts</small></label>
+              <label class="tog"><input type="checkbox" data-key="comboBonus"><span></span> 🎯 Combo artiste + titre <small>+50 pts</small></label>
+            </div>
+          </div>
+
+          <div class="set-block">
+            <h4>Playlist perso <span class="muted">(optionnel, Deezer ou Spotify)</span></h4>
+            <div class="join-row">
+              <input id="custom-link" class="input" placeholder="Lien de playlist Spotify ou Deezer…">
+              <button id="btn-check-pl" class="btn btn-yellow">Ajouter</button>
+            </div>
+            <p id="pl-status" class="muted small"></p>
+            <label class="tog hidden" id="custom-only-row"><input type="checkbox" data-key="customOnly"><span></span> Jouer uniquement ma playlist <small>ignore les catégories cochées</small></label>
+          </div>
+        </div>
+        <div class="lobby-foot">
+          <button id="btn-start" class="btn btn-primary btn-xl">▶ Lancer la partie</button>
+          <p id="wait-host" class="muted">En attente que l'hôte lance la partie…</p>
+          <button class="btn btn-shop open-shop" type="button">🎨 Personnaliser mon avatar en attendant</button>
+        </div>
+      </div>
+
+      <!-- UNDERCOVER -->
+      <div id="v-uc" class="view"></div>
+      <!-- JEU DE LA NOTE -->
+      <div id="v-note" class="view"></div>
+
+      <!-- PETITS CHEVAUX -->
+      <div id="v-horses" class="view"></div>
+      <div id="v-liar" class="view"></div>
+      <div id="v-guess" class="view"></div>
+      <div id="v-primo" class="view"></div>
+      <div id="v-draw" class="view"></div>
+      <div id="v-sem" class="view"></div>
+      <div id="v-bac" class="view"></div>
+      <div id="v-bluff" class="view"></div>
+      <div id="v-punch" class="view"></div>
+      <!-- SPEED WORD -->
+      <div id="v-word" class="view"></div>
+
+      <!-- CHARGEMENT -->
+      <div id="v-loading" class="view center">
+        <div class="vinyl spin"><div class="label">PZ</div></div>
+        <h2>On fouille les bacs à disques…</h2>
+        <p class="muted">Préparation des extraits</p>
+      </div>
+
+      <!-- ZIZANIE : choix des cartes -->
+      <div id="v-powers" class="view center">
+        <div class="round-head wide">
+          <span class="pill big" id="pw-num">1 / 15</span>
+          <button id="btn-skip-pw" class="btn btn-ghost btn-sm host-only">⏭ Lancer l'extrait</button>
+        </div>
+        <h2 class="pw-title">🃏 Zizanie ! Choisis ta carte</h2>
+        <div class="timer pw-timer"><div id="pw-bar"></div></div>
+        <div id="pw-cards" class="pw-cards"></div>
+        <div id="pw-targets" class="pw-targets hidden"></div>
+        <p id="pw-status" class="pw-status"></p>
+        <button id="btn-pw-none" class="btn btn-ghost btn-sm">Je ne joue pas de carte</button>
+      </div>
+
+      <!-- MANCHE -->
+      <div id="v-play" class="view">
+        <div class="round-head">
+          <span class="pill big" id="round-num">1 / 15</span>
+          <span class="pill" id="round-cat"></span>
+          <button id="btn-skip" class="btn btn-ghost btn-sm host-only">⏭ Passer</button>
+          <button id="btn-stop" class="btn btn-ghost btn-sm host-only">⏹ Arrêter</button>
+        </div>
+        <div class="player-visual">
+          <div class="countdown" id="countdown">3</div>
+          <div class="vinyl spin" id="play-vinyl"><div class="label">?</div></div>
+          <div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="timer"><div id="timer-bar"></div></div>
+          <div class="time-left" id="time-left"></div>
+          <button id="btn-unmute" class="btn btn-yellow hidden">🔊 Activer le son</button>
+        </div>
+        <div id="fx-area" class="fx-area"></div>
+
+        <div id="text-answer">
+          <div class="found-badges">
+            <span id="b-artist" class="badge">🎤 Artiste</span>
+            <span id="b-title" class="badge">🎵 Titre</span>
+          </div>
+          <form id="guess-form" class="guess-row">
+            <input id="guess" class="input big" autocomplete="off" placeholder="Artiste ou titre… (Entrée pour valider)">
+            <button class="btn btn-primary">OK</button>
+          </form>
+          <p id="guess-feedback" class="feedback"></p>
+        </div>
+        <div id="qcm-answer" class="qcm"></div>
+      </div>
+
+      <!-- RÉVÉLATION -->
+      <div id="v-reveal" class="view center">
+        <div class="reveal-card">
+          <img id="rv-cover" alt="">
+          <div>
+            <div class="muted small">C'était…</div>
+            <h2 id="rv-title"></h2>
+            <h3 id="rv-artist"></h3>
+            <div id="rv-sub" class="rv-sub"></div>
+            <div id="rv-note" class="rv-note"></div>
+            <a id="rv-link" target="_blank" rel="noopener" class="muted small">Écouter sur Deezer ↗</a>
+          </div>
+        </div>
+        <ul id="rv-results" class="rv-results"></ul>
+        <div class="next-bar" id="next-wrap"><div id="next-bar"></div></div>
+        <div class="rv-actions">
+          <button id="btn-next" class="btn btn-primary hidden">Suivant ▶</button>
+          <button id="btn-ban" class="btn btn-ghost btn-sm host-only" title="Reprise, version piano, mauvais morceau…">🚫 Mauvaise version</button>
+        </div>
+        <p id="wait-next" class="muted hidden">L'hôte passe au morceau suivant quand tout le monde est prêt…</p>
+      </div>
+
+      <!-- FIN -->
+      <div id="v-end" class="view center">
+        <h2 class="end-title">🏆 Classement final</h2>
+        <div id="earned" class="earned hidden"></div>
+        <div class="podium" id="podium"></div>
+        <ol id="final-list" class="final-list"></ol>
+        <details class="history"><summary>📜 Revoir les morceaux</summary><ol id="history"></ol></details>
+        <div class="end-actions">
+          <button id="btn-replay" class="btn btn-primary host-only">🔁 Rejouer</button>
+          <button id="btn-lobby" class="btn btn-yellow host-only">⚙️ Changer les réglages</button>
+          <p class="muted guest-only">L'hôte peut relancer une partie.</p>
+          <button class="btn btn-shop open-shop" type="button">🛍️ Dépenser mes pièces</button>
+        </div>
+      </div>
+    </main>
+
+    <aside class="chat-panel card" id="chat-panel">
+      <h3>Chat</h3>
+      <ul id="chat" class="chat"></ul>
+      <div class="reacts" id="reacts"></div>
+      <form id="chat-form" class="chat-form">
+        <input id="chat-input" class="input" maxlength="200" placeholder="Message…" autocomplete="off">
+        <button class="btn btn-yellow btn-sm">➤</button>
+      </form>
+    </aside>
+  </div>
+</section>
+
+<!-- ───────── CADEAU (10 min) & COFFRE (1 h) ───────── -->
+<div id="rewards" class="rewards">
+  <button class="rw rw-wheel" id="rw-wheel"><span class="rw-ico"><span class="mini-wheel"></span></span><span class="rw-txt"><b>Roue</b><small>🪙 200</small></span></button>
+  <button class="rw rw-gift" id="rw-gift"><span class="rw-ico"><span class="mini-gift"><i></i></span></span><span class="rw-txt"><b>Cadeau</b><small id="rw-gift-t">…</small></span></button>
+  <button class="rw rw-chest" id="rw-chest"><span class="rw-ico"><span class="mini-chest"><i></i></span></span><span class="rw-txt"><b>Coffre</b><small id="rw-chest-t">…</small></span></button>
+</div>
+<div id="opener" class="opener hidden">
+  <div class="op-rays"></div>
+  <div class="op-stage">
+    <p class="op-title" id="op-title">Touche pour ouvrir !</p>
+    <div class="op-box" id="op-box">
+      <div class="gift3d"><div class="gf-lid"><span class="gf-bow">🎀</span></div><div class="gf-body"></div></div>
+      <div class="chest3d"><div class="c-lid"></div><div class="c-body"><span class="c-lock"></span></div><div class="c-glow"></div></div>
+    </div>
+    <p class="op-amount" id="op-amount"></p>
+    <button class="btn btn-primary hidden" id="op-close">Super ! 🤑</button>
+  </div>
+</div>
+
+<!-- ───────── BOUTIQUE ───────── -->
+<div id="shop" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>🛍️ <span class="shop-title">BOUTIQUE</span></h2>
+      <div class="wallet big"><span>🪙</span><b class="coins-n">0</b></div>
+      <button id="shop-close" class="btn btn-ghost btn-sm">✕</button>
+    </div>
+    <div class="shop-preview">
+      <span id="sp-avatar"></span>
+      <div><div id="sp-name" class="pv-name">Ton pseudo</div><div id="sp-title" class="pv-title"></div></div>
+    </div>
+    <div class="tabs" id="shop-tabs">
+      <button data-tab="icons" class="on">Icônes</button>
+      <button data-tab="colors">Couleurs</button>
+      <button data-tab="frames">Cadres</button>
+      <button data-tab="nameFx">Effets de pseudo</button>
+      <button data-tab="titles">Titres</button>
+      <button data-tab="winFx">Effet de victoire</button>
+      <button data-tab="wheel" class="tab-wheel">🎡 Roue</button>
+      <button data-tab="pawns">🐎 Pions</button>
+      <button data-tab="boards">🎲 Plateaux</button>
+      <button data-tab="pcfx">💥 Animations chevaux</button>
+      <button data-tab="cardbacks">🃏 Dos de cartes</button>
+      <button data-tab="save">💾 Sauvegarde</button>
+    </div>
+    <div id="shop-body" class="shop-body"></div>
+  </div>
+</div>
+
+<script src="/shop.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/app.js"></script>
+<script src="/client-undercover.js"></script>
+<script src="/client-note.js"></script>
+<script src="/client-word.js"></script>
+<script src="/client-horses.js"></script>
+<script src="/client-liar.js"></script>
+<script src="/client-guess.js"></script>
+<script src="/client-primo.js"></script>
+<script src="/client-draw.js"></script>
+<script src="/client-sem.js"></script>
+<script src="/client-bac.js"></script>
+<script src="/client-bluff.js"></script>
+<script src="/client-punch.js"></script>
+</body>
+</html>

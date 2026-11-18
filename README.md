@@ -46,6 +46,26 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Le menteur démasqué (ou l'accusateur qui s'est trompé) tire au **pistolet à bouchon** : 6 chambres, un seul bouchon, le risque monte à chaque tir. Dernier debout = gagnant.
 - Options : robots bluffeurs (0 à 5), temps de jeu 20/30/45 s. Pièces : manches survécues, bonnes dénonciations, bluffs réussis, bonus vainqueur.
 
+### 🌡️ Ça chauffe ! (1 à 12 joueurs)
+- Trouve le **mot secret** : chaque proposition donne une **température** (°C) selon sa proximité de sens, et un score sur 1000 (‰) quand tu es dans les 1000 mots les plus proches. Tout le monde cherche le **même mot** en même temps, le premier qui trouve gagne la manche et on passe au suivant.
+- Mots secrets **faciles** (objets, animaux, nourriture…), 1 / 3 / 5 / 10 mots ou **à l'infini**. Indices automatiques (1re lettre à 2 min, longueur à 4 min) désactivables. Abandon d'un mot à la majorité.
+- Fichiers nécessaires : `sem-vectors.bin` (15 Mo) + `sem-words.txt` (vocabulaire de 50 000 mots).
+
+### 📋 Petit Bac (1 à 12 joueurs)
+- Une lettre tirée au sort, une grille de catégories **classiques**, **fun** (« Une excuse pour être en retard », « Un truc qui pue », « Un super-pouvoir nul »…) ou **mélange**. Le premier qui a tout rempli crie **STOP** (+5 si tout est validé).
+- Puis on vérifie : clique sur une réponse pour la contester ; elle tombe si la majorité vote contre. Réponse unique 10 pts, partagée 5 pts.
+
+### 🎭 Le Bluff (2 à 10 joueurs)
+- Une anecdote vraie avec un trou. Chacun **invente** une fausse réponse crédible, puis tout le monde doit retrouver **la vraie** parmi les bluffs.
+- +100 si tu trouves la vérité, +50 par joueur piégé par ton bluff, dernière anecdote ×2.
+
+### 🎤 Punchline (3 à 10 joueurs)
+- Chacun reçoit 2 sujets absurdes et écrit la réponse la plus drôle. Les réponses s'affrontent en **duel**, les autres votent. Tous les votes = **PUNCHLINE !** (+250).
+- Dernière manche « le mot de la fin » : même sujet pour tout le monde, points ×3.
+
+### 🃏 Dos de cartes (boutique)
+- 12 dos de cartes (du classique au holographique) pour **PRIMO** et le **Bar des Menteurs**, achetables ou à gagner à la roue.
+
 ### 🐎 Petits chevaux (1 à 4 joueurs)
 - Règles classiques, 100 % hasard : un **6 pour sortir** un cheval, un 6 fait rejouer, on **renvoie à l'écurie** le cheval adverse sur lequel on s'arrête, les cases ★ de départ sont protégées, arrivée au chiffre exact.
 - Les places vides sont prises par des **robots**. Options : nombre de chevaux (2/3/4), nombre de camps, *Tu choisis ton cheval* (par défaut) ou *100 % hasard*.
