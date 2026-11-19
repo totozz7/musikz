@@ -190,6 +190,22 @@
           </div>
           <div class="set-block rules"><h4>📜 Règles</h4><p>Une anecdote <b>vraie</b> s'affiche avec un trou. Invente une fausse réponse crédible. Ensuite, retrouve la vraie parmi tous les bluffs : <b>+100</b> si tu trouves, <b>+50</b> par joueur piégé par ton bluff. Dernière anecdote : points doublés !</p></div>
         </div>
+        <div id="set-quiz" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block"><h4>❓ Questions</h4><div class="seg gseg" data-key="count"><button data-v="10">10</button><button data-v="15">15</button><button data-v="20">20</button><button data-v="30">30</button></div></div>
+            <div class="set-block"><h4>⏱️ Temps par question</h4><div class="seg gseg" data-key="time"><button data-v="10">10 s</button><button data-v="15">15 s</button><button data-v="20">20 s</button></div></div>
+          </div>
+          <div class="set-block"><h4>🗂️ Thèmes <small class="muted">(coche ceux que tu veux)</small></h4><div class="qz-togs"><label class="tog qz-tog"><input type="checkbox" class="gtog" data-key="t_culture"><span></span> 🧠 Culture G</label><label class="tog qz-tog"><input type="checkbox" class="gtog" data-key="t_sport"><span></span> ⚽ Sport</label><label class="tog qz-tog"><input type="checkbox" class="gtog" data-key="t_manga"><span></span> 🍥 Manga & anime</label><label class="tog qz-tog"><input type="checkbox" class="gtog" data-key="t_cine"><span></span> 🎬 Cinéma & séries</label><label class="tog qz-tog"><input type="checkbox" class="gtog" data-key="t_musique"><span></span> 🎵 Musique</label><label class="tog qz-tog"><input type="checkbox" class="gtog" data-key="t_geo"><span></span> 🌍 Géographie</label><label class="tog qz-tog"><input type="checkbox" class="gtog" data-key="t_histoire"><span></span> 🏰 Histoire</label><label class="tog qz-tog"><input type="checkbox" class="gtog" data-key="t_sciences"><span></span> 🔬 Sciences</label><label class="tog qz-tog"><input type="checkbox" class="gtog" data-key="t_jv"><span></span> 🎮 Jeux vidéo</label><label class="tog qz-tog"><input type="checkbox" class="gtog" data-key="t_nature"><span></span> 🦁 Animaux & nature</label><label class="tog qz-tog"><input type="checkbox" class="gtog" data-key="t_rare"><span></span> 🦄 La moins répondue</label></div></div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>4 choix, une seule bonne réponse : <b>500 à 1 000 pts</b> selon ta vitesse, + bonus de série à partir de 3 bonnes réponses d'affilée. <b>🦄 La moins répondue</b> (une question sur 5) : écris une bonne réponse… que les autres n'ont PAS donnée ! La bonne réponse la plus rare rapporte 1 000 pts, une bonne réponse « banale » 300.</p></div>
+        </div>
+        <div id="set-n25" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block"><h4>🎚️ Difficulté</h4><div class="seg gseg" data-key="mode"><button data-v="easy">😊 Facile</button><button data-v="medium">🧐 Moyen</button><button data-v="mix">🎲 Mélange</button></div></div>
+            <div class="set-block"><h4>⏱️ Temps</h4><div class="seg gseg" data-key="time"><button data-v="5">5 min</button><button data-v="8">8 min</button><button data-v="12">12 min</button></div></div>
+            <div class="set-block"><h4>🔍 Vérifications</h4><div class="seg gseg" data-key="checks"><button data-v="0">0</button><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button></div></div>
+          </div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>25 questions dans le désordre, et leurs réponses sont <b>tous les nombres de 1 à 25, chacun une seule fois</b>. Clique une question puis une boule (ou l'inverse) pour la placer. Tu n'es pas sûr ? Remplis d'abord ce que tu sais : les nombres qui restent t'aideront à deviner le reste. Une <b>vérification</b> te dit combien tu en as de justes (sans dire lesquelles). Valide quand tu as fini : le plus de bonnes réponses gagne, puis le plus rapide.</p></div>
+        </div>
         <div id="set-top7" class="settings gset hidden">
           <div class="set-row">
             <div class="set-block"><h4>🗂️ Thèmes</h4><div class="seg gseg" data-key="rounds"><button data-v="3">3</button><button data-v="5">5</button><button data-v="8">8</button><button data-v="12">12</button></div></div>
@@ -466,6 +482,8 @@
       <div id="v-bluff" class="view"></div>
       <div id="v-punch" class="view"></div>
       <div id="v-top7" class="view"></div>
+      <div id="v-quiz" class="view"></div>
+      <div id="v-n25" class="view"></div>
       <!-- SPEED WORD -->
       <div id="v-word" class="view"></div>
 
@@ -637,5 +655,7 @@
 <script src="/client-bluff.js"></script>
 <script src="/client-punch.js"></script>
 <script src="/client-top7.js"></script>
+<script src="/client-quiz.js"></script>
+<script src="/client-n25.js"></script>
 </body>
 </html>

@@ -52,6 +52,17 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Mots secrets **faciles** (objets, animaux, nourriture…), 1 / 3 / 5 / 10 mots ou **à l'infini**. Indices & bonus, tous cochés par défaut et décochables dans le salon : 🔤 1re lettre (1 min), 🧭 mots voisins (1 min 30, 3 min, 4 min 30), 📏 nombre de lettres (2 min), 🔚 dernière lettre (3 min 30), 🎯 coup de pouce (2 par mot, un mot plus proche que ton meilleur), 🕵️ espion (1 par mot, le meilleur mot du joueur le plus chaud). Abandon d'un mot à la majorité.
 - Fichiers nécessaires : `sem-vectors.bin` (15 Mo) + `sem-words.txt` (vocabulaire de 50 000 mots).
 
+### ❓ Quiz (1 à 12 joueurs)
+- 10 thèmes au choix (Culture G, Sport, Manga & anime, Cinéma & séries, Musique, Géographie, Histoire, Sciences, Jeux vidéo, Animaux & nature), ~220 questions à 4 choix dans `data-quiz.js`.
+- Bonne réponse = 500 à 1 000 pts selon la vitesse, + bonus de série (🔥 dès 3 d'affilée). Classement animé après chaque question.
+- **🦄 La moins répondue** (une question sur 5 si le thème est coché) : question ouverte (« Cite un pays d'Afrique »…), la bonne réponse donnée par le moins de joueurs rapporte 1 000 pts, une bonne réponse « banale » 300. 18 questions, réponses acceptées avec fautes de frappe.
+- Réglages : 10 / 15 / 20 / 30 questions, 10 / 15 / 20 s par question.
+
+### 🎯 25 Pile ! (1 à 12 joueurs)
+- 25 questions dans le désordre ; leurs réponses sont **tous les nombres de 1 à 25, chacun une seule fois**. On place des boules numérotées sur les questions (la déduction aide pour les dernières).
+- Modes 😊 facile, 🧐 moyen, 🎲 mélange (une question tirée au hasard par nombre dans `data-25.js`), 5 / 8 / 12 min, 0 à 3 vérifications (« X bonnes réponses sur Y », sans dire lesquelles).
+- Le plus de bonnes réponses gagne, puis le plus rapide à valider.
+
 ### 7️⃣ Top 7 (1 à 10 joueurs)
 - Un thème (« les sports préférés des Français », « ce qu'on achète à la boulangerie »…) et ses **7 réponses les plus citées**, cachées sur un plateau télé. 83 thèmes dans `data-top7.js` (classements estimés, modifiables).
 - Chacun son tour, on propose une réponse : la n°1 (la plus évidente) vaut **1 point**… la n°7 (la plus rare) **7 points**. Raté, trop tard ou déjà trouvée = 0.
