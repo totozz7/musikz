@@ -2834,3 +2834,13 @@ body.pr-clown .avi:after{content:"🤡";font-size:calc(var(--s,36px) * .62)}
 .nz-room.over .nz-side{display:none}
 .nz-room.over .nz-main{grid-template-columns:1fr}
 .nz-endc{background:#06252dee;border-color:#ffd84d}
+/* Quiz — choix des thèmes */
+#set-quiz .qz-grp{margin:.5rem 0 .8rem}
+#set-quiz .qz-gh{display:flex;align-items:center;gap:.45rem;margin-bottom:.45rem;flex-wrap:wrap}
+#set-quiz .qz-gh b{margin-right:.3rem}
+#set-quiz .qz-bulk{background:#ffffff10;border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:.15rem .7rem;font-size:.78rem;font-weight:700;cursor:pointer}
+#set-quiz .qz-bulk:hover{color:var(--text);border-color:#ff4fd8}
+#set-quiz .qz-cats{display:flex;flex-wrap:wrap;gap:.4rem}
+#set-quiz .qz-cats .cat{font-size:.86rem;padding:.35rem .65rem}
+#set-quiz .qz-cats .cat.on{background:linear-gradient(135deg,#ff4fd855,#7c4dff55);border-color:#ff4fd8;box-shadow:0 0 12px #ff4fd855}
+#set-quiz .qz-raretog{margin-top:.3rem}

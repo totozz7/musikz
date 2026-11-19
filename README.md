@@ -53,12 +53,13 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Fichiers nécessaires : `sem-vectors.bin` (15 Mo) + `sem-words.txt` (vocabulaire de 50 000 mots).
 
 ### ❓ Quiz (1 à 12 joueurs)
-- 10 thèmes au choix (Culture G, Sport, Manga & anime, Cinéma & séries, Musique, Géographie, Histoire, Sciences, Jeux vidéo, Animaux & nature), ~220 questions à 4 choix dans `data-quiz.js`.
+- 40 thèmes, ~3 800 questions à 4 choix : 10 généraux (Culture G, Sport, Manga, Cinéma, Musique, Géo, Histoire, Sciences, Jeux vidéo, Nature) dans `data-quiz.js` + 30 sous-thèmes (Star Wars, Harry Potter, Pokémon, Football, F1, La France, Rap français, GTA, Minecraft…) dans `data-quiz2.js` et `data-quiz3.js`. Une ligne = `Question|Bonne réponse|Faux 1|Faux 2|Faux 3`, facile à corriger.
+- Les questions sont tirées à tour de rôle dans les thèmes cochés (pas de doublon dans une partie).
 - Bonne réponse = 500 à 1 000 pts selon la vitesse, + bonus de série (🔥 dès 3 d'affilée). Classement animé après chaque question.
 - **🦄 La moins répondue** (une question sur 5 si le thème est coché) : question ouverte (« Cite un pays d'Afrique »…), la bonne réponse donnée par le moins de joueurs rapporte 1 000 pts, une bonne réponse « banale » 300. 18 questions, réponses acceptées avec fautes de frappe.
 - Réglages : 10 / 15 / 20 / 30 questions, 10 / 15 / 20 s par question.
 
-### 🎯 25 Pile ! (1 à 12 joueurs)
+### 🎯 25 Pile (1 à 12 joueurs)
 - 25 questions dans le désordre ; leurs réponses sont **tous les nombres de 1 à 25, chacun une seule fois**. On place des boules numérotées sur les questions (la déduction aide pour les dernières).
 - Modes 😊 facile, 🧐 moyen, 🎲 mélange (une question tirée au hasard par nombre dans `data-25.js`), 5 / 8 / 12 min, 0 à 3 vérifications (« X bonnes réponses sur Y », sans dire lesquelles).
 - Le plus de bonnes réponses gagne, puis le plus rapide à valider.

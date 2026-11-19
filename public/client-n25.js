@@ -1,4 +1,4 @@
-// PLAYZUP — client « 25 PILE ! » : 25 questions, 25 boules numérotées, chacune sert une fois.
+// PLAYZUP — client « 25 PILE » : 25 questions, 25 boules numérotées, chacune sert une fois.
 (function () {
   const P = (id) => state?.players.find(p => p.id === id);
   let V = null, key = null, selQ = null, selN = null, timerIv = null, revealed = false;
@@ -8,7 +8,7 @@
     $('#v-n25').innerHTML = `
       <div class="nz-room" id="nz-room">
         <header class="nz-top">
-          <div class="nz-logo"><span class="nz-b">25</span><b>PILE !</b></div>
+          <div class="nz-logo"><span class="nz-b">25</span><b>PILE</b></div>
           <div class="nz-meta"><span class="nz-chip" id="nz-mode"></span><span class="nz-clock" id="nz-clock">⏱️ <b id="nz-time"></b></span></div>
         </header>
         <div class="nz-race" id="nz-race"></div>

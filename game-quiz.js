@@ -5,7 +5,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
   const id = 'quiz';
   const MIN = 1, MAX = 12;
   const TK = Object.keys(THEMES);
-  const defaults = () => ({ count: 15, time: 15, ...Object.fromEntries(TK.map(k => ['t_' + k, true])), t_rare: true });
+  const defaults = () => ({ count: 15, time: 15, ...Object.fromEntries(TK.map(k => ['t_' + k, THEMES[k].cat === 'gen'])), t_rare: true });
   function applySettings(room, p) {
     const s = room.gs.quiz;
     if ([10, 15, 20, 30].includes(+p.count)) s.count = +p.count;
@@ -36,7 +36,19 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
 
   function build(s) {
     const themes = TK.filter(k => s['t_' + k]);
-    const pool = shuffle(themes.flatMap(k => THEMES[k].q.map(q => ({ type: 'mcq', theme: k, q }))));
+    // tirage équilibré : on fait tourner les thèmes cochés (mélangés), une question à chaque fois, sans doublon
+    const bags = Object.fromEntries(themes.map(k => [k, shuffle(THEMES[k].q.slice())]));
+    const seen = new Set(), pool = [];
+    let order = shuffle(themes.slice());
+    while (pool.length < s.count && order.length) {
+      for (const k of order) {
+        let q = bags[k].pop();
+        while (q && seen.has(q[0].toLowerCase())) q = bags[k].pop();
+        if (q) { seen.add(q[0].toLowerCase()); pool.push({ type: 'mcq', theme: k, q }); }
+      }
+      order = shuffle(order.filter(k => bags[k].length));
+    }
+    pool.reverse();
     const rares = shuffle(RARE.slice());
     const out = [];
     for (let i = 1; i <= s.count; i++) {

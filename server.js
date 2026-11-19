@@ -860,7 +860,7 @@ io.on('connection', (socket) => {
   socket.on('setGame', (game) => {
     if (!isHost() || !['lobby', 'end'].includes(room.phase) || !GAME_INFO[game]) return;
     room.game = game; room.phase = 'lobby'; stopModuleGame(room);
-    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time', bac: '📋 Petit Bac', bluff: '🎭 Le Bluff', punch: '🎤 Punchline', sem: '🌡️ Ça chauffe !', top7: '7️⃣ Top 7', quiz: '❓ Quiz', n25: '🎯 25 Pile !' }[game]}`);
+    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time', bac: '📋 Petit Bac', bluff: '🎭 Le Bluff', punch: '🎤 Punchline', sem: '🌡️ Ça chauffe !', top7: '7️⃣ Top 7', quiz: '❓ Quiz', n25: '🎯 25 Pile' }[game]}`);
     broadcast(room);
   });
   socket.on('gsettings', (patch = {}) => {

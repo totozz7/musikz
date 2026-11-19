@@ -1,3 +1,45 @@
+const QZ_THEMES = [
+  {"id": "culture", "name": "Culture G", "emoji": "🧠", "n": 102, "cat": "gen"},
+  {"id": "sport", "name": "Sport", "emoji": "🏅", "n": 101, "cat": "gen"},
+  {"id": "manga", "name": "Manga & anime", "emoji": "🍥", "n": 100, "cat": "gen"},
+  {"id": "cine", "name": "Cinéma & séries", "emoji": "🎬", "n": 99, "cat": "gen"},
+  {"id": "musique", "name": "Musique", "emoji": "🎵", "n": 98, "cat": "gen"},
+  {"id": "geo", "name": "Géographie", "emoji": "🌍", "n": 100, "cat": "gen"},
+  {"id": "histoire", "name": "Histoire", "emoji": "🏰", "n": 99, "cat": "gen"},
+  {"id": "sciences", "name": "Sciences", "emoji": "🔬", "n": 99, "cat": "gen"},
+  {"id": "jv", "name": "Jeux vidéo", "emoji": "🎮", "n": 99, "cat": "gen"},
+  {"id": "nature", "name": "Animaux & nature", "emoji": "🦁", "n": 99, "cat": "gen"},
+  {"id": "starwars", "name": "Star Wars", "emoji": "⚔️", "n": 96, "cat": "sub"},
+  {"id": "hp", "name": "Harry Potter", "emoji": "🪄", "n": 98, "cat": "sub"},
+  {"id": "marvel", "name": "Marvel", "emoji": "🦸", "n": 96, "cat": "sub"},
+  {"id": "disney", "name": "Disney & Pixar", "emoji": "✨", "n": 96, "cat": "sub"},
+  {"id": "onepiece", "name": "One Piece", "emoji": "🏴‍☠️", "n": 94, "cat": "sub"},
+  {"id": "naruto", "name": "Naruto", "emoji": "🍜", "n": 95, "cat": "sub"},
+  {"id": "dbz", "name": "Dragon Ball", "emoji": "🐉", "n": 94, "cat": "sub"},
+  {"id": "pokemon", "name": "Pokémon", "emoji": "⚡", "n": 93, "cat": "sub"},
+  {"id": "nintendo", "name": "Mario & Nintendo", "emoji": "🍄", "n": 96, "cat": "sub"},
+  {"id": "minecraft", "name": "Minecraft", "emoji": "⛏️", "n": 90, "cat": "sub"},
+  {"id": "gta", "name": "GTA", "emoji": "🚓", "n": 97, "cat": "sub"},
+  {"id": "foot", "name": "Football", "emoji": "🥅", "n": 95, "cat": "sub"},
+  {"id": "f1", "name": "Formule 1", "emoji": "🏎️", "n": 92, "cat": "sub"},
+  {"id": "nba", "name": "Basket & NBA", "emoji": "🏀", "n": 94, "cat": "sub"},
+  {"id": "tennis", "name": "Tennis", "emoji": "🎾", "n": 91, "cat": "sub"},
+  {"id": "jo", "name": "Jeux olympiques", "emoji": "🥇", "n": 89, "cat": "sub"},
+  {"id": "france", "name": "La France", "emoji": "🥖", "n": 96, "cat": "sub"},
+  {"id": "capitales", "name": "Capitales du monde", "emoji": "🏙️", "n": 93, "cat": "sub"},
+  {"id": "series", "name": "Séries TV", "emoji": "📺", "n": 96, "cat": "sub"},
+  {"id": "cinefr", "name": "Cinéma français", "emoji": "🎞️", "n": 95, "cat": "sub"},
+  {"id": "dessins", "name": "Dessins animés", "emoji": "🧸", "n": 95, "cat": "sub"},
+  {"id": "rapfr", "name": "Rap français", "emoji": "🎤", "n": 94, "cat": "sub"},
+  {"id": "annees80", "name": "Tubes 80-90", "emoji": "📼", "n": 95, "cat": "sub"},
+  {"id": "espace", "name": "Espace", "emoji": "🚀", "n": 92, "cat": "sub"},
+  {"id": "corps", "name": "Corps humain", "emoji": "🫀", "n": 93, "cat": "sub"},
+  {"id": "mytho", "name": "Mythologie", "emoji": "🔱", "n": 96, "cat": "sub"},
+  {"id": "langue", "name": "Langue française", "emoji": "📝", "n": 93, "cat": "sub"},
+  {"id": "cuisine", "name": "Cuisine du monde", "emoji": "🍳", "n": 90, "cat": "sub"},
+  {"id": "internet", "name": "Internet & réseaux", "emoji": "📱", "n": 96, "cat": "sub"},
+  {"id": "sda", "name": "Seigneur des anneaux", "emoji": "💍", "n": 95, "cat": "sub"}
+];
 // PLAYZUP — client (accueil, boutique, salon, Blind test). Undercover et Note : client-undercover.js / client-note.js
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
@@ -211,7 +253,7 @@ const GAME_META = {
   bac: { emoji: '📋', name: 'Petit Bac', desc: 'Une lettre, des catégories classiques ou complètement fun… Remplis tout et crie STOP ! Puis on démonte les réponses des autres.', cls: 'g-bac', lobby: 'Tous à vos stylos ! ✍️' },
   bluff: { emoji: '🎭', name: 'Le Bluff', desc: 'Une anecdote vraie à trou : invente une fausse réponse crédible pour piéger tes potes… et retrouve la vraie !', cls: 'g-bluff', lobby: 'Que le meilleur menteur gagne 😏' },
   quiz: { emoji: '❓', name: 'Quiz', desc: 'Culture G, sport, manga, ciné… 4 choix, réponds vite ! Et des manches « La moins répondue » où il faut la bonne réponse que personne d\'autre n\'a donnée.', cls: 'g-quiz', lobby: 'Buzzers prêts ! ❓' },
-  n25: { emoji: '🎯', name: '25 Pile !', desc: '25 questions dans le désordre, et les réponses sont tous les nombres de 1 à 25, chacun une seule fois. Place les boules, déduis, et vise le 25/25 !', cls: 'g-n25', lobby: 'Boules chargées ! 🎯' },
+  n25: { emoji: '🎯', name: '25 Pile', desc: '25 questions dans le désordre, et les réponses sont tous les nombres de 1 à 25, chacun une seule fois. Place les boules, déduis, et vise le 25/25 !', cls: 'g-n25', lobby: 'Boules chargées ! 🎯' },
   top7: { emoji: '7️⃣', name: 'Top 7', desc: 'Les 7 réponses préférées des gens sur un thème. Chacun son tour : plus ta réponse est rare dans le top, plus elle rapporte (n°7 = 7 pts) !', cls: 'g-top7', lobby: 'Plateau prêt ! 7️⃣' },
   punch: { emoji: '🎤', name: 'Punchline', desc: 'Réponds aux sujets de la façon la plus drôle possible. Duel de vannes, les autres votent. 100 % des votes = PUNCHLINE !', cls: 'g-punch', lobby: 'Micro ouvert ! 🎤' },
   draw: { emoji: '🎨', name: 'Draw Time', desc: "Un joueur dessine, les autres devinent ! Des mots classiques, marrants… ou un peu pimentés 🌶️", cls: 'g-draw', lobby: 'Sortez les crayons ! ✏️' },
@@ -352,7 +394,7 @@ function renderGameLobby() {
   $('#set-primo').classList.toggle('hidden', g !== 'primo');
   $('#set-draw').classList.toggle('hidden', g !== 'draw');
   ['bac', 'bluff', 'punch', 'sem', 'top7', 'quiz', 'n25'].forEach(k => $('#set-' + k).classList.toggle('hidden', g !== k));
-  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO', draw: 'Draw Time', bac: 'le Petit Bac', bluff: 'le Bluff', punch: 'Punchline', sem: 'Ça chauffe', top7: 'le Top 7', quiz: 'le Quiz', n25: '25 Pile !' }[g]}`;
+  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO', draw: 'Draw Time', bac: 'le Petit Bac', bluff: 'le Bluff', punch: 'Punchline', sem: 'Ça chauffe', top7: 'le Top 7', quiz: 'le Quiz', n25: '25 Pile' }[g]}`;
   $('#btn-start').disabled = !ok;
   if (g === 'blindtest') return;
   const box = $('#set-' + g), gs = state.gs?.[g] || {};
@@ -361,6 +403,16 @@ function renderGameLobby() {
     $('#uc-themes').innerHTML = [{ id: 'all', emoji: '🎲', name: 'Tout mélangé' }, ...UC_THEMES].map(t =>
       `<button class="cat ${gs.theme === t.id ? 'on' : ''} ${t.id === 'anime' ? 'star' : ''}" data-t="${t.id}">${t.emoji} ${esc(t.name)}</button>`).join('');
     $$('#uc-themes .cat').forEach(b => b.onclick = () => socket.emit('gsettings', { theme: b.dataset.t }));
+  }
+  if (g === 'quiz') {
+    const keyOn = (t) => !!gs['t_' + t.id];
+    ['gen', 'sub'].forEach(c => {
+      $('#qz-' + c).innerHTML = QZ_THEMES.filter(t => t.cat === c).map(t => `<button class="cat ${keyOn(t) ? 'on' : ''}" data-t="${t.id}">${t.emoji} ${esc(t.name)}</button>`).join('');
+    });
+    const nOn = QZ_THEMES.filter(keyOn);
+    $('#qz-count').textContent = `— ${nOn.length} coché${nOn.length > 1 ? 's' : ''} · ${nOn.reduce((a, t) => a + t.n, 0)} questions`;
+    $$('#set-quiz .qz-cats .cat').forEach(b => b.onclick = () => socket.emit('gsettings', { ['t_' + b.dataset.t]: !gs['t_' + b.dataset.t] }));
+    $$('#set-quiz .qz-bulk').forEach(b => b.onclick = () => socket.emit('gsettings', Object.fromEntries(QZ_THEMES.filter(t => t.cat === b.dataset.grp).map(t => ['t_' + t.id, b.dataset.on === '1']))));
   }
   if (g === 'guess') {
     const on = gs.themes || [];

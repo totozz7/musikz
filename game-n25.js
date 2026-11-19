@@ -1,4 +1,4 @@
-// PlayZup — 25 PILE ! (1 à 12 joueurs) : 25 questions dans le désordre, les réponses sont TOUS les nombres de 1 à 25,
+// PlayZup — 25 PILE (1 à 12 joueurs) : 25 questions dans le désordre, les réponses sont TOUS les nombres de 1 à 25,
 // chacun une seule fois. Place les boules numérotées sur les bonnes questions (la déduction aide !).
 const DATA = require('./data-25');
 module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
@@ -26,7 +26,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
     room.g = { game: id, stage: 'play', gameKey: Date.now().toString(36), qs, mode: s.mode, maxChecks: s.checks, startAt: Date.now(),
       boards: Object.fromEntries(pl.map(p => [p.id, {}])), done: {}, checks: {}, lastCheck: {}, timer: null, deadline: 0 };
     room.phase = 'game';
-    sysMsg(room, `🎯 25 PILE ! — mode ${s.mode === 'easy' ? 'facile' : s.mode === 'medium' ? 'moyen' : 'mélange'} · ${s.time} min · chaque nombre de 1 à 25 sert une seule fois !`);
+    sysMsg(room, `🎯 25 PILE — mode ${s.mode === 'easy' ? 'facile' : s.mode === 'medium' ? 'moyen' : 'mélange'} · ${s.time} min · chaque nombre de 1 à 25 sert une seule fois !`);
     broadcast(room);
     later(room, s.time * 60000, () => end(room));
     pushState(room);
@@ -42,7 +42,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
     res.forEach((r, i) => { g.coins[r.pid] = { coins: 10 + r.pts + (r.pts === 25 ? 15 : 0) + (res.length > 1 ? [30, 15, 8][i] || 0 : 0), win: i === 0 }; });
     room.gscores.n25 = room.gscores.n25 || {};
     if (res[0] && res.length > 1) room.gscores.n25[res[0].pid] = (room.gscores.n25[res[0].pid] || 0) + 1;
-    sysMsg(room, `🏆 25 PILE ! : ${room.players.get(res[0]?.pid)?.name || '?'} gagne avec ${res[0]?.pts || 0}/25 !`);
+    sysMsg(room, `🏆 25 PILE : ${room.players.get(res[0]?.pid)?.name || '?'} gagne avec ${res[0]?.pts || 0}/25 !`);
     reward(room, g.coins);
     pushState(room); broadcast(room);
   }
