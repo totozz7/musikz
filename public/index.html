@@ -38,6 +38,7 @@
         <label class="lbl">Ton pseudo</label>
         <input id="name" class="input" maxlength="18" placeholder="Ex. Zuppy" autocomplete="off">
         <button id="btn-shop" class="btn btn-shop" type="button">🎨 Personnaliser &amp; Boutique</button>
+        <div class="home-2btn"><button id="btn-locker" class="btn btn-ghost" type="button">🎒 Mon casier</button><button id="btn-cards" class="btn btn-cards" type="button">🃏 Cartes à collectionner</button></div>
         <p class="muted small center-txt">Gagne des 🪙 dans tous les jeux pour débloquer cadres, effets, titres…</p>
         <div class="or"><span>tu as un code ?</span></div>
         <div class="join-row">
@@ -608,6 +609,8 @@
 <div id="rewards" class="rewards">
   <button class="rw rw-wheel" id="rw-wheel"><span class="rw-ico"><span class="mini-wheel"></span></span><span class="rw-txt"><b>Roue</b><small>🪙 200</small></span></button>
   <button class="rw rw-gift" id="rw-gift"><span class="rw-ico"><span class="mini-gift"><i></i></span></span><span class="rw-txt"><b>Cadeau</b><small id="rw-gift-t">…</small></span></button>
+  <button class="rw rw-cards" id="rw-cards"><span class="rw-ico"><span class="mini-pack">🃏</span></span><span class="rw-txt"><b>Cartes</b><small>🪙 50</small></span></button>
+  <button class="rw rw-locker" id="rw-locker"><span class="rw-ico">🎒</span><span class="rw-txt"><b>Casier</b><small>Équiper</small></span></button>
   <button class="rw rw-chest" id="rw-chest"><span class="rw-ico"><span class="mini-chest"><i></i></span></span><span class="rw-txt"><b>Coffre</b><small id="rw-chest-t">…</small></span></button>
 </div>
 <div id="opener" class="opener hidden">
@@ -674,5 +677,7 @@
 <script src="/client-quiz.js"></script>
 <script src="/client-n25.js"></script>
 <script src="/client-chess.js"></script>
+<script src="/cards.js"></script>
+<script src="/client-cards.js"></script>
 </body>
 </html>

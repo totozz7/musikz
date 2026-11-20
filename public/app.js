@@ -114,7 +114,7 @@ $('#shop').onclick = (e) => { if (e.target.id === 'shop') $('#shop').classList.a
 $$('#shop-tabs button').forEach(b => b.onclick = () => { shopTab = b.dataset.tab; shopSel = null; renderShop(); });
 
 const LOOK_KEY = { icons: 'avatar', colors: 'color', frames: 'frame', nameFx: 'nameFx', titles: 'title', winFx: 'winFx', pawns: 'pawn', boards: 'board', pcfx: 'pcfx', cardbacks: 'cardback', chessb: 'chessb', chesspc: 'chesspc' };
-const RARITY_LABEL = { common: 'Commun', rare: '◆ Rare', epic: '✦ Épique', legendary: '★ Légendaire' };
+const RARITY_LABEL = { common: 'Commun', rare: '◆ Rare', epic: '✦ Épique', legendary: '★ Légendaire', divine: '✹ DIVIN' };
 function itemPreview(kind, it, m, big = false) {
   const s = big ? 84 : 52;
   if (kind === 'icons') return avatarHTML({ ...m, avatar: it.id }, s);
@@ -166,7 +166,7 @@ function renderShop() {
     };
     return;
   }
-  const RANK = { free: 0, common: 1, rare: 2, epic: 3, legendary: 4 };
+  const RANK = { free: 0, common: 1, rare: 2, epic: 3, legendary: 4, divine: 5 };
   const kind = shopTab, lookKey = LOOK_KEY[kind];
   const items = SHOP[kind].map((it, n) => ({ it, n })).sort((a, b) =>
     RANK[a.it.price ? SHOP.rarity(a.it.price) : 'free'] - RANK[b.it.price ? SHOP.rarity(b.it.price) : 'free'] || (a.it.price || 0) - (b.it.price || 0) || a.n - b.n).map(x => x.it);
@@ -201,9 +201,10 @@ function renderShop() {
     if (save.coins < it.price) { el?.classList.add('shake'); setTimeout(() => el?.classList.remove('shake'), 300); return toast(`Il te manque ${it.price - save.coins} 🪙`, 'error'); }
     save.coins -= it.price; save.owned.push(kind + ':' + it.id);
     const rar = SHOP.rarity(it.price);
-    toast(`🛍️ ${rar === 'legendary' ? '★ LÉGENDAIRE ★ ' : ''}Acheté ! (-${it.price} 🪙)`);
-    sfx('legend'); if (rar === 'legendary' || rar === 'epic') setTimeout(() => sfx('legend'), 300);
-    burst(rar === 'legendary' ? 'galaxy' : rar === 'epic' ? 'money' : 'party', rar === 'legendary' ? 40 : 18);
+    toast(`🛍️ ${rar === 'divine' ? '✹ DIVIN ✹ ' : rar === 'legendary' ? '★ LÉGENDAIRE ★ ' : ''}Acheté ! (-${it.price} 🪙)`);
+    sfx('legend'); if (rar === 'legendary' || rar === 'epic' || rar === 'divine') setTimeout(() => sfx('legend'), 300);
+    if (rar === 'divine') divineFlash();
+    burst(rar === 'divine' ? (kind === 'winFx' ? it.id : 'supernova') : rar === 'legendary' ? 'galaxy' : rar === 'epic' ? 'money' : 'party', rar === 'legendary' || rar === 'divine' ? 40 : 18);
     shopSel = null; equip(it);
   };
   $$('#shop-body .item, #shop-body .featured').forEach(b => b.onclick = () => {
@@ -1089,6 +1090,7 @@ function sfx(name, vol = 1) {
     g.gain.value = gain; src.buffer = buf; src.connect(f); f.connect(g); g.connect(out); src.start(t0 + start);
   };
   if (name === 'tick') { noise(.03, 4000, 2500, 'highpass', .8); }
+  if (name === 'crowd') { noise(2.6, 500, 1100, 'bandpass', 2.4); noise(2.2, 1400, 2200, 'bandpass', 1.2); }
   if (name === 'click') { noise(.05, 2500, 1200, 'bandpass', 1.6); osc('square', 1800, 0, .04, .25); }
   if (name === 'card') { noise(.14, 1500, 5000, 'bandpass', .9); }
   if (name === 'spin') { for (let i = 0; i < 14; i++) noise(.025, 3500, 2500, 'highpass', .7, i * (.04 + i * .006)); }
@@ -1140,7 +1142,7 @@ function burst(fxId, n = 16) {
   const fx = SHOP.winFx.find(x => x.id === fxId) || SHOP.winFx[0];
   if (fx.kind && CELEBRATIONS[fx.kind]) {
     if (Date.now() < burst.lock) return; // une célébration animée à la fois
-    burst.lock = Date.now() + (fx.kind === 'goat' ? 3200 : 1800);
+    burst.lock = Date.now() + (fx.kind === 'goat' ? 3200 : fx.kind === 'siuuu' ? 4200 : 1800);
     return CELEBRATIONS[fx.kind](Math.min(1.3, Math.max(.45, n / 22)));
   }
   const em = [...fx.emojis];
@@ -1155,6 +1157,7 @@ function burst(fxId, n = 16) {
     setTimeout(() => el.remove(), 3300);
   }
 }
+function divineFlash() { fxEl('dv-flash', {}, '<b>✹ DIVIN ✹</b>', 2200); }
 function fxEl(cls, css = {}, html = '', life = 2500) {
   const el = document.createElement('div');
   el.className = cls; el.innerHTML = html;
@@ -1165,6 +1168,31 @@ function fxEl(cls, css = {}, html = '', life = 2500) {
 }
 const rnd = (a, b) => a + Math.random() * (b - a);
 const CELEBRATIONS = {
+  // ⚽ SIUUU : le n°7 court, saute en tournant et retombe dans LA pose (rareté divine)
+  siuuu(k) {
+    const kit = `<defs><linearGradient id="sjers" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dfe6f0"/></linearGradient></defs>`;
+    const head = `<circle cx="100" cy="46" r="17" fill="#c98b5e" stroke="#2a1a10" stroke-width="3"/><path d="M83 42c0-14 9-20 18-20s17 5 17 18c-5-6-12-8-18-8s-11 3-17 10z" fill="#1d140e"/>`;
+    const shirt = `<path d="M72 70q28-10 56 0l6 52h-68z" fill="url(#sjers)" stroke="#2a1a10" stroke-width="3" stroke-linejoin="round"/><text x="100" y="106" text-anchor="middle" font-family="Bungee,sans-serif" font-size="26" fill="#d4a020" stroke="#5a3a00" stroke-width="1.5">7</text>`;
+    const run = `<g class="sx-run">${head}
+      <path d="M74 76l-22 24 10 6" fill="none" stroke="#c98b5e" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M126 76l20 -20" fill="none" stroke="#c98b5e" stroke-width="9" stroke-linecap="round"/>
+      ${shirt}<path d="M68 120h64l-2 18h-60z" fill="#1c2a4a" stroke="#2a1a10" stroke-width="3"/>
+      <path class="sx-legA" d="M86 136l-14 34 -18 12" fill="none" stroke="#c98b5e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><path class="sx-legB" d="M114 136l20 28 6 26" fill="none" stroke="#c98b5e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="52" cy="183" r="7" fill="#111"/><circle cx="141" cy="192" r="7" fill="#111"/></g>`;
+    const pose = `<g class="sx-pose">${head}
+      <path d="M74 76l-26 40 -6 16" fill="none" stroke="#c98b5e" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M126 76l26 40 6 16" fill="none" stroke="#c98b5e" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      ${shirt}<path d="M68 120h64l2 18h-68z" fill="#1c2a4a" stroke="#2a1a10" stroke-width="3"/>
+      <path d="M82 136l-30 64" fill="none" stroke="#c98b5e" stroke-width="11" stroke-linecap="round"/><path d="M118 136l30 64" fill="none" stroke="#c98b5e" stroke-width="11" stroke-linecap="round"/>
+      <ellipse cx="46" cy="204" rx="13" ry="7" fill="#111"/><ellipse cx="154" cy="204" rx="13" ry="7" fill="#111"/></g>`;
+    fxEl('sx-dark', {}, '', 4400);
+    fxEl('sx-spot l', {}, '', 4400); fxEl('sx-spot r', {}, '', 4400);
+    fxEl('sx-stage', {}, `<div class="sx-mover"><svg viewBox="0 0 200 220" class="sx-svg">${kit}${run}${pose}</svg></div><div class="sx-shadow"></div><div class="sx-wave"></div>`, 4400);
+    fxEl('sx-title', {}, [...'SIUUU'].map((c, i) => `<span style="--i:${i}">${c}</span>`).join('') + '<small>✹ CÉLÉBRATION DIVINE ✹</small>', 4400);
+    for (let i = 0; i < (innerWidth < 700 ? 24 : 46); i++) fxEl('sx-flashbulb', { left: rnd(0, 100) + 'vw', bottom: rnd(0, 22) + 'vh', animationDelay: rnd(1.6, 3.6) + 's' }, '', 4400);
+    for (let i = 0; i < Math.round(24 + 24 * k); i++) fxEl('goat-glit', { left: rnd(0, 100) + 'vw', '--d': rnd(.9, 2) + 's', '--x': rnd(-60, 60) + 'px', fontSize: rnd(.9, 2) + 'rem', animationDelay: rnd(1.7, 2.6) + 's' }, ['✦', '⚽', '✨', '🏆', '7'][i % 5], 4400);
+    setTimeout(() => { try { sfx('crowd'); sfx('bang', .7); } catch (e) {} if ($('#shop').classList.contains('hidden')) { document.body.classList.add('sn-shake'); setTimeout(() => document.body.classList.remove('sn-shake'), 500); } }, 1650);
+    setTimeout(() => { try { const u = new SpeechSynthesisUtterance('Siiiiuuuuuu'); u.lang = 'es-ES'; u.rate = .55; u.pitch = .6; u.volume = Math.max(.3, baseVolume); speechSynthesis.speak(u); } catch (e) {} }, 1600);
+    setTimeout(() => { try { sfx('legend'); } catch (e) {} }, 2000);
+  },
   // 🎆 bouquets de particules colorées
   fireworks(k) {
     const colors = ['#ff2e4d', '#ffc21a', '#00e5ff', '#7dff8a', '#ff4fa3', '#c13cff', '#fff'];
@@ -1427,34 +1455,50 @@ window.WHEEL = (() => {
   const W = SHOP.wheel, N = W.slices.length, A = 360 / N;
   const KIND_LABEL = { icons: 'Icône', colors: 'Couleur de pseudo', frames: 'Cadre', nameFx: 'Effet de pseudo', titles: 'Titre', winFx: 'Célébration', pawns: 'Pion', boards: 'Plateau', pcfx: 'Animation chevaux', cardbacks: 'Dos de cartes', chessb: "Plateau d'échecs", chesspc: "Pièces d'échecs" };
   const SL = {
-    c60: { t: '60', e: '🪙', c: '#ffb12b', c2: '#e07b00' }, c120: { t: '120', e: '💰', c: '#ffd84d', c2: '#e3a300' },
-    c250: { t: '250', e: '💰', c: '#ff9a1f', c2: '#d96500' }, c500: { t: '500', e: '💎', c: '#ff5aa0', c2: '#c4126a' },
-    common: { t: 'COMMUN', e: '🎁', c: '#a9bccf', c2: '#6f859b' }, rare: { t: 'RARE', e: '🔷', c: '#3b95ff', c2: '#1356c4' },
-    epic: { t: 'ÉPIQUE', e: '🔮', c: '#ab64ff', c2: '#6a1fc9' }, legendary: { t: 'LÉGENDE', e: '👑', c: 'url(#wRain)', c2: '#000' },
+    c60: { t: '60', e: '🪙', c: '#ffb12b', c2: '#b35a00', c3: '#ffe39a', pat: 'coins' }, c120: { t: '120', e: '💰', c: '#ffd84d', c2: '#b37800', c3: '#fff3b8', pat: 'coins' },
+    c250: { t: '250', e: '💰', c: '#ff8a1f', c2: '#a83f00', c3: '#ffd2a0', pat: 'coins' }, c500: { t: '500', e: '💎', c: '#ff5aa0', c2: '#8a0a48', c3: '#ffd0e6', pat: 'gems' },
+    common: { t: 'COMMUN', e: '🎁', c: '#8fb0cf', c2: '#3f5873', c3: '#e2eefa', pat: 'stripes' }, rare: { t: 'RARE', e: '🔷', c: '#3b95ff', c2: '#0b3c96', c3: '#bfe0ff', pat: 'stripes' },
+    epic: { t: 'ÉPIQUE', e: '🔮', c: '#ab64ff', c2: '#4a0d9c', c3: '#ead6ff', pat: 'stars' }, legendary: { t: 'LÉGENDE', e: '👑', c: '#ffd000', c2: '#c4005a', c3: '#fff7c2', pat: 'rainbow' },
   };
-  const FX = { rare: 1, epic: 1, legendary: 1, c500: 1 };
+  const FX = { rare: 1, epic: 1, legendary: 1, c500: 1, c250: 1 };
   let rot = 0, spinning = false;
   function wheelSVG() {
     const R = 150, cx = 160, cy = 160;
     const pt = (a, r) => [cx + r * Math.sin(a * Math.PI / 180), cy - r * Math.cos(a * Math.PI / 180)];
+    const wedge = (a0, a1, r = R) => { const [x0, y0] = pt(a0, r), [x1, y1] = pt(a1, r); return `M${cx} ${cy} L${x0} ${y0} A${r} ${r} 0 0 1 ${x1} ${y1}Z`; };
+    const defs = Object.entries(SL).map(([id, s]) => `<radialGradient id="wg-${id}" cx="160" cy="160" r="150" gradientUnits="userSpaceOnUse"><stop offset=".12" stop-color="${s.c3}"/><stop offset=".55" stop-color="${s.c}"/><stop offset="1" stop-color="${s.c2}"/></radialGradient>`).join('')
+      + `<pattern id="wp-coins" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="9" cy="9" r="3.2" fill="#fff" opacity=".22"/></pattern>
+         <pattern id="wp-gems" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect x="5" y="5" width="6" height="6" fill="#fff" opacity=".22"/></pattern>
+         <pattern id="wp-stripes" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="5" height="12" fill="#fff" opacity=".13"/></pattern>
+         <pattern id="wp-stars" width="22" height="22" patternUnits="userSpaceOnUse"><text x="11" y="13" font-size="9" text-anchor="middle" fill="#fff" opacity=".35">✦</text></pattern>
+         <linearGradient id="wp-rainbow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff004c" stop-opacity=".55"/><stop offset=".25" stop-color="#ffe600" stop-opacity=".45"/><stop offset=".5" stop-color="#3dff6e" stop-opacity=".45"/><stop offset=".75" stop-color="#00e5ff" stop-opacity=".45"/><stop offset="1" stop-color="#c13cff" stop-opacity=".55"/></linearGradient>`;
     const slices = W.slices.map((id, i) => {
-      const a0 = i * A, a1 = a0 + A, [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R), s = SL[id], mid = a0 + A / 2;
-      const [tx, ty] = pt(mid, R * .68), [ex, ey] = pt(mid, R * .87);
-      return `<path d="M${cx} ${cy} L${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1}Z" fill="${s.c}" stroke="#2a1600" stroke-width="2"/>
-        <path d="M${cx} ${cy} L${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1}Z" fill="url(#wShade)"/>
-        ${FX[id] ? `<path d="M${cx} ${cy} L${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1}Z" class="wh-flash f-${id}"/><path d="M${cx} ${cy} L${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1}Z" class="wh-edge f-${id}"/>${[.45, .62, .8].map((r, j) => { const [sx, sy] = pt(a0 + A * (.25 + j * .25), R * r); return `<text x="${sx}" y="${sy}" class="wh-spark s${j} f-${id}" text-anchor="middle" dominant-baseline="central">✦</text>`; }).join('')}` : ''}
-        <text x="${ex}" y="${ey}" font-size="20" text-anchor="middle" dominant-baseline="central" transform="rotate(${mid} ${ex} ${ey})" class="${FX[id] ? 'wh-em f-' + id : ''}" style="transform-box:fill-box;transform-origin:center">${s.e}</text>
-        <text x="${tx}" y="${ty}" class="wl ${id.startsWith('c') ? 'coin' : ''}" text-anchor="middle" dominant-baseline="central" transform="rotate(${mid + 90} ${tx} ${ty})">${s.t}</text>`;
+      const a0 = i * A, a1 = a0 + A, s = SL[id], mid = a0 + A / 2, d = wedge(a0, a1);
+      const [tx, ty] = pt(mid, R * (/^c\d/.test(id) ? .6 : .47)), [ex, ey] = pt(mid, R * .85);
+      const sparks = [.38, .55, .72, .9].map((r, j) => { const [sx, sy] = pt(a0 + A * (.2 + ((j * 37) % 60) / 100), R * r); return `<text x="${sx}" y="${sy}" class="wh-spark s${j} f-${id}" text-anchor="middle" dominant-baseline="central" style="animation-delay:${(i * .23 + j * .45) % 2}s">✦</text>`; }).join('');
+      return `<g class="wh-sl sl-${id}" style="--i:${i}">
+        <path d="${d}" fill="url(#wg-${id})"/>
+        <path d="${d}" fill="url(#wp-${s.pat})" class="wh-pat"/>
+        <path d="${d}" class="wh-flash f-${id}" style="animation-delay:${(i * .17) % 1.6}s"/>
+        <path d="${wedge(a0 + 1.2, a1 - 1.2, R - 3)}" class="wh-edge f-${id}"/>
+        ${sparks}
+        <g class="wh-badge" style="transform-origin:${ex}px ${ey}px">
+          <circle cx="${ex}" cy="${ey}" r="15" class="wh-disc f-${id}"/>
+          <text x="${ex}" y="${ey + 1}" font-size="18" text-anchor="middle" dominant-baseline="central" transform="rotate(${mid} ${ex} ${ey})" class="wh-em f-${id}">${s.e}</text>
+        </g>
+        <text x="${tx}" y="${ty}" class="wl ${/^c\d/.test(id) ? 'coin' : 'it'} f-${id}" text-anchor="middle" dominant-baseline="central" transform="rotate(${mid + 90} ${tx} ${ty})">${s.t}</text>
+      </g>`;
     }).join('');
-    const bulbs = Array.from({ length: 24 }, (_, i) => { const [x, y] = pt(i * 15, R + 13); return `<circle cx="${x}" cy="${y}" r="4.5" class="bulb b${i % 2}"/>`; }).join('');
+    const seps = W.slices.map((_, i) => { const [x, y] = pt(i * A, R), [sx, sy] = pt(i * A, R - 6); return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="url(#wGold2)" stroke-width="3"/><circle cx="${sx}" cy="${sy}" r="3.6" fill="#fff2b0" stroke="#7a4a00" stroke-width="1.2" class="wh-rivet"/>`; }).join('');
+    const bulbs = Array.from({ length: 24 }, (_, i) => { const [x, y] = pt(i * 15, R + 13); return `<circle cx="${x}" cy="${y}" r="4.5" class="bulb b${i % 3}"/>`; }).join('');
     const VB = 'viewBox="-18 -18 356 356"';
     return `<svg ${VB} class="wh-svg wh-base"><defs><linearGradient id="wGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#e2a70f"/><stop offset="1" stop-color="#8a5a00"/></linearGradient></defs>
-      <circle cx="160" cy="160" r="168" fill="#3a0d1f" stroke="url(#wGold)" stroke-width="10"/>${bulbs}</svg>
-      <svg ${VB} class="wh-svg wh-rot" id="wh-rot"><defs>
-      <linearGradient id="wRain" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff004c"/><stop offset=".25" stop-color="#ffe600"/><stop offset=".5" stop-color="#3dff6e"/><stop offset=".75" stop-color="#00e5ff"/><stop offset="1" stop-color="#c13cff"/></linearGradient>
-      <radialGradient id="wShade" cx="160" cy="160" r="150" gradientUnits="userSpaceOnUse"><stop offset=".2" stop-color="#fff" stop-opacity=".25"/><stop offset=".75" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></radialGradient>
-      <linearGradient id="wGold2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#e2a70f"/><stop offset="1" stop-color="#8a5a00"/></linearGradient></defs>${slices}</svg>
-      <svg ${VB} class="wh-svg"><circle cx="160" cy="160" r="34" fill="url(#wGold)" stroke="#5a3a00" stroke-width="3"/>
+      <circle cx="160" cy="160" r="168" fill="#3a0d1f" stroke="url(#wGold)" stroke-width="10"/><circle cx="160" cy="160" r="160" fill="none" stroke="#ffd84d55" stroke-width="2" stroke-dasharray="3 7" class="wh-ring"/>${bulbs}</svg>
+      <svg ${VB} class="wh-svg wh-rot" id="wh-rot"><defs>${defs}
+      <linearGradient id="wGold2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#e2a70f"/><stop offset="1" stop-color="#8a5a00"/></linearGradient></defs>${slices}${seps}
+      <circle cx="160" cy="160" r="150" fill="none" stroke="#2a1600" stroke-width="3"/></svg>
+      <div class="wh-glint"></div>
+      <svg ${VB} class="wh-svg"><circle cx="160" cy="160" r="34" fill="url(#wGold)" stroke="#5a3a00" stroke-width="3" class="wh-hubring"/>
       <circle cx="160" cy="160" r="26" fill="#3a0d1f"/>
       <text x="160" y="161" text-anchor="middle" dominant-baseline="central" class="wh-hub">PZ</text></svg>`;
   }

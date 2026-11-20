@@ -216,10 +216,12 @@
       { id: 'galaxy', name: 'Galaxie', emojis: '🪐🌌☄️', kind: 'galaxy', price: 3500 },
       { id: 'supernova', name: 'Supernova', emojis: '🌟', kind: 'supernova', price: 4500 },
       { id: 'goat', name: 'G.O.A.T.', emojis: '🐐👑', kind: 'goat', price: 7500 },
+      // ✹ rareté DIVINE (au-dessus de légendaire)
+      { id: 'siuuu', name: 'SIUUU', emojis: '⚽7️⃣', kind: 'siuuu', price: 15000 },
     ],
   };
   SHOP.ids = (k) => SHOP[k].map(x => x.id);
-  SHOP.rarity = (price) => price >= 2500 ? 'legendary' : price >= 1200 ? 'epic' : price >= 300 ? 'rare' : 'common';
+  SHOP.rarity = (price) => price >= 10000 ? 'divine' : price >= 2500 ? 'legendary' : price >= 1200 ? 'epic' : price >= 300 ? 'rare' : 'common';
   SHOP.colorBase = (id) => (SHOP.colors.find(c => c.id === id) || {}).base || (/^#[0-9a-f]{6}$/i.test(id) ? id : '#ffc21a');
   SHOP.iconAnim = (id) => (SHOP.icons.find(i => i.id === id) || {}).anim || '';
   if (typeof module !== 'undefined' && module.exports) module.exports = SHOP; else root.SHOP = SHOP;

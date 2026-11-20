@@ -123,6 +123,17 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 
 ## Jouer
 
+### 🃏 Cartes à collectionner
+- 203 cartes : 10 séries de 20 (Bestiaire fantastique, Zoo déjanté, Malbouffe & Cie, Cosmos, Le Stade, Arcade rétro, Frissons, Mythes & Légendes, Héros de PlayZup, Forces de la nature) + 3 cartes **✹ DIVINES**. Données dans `public/cards.js` (modifiable), interface dans `public/client-cards.js`.
+- Booster 50 🪙 = 1 carte ; Méga booster 225 🪙 = 5 cartes dont au moins une rare. Chances : commune 62 %, rare 25 %, épique 9,5 %, légendaire 3 %, divine 0,5 %. Les doubles se recyclent en pièces.
+- Collection avec filtres (série, rareté, « seulement les miennes »), zoom avec effet 3D holographique. Les cartes sont dans la sauvegarde du navigateur (et dans le code de sauvegarde).
+
+### 🎒 Casier
+- Tout ce que tu as débloqué, rangé par catégorie, et équipable en un clic (accueil, barre du bas ou depuis les cartes).
+
+### ✹ Rareté DIVINE
+- Au-dessus de Légendaire (prix ≥ 10 000 🪙). Premier objet : l'effet de victoire **SIUUU** (15 000 🪙) — le n°7 court, saute en tournant et retombe dans la pose, sous les projecteurs.
+
 ### 🪙 Progression, pièces et boutique
 - Chaque partie rapporte : **10 🪙 de participation + 4 🪙 par bonne réponse + podium 30 / 15 / 8 🪙**
   (une bonne partie ≈ 40 à 80 🪙). On démarre avec 100 🪙. Barème modifiable en haut de `shop.js` (`earn`).
