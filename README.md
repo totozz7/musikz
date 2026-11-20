@@ -64,13 +64,19 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Modes 😊 facile, 🧐 moyen, 🎲 mélange (une question tirée au hasard par nombre dans `data-25.js`), 5 / 8 / 12 min, 0 à 3 vérifications (« X bonnes réponses sur Y », sans dire lesquelles).
 - Le plus de bonnes réponses gagne, puis le plus rapide à valider.
 
+### ♟️ Échecs (2 à 12 joueurs)
+- Vraies règles (roque, prise en passant, promotion, pat, triple répétition, 50 coups, matériel insuffisant), coups en notation française (C, F, T, D, R).
+- 5 modes : Classique, Chess960 (dernière rangée mélangée, sans roque), Roi de la colline (roi au centre = victoire), Trois échecs, Brouillard (on ne voit que ses cases ; il faut capturer le roi).
+- Pendules 3+2 / 5+3 / 10 min / 15+10 / sans, 1, 3 ou 5 parties. À plus de 2 : le gagnant reste à la table, les spectateurs parient sur le résultat et envoient des émojis.
+- Boutique : 13 plateaux d'échecs (vus par toi seul) et 14 jeux de pièces (tes pièces s'affichent avec ton skin chez tout le monde). Fichiers : `game-chess.js`, `public/client-chess.js`.
+
 ### 7️⃣ Top 7 (1 à 10 joueurs)
-- Un thème (« les sports préférés des Français », « ce qu'on achète à la boulangerie »…) et ses **7 réponses les plus citées**, cachées sur un plateau télé. 83 thèmes dans `data-top7.js` (classements estimés, modifiables).
+- Un thème (« les sports préférés des Français », « ce qu'on achète à la boulangerie »…) et ses **7 réponses les plus citées**, cachées sur un plateau télé. 191 thèmes dans `data-top7.js` (classements estimés, modifiables).
 - Chacun son tour, on propose une réponse : la n°1 (la plus évidente) vaut **1 point**… la n°7 (la plus rare) **7 points**. Raté, trop tard ou déjà trouvée = 0.
 - Réglages : nombre de thèmes (3 / 5 / 8 / 12), essais par joueur et par thème (2 / 3 / 4), temps pour répondre (15 / 20 / 30 s). Fautes de frappe, accents et pluriels tolérés.
 
 ### 📋 Petit Bac (1 à 12 joueurs)
-- Une lettre tirée au sort, une grille de catégories **classiques**, **fun** (« Une excuse pour être en retard », « Un truc qui pue », « Un super-pouvoir nul »…) ou **mélange**. Le premier qui a tout rempli crie **STOP** (+5 si tout est validé).
+- Une lettre tirée au sort, deux modes : **normal** (pays, ville, animal…) ou **spécial** (« Une excuse à dire à ton patron », « Un red flag », « Un mensonge sur Tinder »… 71 catégories dans `data-bac.js`). Le premier qui a tout rempli crie **STOP** (+5 si tout est validé).
 - Puis on vérifie : clique sur une réponse pour la contester ; elle tombe si la majorité vote contre. Réponse unique 10 pts, partagée 5 pts. De 1 à 8 lettres par partie.
 
 ### 🎭 Le Bluff (2 à 10 joueurs)

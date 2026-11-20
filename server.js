@@ -20,7 +20,7 @@ const io = new Server(server);
 const PUB = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : __dirname;
 const INDEX = path.join(PUB, 'index.html');
 const SHOP = require(path.join(PUB, 'shop.js'));
-for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js', 'client-draw.js', 'client-bac.js', 'client-bluff.js', 'client-punch.js', 'client-top7.js', 'client-quiz.js', 'client-n25.js', 'client-sem.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
+for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js', 'client-draw.js', 'client-bac.js', 'client-bluff.js', 'client-punch.js', 'client-top7.js', 'client-quiz.js', 'client-n25.js', 'client-sem.js', 'client-chess.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
 app.get('/', (req, res) => res.sendFile(INDEX));
 app.get('/r/:code', (req, res) => res.sendFile(INDEX));
 app.get('/health', (req, res) => res.send('ok'));
@@ -172,8 +172,12 @@ function bestByWords(list, q) {
 async function resolveWork(item) {
   const data = (await dz(`/search?q=${encodeURIComponent(item.q)}&limit=25`)).data || [];
   const wanted = item.q + ' ' + item.work + ' ' + (item.alts || []).join(' ');
-  const ok = data.filter(t => playable(t) && !isCoverish(t, wanted, !item.allowCovers));
-  const best = bestByWords(ok, item.q);
+  // pas de morceaux « explicites » (souvent du rap qui porte juste le nom du dessin animé)
+  const ok = data.filter(t => playable(t) && !t.explicit_lyrics && !isCoverish(t, wanted, !item.allowCovers));
+  // on préfère ce qui ressemble vraiment à un générique / une BO
+  const THEME_RE = /(^| )(generique|theme|opening|intro|soundtrack|bande originale|b o|ost|original|serie|dessin anime|tv|cartoon|chanson du film|from)( |$)/;
+  const themey = ok.filter(t => THEME_RE.test(flat(`${t.title} ${t.album?.title || ''}`)));
+  const best = bestByWords(themey, item.q) || bestByWords(ok, item.q);
   if (!best) return null;
   return fromDeezer(best, { title: item.work, alts: item.alts, artist: '', work: true, cat: item.cat, note: item.note, key: item.key });
 }
@@ -353,7 +357,7 @@ function publicPlayers(room) {
     return {
       id: p.id, name: p.name, avatar: p.avatar, color: p.color, frame: p.frame || 'none',
       score: room.game === 'blindtest' || !room.game ? p.score : room.g?.game === 'note' && room.g.stage !== 'over' ? room.g.scores[p.id] || 0 : room.gscores?.[room.game]?.[p.id] || 0,
-      nameFx: p.nameFx || 'none', title: SHOP.titles.find(t => t.id === p.title && t.id !== 'none')?.name || '', winFx: p.winFx || 'party',
+      nameFx: p.nameFx || 'none', title: SHOP.titles.find(t => t.id === p.title && t.id !== 'none')?.name || '', winFx: p.winFx || 'party', chesspc: p.chesspc || 'classic',
       online: p.online, host: p.id === room.hostId,
       foundArtist: !!f.artist, foundTitle: !!f.title, answered: !!f.answered, streak: p.streak || 0,
       powered: room.phase === 'powers' && !!room.round?.powers?.has(p.id),
@@ -396,6 +400,7 @@ const GAMES = {
   top7: require('./game-top7')(gameCtx),
   quiz: require('./game-quiz')(gameCtx),
   n25: require('./game-n25')(gameCtx),
+  chess: require('./game-chess')(gameCtx),
   sem: require('./game-sem')(gameCtx),
 };
 // infos affichées sur l'écran de choix (nombre de joueurs !)
@@ -409,7 +414,7 @@ const GAME_INFO = {
   guess: { min: 1, max: GAMES.guess.max },
   primo: { min: 1, max: GAMES.primo.max },
   draw: { min: 2, max: GAMES.draw.max },
-  bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, quiz: { min: 1, max: 12 }, n25: { min: 1, max: 12 },
+  bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, quiz: { min: 1, max: 12 }, n25: { min: 1, max: 12 }, chess: { min: 2, max: 12 },
 };
 app.get('/api/guess-themes', (req, res) => res.json(GAMES.guess.themes));
 app.get('/api/games', (req, res) => res.json({ info: GAME_INFO, ucThemes: GAMES.undercover.themes() }));
@@ -771,7 +776,7 @@ io.on('connection', (socket) => {
   socket.on('create', ({ name, avatar, pid, game, ...look }, cb) => {
     const code = makeCode();
     room = { code, players: new Map(), hostId: pid, phase: 'lobby', settings: defaultSettings(), chat: [], history: [],
-      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults(), draw: GAMES.draw.defaults(), bac: GAMES.bac.defaults(), bluff: GAMES.bluff.defaults(), punch: GAMES.punch.defaults(), sem: GAMES.sem.defaults(), top7: GAMES.top7.defaults(), quiz: GAMES.quiz.defaults(), n25: GAMES.n25.defaults() }, gscores: {}, g: null };
+      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults(), draw: GAMES.draw.defaults(), bac: GAMES.bac.defaults(), bluff: GAMES.bluff.defaults(), punch: GAMES.punch.defaults(), sem: GAMES.sem.defaults(), top7: GAMES.top7.defaults(), quiz: GAMES.quiz.defaults(), n25: GAMES.n25.defaults(), chess: GAMES.chess.defaults() }, gscores: {}, g: null };
     rooms.set(code, room);
     join(room, { name, avatar, pid, ...look }, cb);
   });
@@ -783,7 +788,7 @@ io.on('connection', (socket) => {
     room = r; join(r, { name, avatar, pid, ...look }, cb);
   });
 
-  function join(r, { name, avatar, pid, color, frame, nameFx, title, winFx, pawn, pcfx }, cb) {
+  function join(r, { name, avatar, pid, color, frame, nameFx, title, winFx, pawn, pcfx, chesspc }, cb) {
     name = String(name || 'Joueur').trim().slice(0, 18) || 'Joueur';
     avatar = pick(SHOP.ids('icons'), avatar, '');
     frame = pick(SHOP.ids('frames'), frame, 'none');
@@ -792,12 +797,13 @@ io.on('connection', (socket) => {
     winFx = pick(SHOP.ids('winFx'), winFx, 'party');
     pawn = pick(SHOP.ids('pawns'), pawn, 'classic');
     pcfx = pick(SHOP.ids('pcfx'), pcfx, 'basic');
+    chesspc = pick(SHOP.ids('chesspc'), chesspc, 'classic');
     color = validColor(color);
     let p = r.players.get(pid);
-    if (p) { p.online = true; p.name = name; p.avatar = avatar || p.avatar; p.socketId = socket.id; Object.assign(p, { frame, nameFx, title, winFx, pawn, pcfx }); if (color) p.color = color; }
+    if (p) { p.online = true; p.name = name; p.avatar = avatar || p.avatar; p.socketId = socket.id; Object.assign(p, { frame, nameFx, title, winFx, pawn, pcfx, chesspc }); if (color) p.color = color; }
     else {
       const used = [...r.players.values()].map(x => x.color);
-      p = { id: pid, name, avatar: avatar || AVATARS[r.players.size % AVATARS.length], frame, nameFx, title, winFx, pawn, pcfx, good: 0, color: color || COLORS.find(c => !used.includes(c)) || COLORS[r.players.size % COLORS.length], score: 0, streak: 0, online: true, socketId: socket.id };
+      p = { id: pid, name, avatar: avatar || AVATARS[r.players.size % AVATARS.length], frame, nameFx, title, winFx, pawn, pcfx, chesspc, good: 0, color: color || COLORS.find(c => !used.includes(c)) || COLORS[r.players.size % COLORS.length], score: 0, streak: 0, online: true, socketId: socket.id };
       r.players.set(pid, p);
       sysMsg(r, `👋 ${name} a rejoint le salon`);
     }
@@ -826,6 +832,7 @@ io.on('connection', (socket) => {
     me.winFx = pick(SHOP.ids('winFx'), look.winFx, me.winFx);
     me.pawn = pick(SHOP.ids('pawns'), look.pawn, me.pawn || 'classic');
     me.pcfx = pick(SHOP.ids('pcfx'), look.pcfx, me.pcfx || 'basic');
+    me.chesspc = pick(SHOP.ids('chesspc'), look.chesspc, me.chesspc || 'classic');
     // en pleine partie de petits chevaux : le nouveau skin / la nouvelle animation s'applique tout de suite
     if (room.g?.game === 'horses') { const seat = room.g.seats.find(x => x.pid === me.id); if (seat) { seat.skin = me.pawn; seat.fx = me.pcfx; pushState(room); } }
     me.color = validColor(look.color) || me.color;
@@ -860,7 +867,7 @@ io.on('connection', (socket) => {
   socket.on('setGame', (game) => {
     if (!isHost() || !['lobby', 'end'].includes(room.phase) || !GAME_INFO[game]) return;
     room.game = game; room.phase = 'lobby'; stopModuleGame(room);
-    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time', bac: '📋 Petit Bac', bluff: '🎭 Le Bluff', punch: '🎤 Punchline', sem: '🌡️ Ça chauffe !', top7: '7️⃣ Top 7', quiz: '❓ Quiz', n25: '🎯 25 Pile' }[game]}`);
+    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time', bac: '📋 Petit Bac', bluff: '🎭 Le Bluff', punch: '🎤 Punchline', sem: '🌡️ Ça chauffe !', top7: '7️⃣ Top 7', quiz: '❓ Quiz', n25: '🎯 25 Pile', chess: '♟️ Échecs' }[game]}`);
     broadcast(room);
   });
   socket.on('gsettings', (patch = {}) => {

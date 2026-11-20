@@ -73,7 +73,7 @@
   function drawList(v) {
     const mine = v.mine || [];
     const L = mine.find(x => x.w === last) || mine[mine.length - 1];
-    $('#sx-last').innerHTML = L ? `<ol class="sx-list one">${row(L, 'latest')}</ol>` : '<p class="sx-empty">Propose un premier mot pour prendre la température 🌡️</p>';
+    $('#sx-last').innerHTML = L ? '' : '<p class="sx-empty">Propose un premier mot pour prendre la température 🌡️</p>';
     $('#sx-list').innerHTML = [...mine].sort((a, b) => b.t - a.t).map(r => row(r, r.w === L?.w ? 'cur' : '')).join('');
     const best = mine.reduce((m, r) => Math.max(m, r.t), -100);
     $('#sx-room').style.setProperty('--heat', String(Math.max(0, Math.min(1, (best + 5) / 75))));

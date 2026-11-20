@@ -59,7 +59,7 @@ const SAVE_KEY = 'mz_save';
 function defaultSave() {
   return { v: 1, coins: SHOP.startCoins, owned: [], games: 0, wins: 0, good: 0, lastGame: '',
     look: { avatar: store.get('mz_avatar', SHOP.icons[Math.floor(Math.random() * 20)].id), color: store.get('mz_color', COLORS[Math.floor(Math.random() * 8)]),
-      frame: 'classic', nameFx: 'none', title: 'debutant', winFx: 'party', pawn: 'classic', board: 'bois', pcfx: 'basic', cardback: 'classic' } };
+      frame: 'classic', nameFx: 'none', title: 'debutant', winFx: 'party', pawn: 'classic', board: 'bois', pcfx: 'basic', cardback: 'classic', chessb: 'tournoi', chesspc: 'classic' } };
 }
 let save;
 try { save = JSON.parse(localStorage.getItem(SAVE_KEY)) || defaultSave(); } catch { save = defaultSave(); }
@@ -67,7 +67,7 @@ save = { ...defaultSave(), ...save, look: { ...defaultSave().look, ...(save.look
 const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch {} };
 const owns = (kind, id) => { const it = SHOP[kind].find(x => x.id === id); return !!it && (!it.price || save.owned.includes(kind + ':' + id)); };
 // un cosmétique équipé mais pas possédé (ancienne version) revient au gratuit
-for (const [k, d] of [['icons', null], ['colors', '#ffc21a'], ['frames', 'classic'], ['nameFx', 'none'], ['titles', 'debutant'], ['winFx', 'party'], ['pawns', 'classic'], ['boards', 'bois'], ['pcfx', 'basic'], ['cardbacks', 'classic']]) {
+for (const [k, d] of [['icons', null], ['colors', '#ffc21a'], ['frames', 'classic'], ['nameFx', 'none'], ['titles', 'debutant'], ['winFx', 'party'], ['pawns', 'classic'], ['boards', 'bois'], ['pcfx', 'basic'], ['cardbacks', 'classic'], ['chessb', 'tournoi'], ['chesspc', 'classic']]) {
   const key = k === 'icons' ? 'avatar' : k === 'colors' ? 'color' : k === 'frames' ? 'frame' : k === 'titles' ? 'title' : k === 'pawns' ? 'pawn' : k === 'boards' ? 'board' : k === 'cardbacks' ? 'cardback' : k;
   if (!owns(k, save.look[key])) save.look[key] = d || SHOP.icons[0].id;
 }
@@ -113,7 +113,7 @@ $('#shop-close').onclick = () => $('#shop').classList.add('hidden');
 $('#shop').onclick = (e) => { if (e.target.id === 'shop') $('#shop').classList.add('hidden'); };
 $$('#shop-tabs button').forEach(b => b.onclick = () => { shopTab = b.dataset.tab; shopSel = null; renderShop(); });
 
-const LOOK_KEY = { icons: 'avatar', colors: 'color', frames: 'frame', nameFx: 'nameFx', titles: 'title', winFx: 'winFx', pawns: 'pawn', boards: 'board', pcfx: 'pcfx', cardbacks: 'cardback' };
+const LOOK_KEY = { icons: 'avatar', colors: 'color', frames: 'frame', nameFx: 'nameFx', titles: 'title', winFx: 'winFx', pawns: 'pawn', boards: 'board', pcfx: 'pcfx', cardbacks: 'cardback', chessb: 'chessb', chesspc: 'chesspc' };
 const RARITY_LABEL = { common: 'Commun', rare: '◆ Rare', epic: '✦ Épique', legendary: '★ Légendaire' };
 function itemPreview(kind, it, m, big = false) {
   const s = big ? 84 : 52;
@@ -126,6 +126,8 @@ function itemPreview(kind, it, m, big = false) {
   if (kind === 'boards') return `<div class="bd-prev pc-board bd-${it.id} ${big ? 'big' : ''}"><s class="q0"></s><s class="q1"></s><s class="q2"></s><s class="q3"></s><b></b><em></em><span>${it.emoji}</span></div>`;
   if (kind === 'pcfx') return `<div class="pf-prev ${it.special ? 'sp' : ''}" style="--fc:${it.color}"><span>${it.emoji}</span><u></u><small>${esc(it.text)}</small></div>`;
   if (kind === 'cardbacks') return `<div class="cb-prev cb-${it.id} ${big ? 'big' : ''}"><div class="pm-card back"><span class="pm-logo">PRIMO<b>!</b></span></div><div class="lb-card back"><span>PZ</span></div></div>`;
+  if (kind === 'chessb') return `<div class="chb-prev chb-${it.id} ${big ? 'big' : ''}">${Array.from({ length: 16 }, (_, k) => `<b class="${((k >> 2) + k) % 2 ? 'd' : 'l'}"></b>`).join('')}</div>`;
+  if (kind === 'chesspc') return `<div class="chp-prev ${big ? 'big' : ''}">${window.CHESS ? CHESS.pieceHTML({ t: 'N', c: 'w' }, it.id) + CHESS.pieceHTML({ t: 'Q', c: 'b' }, it.id) : it.emoji}</div>`;
   if (kind === 'winFx') return `<div class="wprev">${it.emojis}${it.kind ? '<small class="anim-tag">✨ animée</small>' : ''}</div>`;
   return '';
 }
@@ -190,7 +192,7 @@ function renderShop() {
     return `<button class="item r-${rar} ${eq ? 'eq' : ''} ${own ? '' : 'locked'} ${sel && sel.id === it.id ? 'pv-on' : ''}" data-id="${esc(it.id)}">${rar !== 'free' && rar !== 'common' ? `<span class="rtag">${RARITY_LABEL[rar]}</span>` : ''}${itemPreview(kind, it, m)}${label}${btn}</button>`;
   }).join('')}</div>`;
   const equip = (it) => {
-    save.look[lookKey] = it.id; persist(); renderProfile(); renderShop(); pushLook(); applyCardback();
+    save.look[lookKey] = it.id; persist(); renderProfile(); renderShop(); pushLook(); applyCardback(); window.CHESS?.refresh?.();
     if (kind === 'winFx') burst(it.id);
     if (kind === 'pcfx') window.HORSES?.demo(it.id);
     if (kind === 'boards') window.HORSES?.skinBoard();
@@ -253,6 +255,7 @@ const GAME_META = {
   bac: { emoji: '📋', name: 'Petit Bac', desc: 'Une lettre, des catégories classiques ou complètement fun… Remplis tout et crie STOP ! Puis on démonte les réponses des autres.', cls: 'g-bac', lobby: 'Tous à vos stylos ! ✍️' },
   bluff: { emoji: '🎭', name: 'Le Bluff', desc: 'Une anecdote vraie à trou : invente une fausse réponse crédible pour piéger tes potes… et retrouve la vraie !', cls: 'g-bluff', lobby: 'Que le meilleur menteur gagne 😏' },
   quiz: { emoji: '❓', name: 'Quiz', desc: 'Culture G, sport, manga, ciné… 4 choix, réponds vite ! Et des manches « La moins répondue » où il faut la bonne réponse que personne d\'autre n\'a donnée.', cls: 'g-quiz', lobby: 'Buzzers prêts ! ❓' },
+  chess: { emoji: '♟️', name: 'Échecs', desc: 'Le vrai jeu d\'échecs, en beau : pendules, 5 modes (Chess960, Roi de la colline, 3 échecs, Brouillard…), le gagnant reste à la table et les spectateurs parient !', cls: 'g-chess', lobby: 'Que le meilleur stratège gagne ♟️' },
   n25: { emoji: '🎯', name: '25 Pile', desc: '25 questions dans le désordre, et les réponses sont tous les nombres de 1 à 25, chacun une seule fois. Place les boules, déduis, et vise le 25/25 !', cls: 'g-n25', lobby: 'Boules chargées ! 🎯' },
   top7: { emoji: '7️⃣', name: 'Top 7', desc: 'Les 7 réponses préférées des gens sur un thème. Chacun son tour : plus ta réponse est rare dans le top, plus elle rapporte (n°7 = 7 pts) !', cls: 'g-top7', lobby: 'Plateau prêt ! 7️⃣' },
   punch: { emoji: '🎤', name: 'Punchline', desc: 'Réponds aux sujets de la façon la plus drôle possible. Duel de vannes, les autres votent. 100 % des votes = PUNCHLINE !', cls: 'g-punch', lobby: 'Micro ouvert ! 🎤' },
@@ -263,7 +266,7 @@ const GAME_META = {
   horses: { emoji: '🐎', name: 'Petits chevaux', desc: 'Le grand classique : lance le dé, sors tes chevaux, renvoie les autres à l\'écurie ! Choisis le skin de tes pions.', cls: 'g-horses', lobby: 'Tous en selle ! 🐎' },
   note: { emoji: '🔢', name: 'Jeu de la Note', desc: "Une note secrète sur 10, trois thèmes : réponds avec quelque chose qui « vaut » ta note. Les autres devinent !", cls: 'g-note', lobby: 'Sur une échelle de 1 à 10… 🔢' },
 };
-let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, primo: { min: 1, max: 8 }, draw: { min: 2, max: 12 }, bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, quiz: { min: 1, max: 12 }, n25: { min: 1, max: 12 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [];
+let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, primo: { min: 1, max: 8 }, draw: { min: 2, max: 12 }, bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, quiz: { min: 1, max: 12 }, n25: { min: 1, max: 12 }, chess: { min: 2, max: 12 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [];
 fetch('/api/guess-themes').then(r => r.json()).then(t => { GP_THEMES = t; if (state?.game === 'guess') renderGameLobby?.(); }).catch(() => {});
 const playersLabel = (g) => { const i = GAME_INFO[g]; return i.min === i.max ? `${i.min} joueurs` : `${i.min} à ${i.max} joueurs`; };
 function renderGames() {
@@ -393,8 +396,8 @@ function renderGameLobby() {
   $('#set-guess').classList.toggle('hidden', g !== 'guess');
   $('#set-primo').classList.toggle('hidden', g !== 'primo');
   $('#set-draw').classList.toggle('hidden', g !== 'draw');
-  ['bac', 'bluff', 'punch', 'sem', 'top7', 'quiz', 'n25'].forEach(k => $('#set-' + k).classList.toggle('hidden', g !== k));
-  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO', draw: 'Draw Time', bac: 'le Petit Bac', bluff: 'le Bluff', punch: 'Punchline', sem: 'Ça chauffe', top7: 'le Top 7', quiz: 'le Quiz', n25: '25 Pile' }[g]}`;
+  ['bac', 'bluff', 'punch', 'sem', 'top7', 'quiz', 'n25', 'chess'].forEach(k => $('#set-' + k).classList.toggle('hidden', g !== k));
+  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO', draw: 'Draw Time', bac: 'le Petit Bac', bluff: 'le Bluff', punch: 'Punchline', sem: 'Ça chauffe', top7: 'le Top 7', quiz: 'le Quiz', n25: '25 Pile', chess: 'les Échecs' }[g]}`;
   $('#btn-start').disabled = !ok;
   if (g === 'blindtest') return;
   const box = $('#set-' + g), gs = state.gs?.[g] || {};
@@ -404,6 +407,7 @@ function renderGameLobby() {
       `<button class="cat ${gs.theme === t.id ? 'on' : ''} ${t.id === 'anime' ? 'star' : ''}" data-t="${t.id}">${t.emoji} ${esc(t.name)}</button>`).join('');
     $$('#uc-themes .cat').forEach(b => b.onclick = () => socket.emit('gsettings', { theme: b.dataset.t }));
   }
+  if (g === 'chess' && window.CHESS) $('#ch-modehelp').textContent = CHESS.MODE_HELP[gs.mode] || '';
   if (g === 'quiz') {
     const keyOn = (t) => !!gs['t_' + t.id];
     ['gen', 'sub'].forEach(c => {
@@ -646,7 +650,7 @@ socket.on('reward', grantCoins);
 const gAct = (type, data) => new Promise(r => socket.emit('g', { type, data }, (res) => { if (res?.error) toast(res.error, 'error'); r(res); }));
 socket.on('g:state', (v) => {
   if (v.game === 'undercover' && window.UC) { if (!$('#v-uc').classList.contains('active')) showView('v-uc'); window.UC.render(v); }
-  const MODS = { bac: 'BAC', bluff: 'BLUFF', punch: 'PUNCH', sem: 'SEM', top7: 'TOP7', quiz: 'QUIZ', n25: 'N25' };
+  const MODS = { bac: 'BAC', bluff: 'BLUFF', punch: 'PUNCH', sem: 'SEM', top7: 'TOP7', quiz: 'QUIZ', n25: 'N25', chess: 'CHESS' };
   if (MODS[v.game] && window[MODS[v.game]]) { if (!$('#v-' + v.game).classList.contains('active')) showView('v-' + v.game); window[MODS[v.game]].render(v); }
   if (v.game === 'draw' && window.DRAW) { if (!$('#v-draw').classList.contains('active')) showView('v-draw'); window.DRAW.render(v); }
   if (v.game === 'primo' && window.PRIMO) { if (!$('#v-primo').classList.contains('active')) showView('v-primo'); window.PRIMO.render(v); }
@@ -1421,7 +1425,7 @@ setInterval(tickRewards, 1000); tickRewards();
 // ───────────── 🎡 Roue de la chance ─────────────
 window.WHEEL = (() => {
   const W = SHOP.wheel, N = W.slices.length, A = 360 / N;
-  const KIND_LABEL = { icons: 'Icône', colors: 'Couleur de pseudo', frames: 'Cadre', nameFx: 'Effet de pseudo', titles: 'Titre', winFx: 'Célébration', pawns: 'Pion', boards: 'Plateau', pcfx: 'Animation chevaux', cardbacks: 'Dos de cartes' };
+  const KIND_LABEL = { icons: 'Icône', colors: 'Couleur de pseudo', frames: 'Cadre', nameFx: 'Effet de pseudo', titles: 'Titre', winFx: 'Célébration', pawns: 'Pion', boards: 'Plateau', pcfx: 'Animation chevaux', cardbacks: 'Dos de cartes', chessb: "Plateau d'échecs", chesspc: "Pièces d'échecs" };
   const SL = {
     c60: { t: '60', e: '🪙', c: '#ffb12b', c2: '#e07b00' }, c120: { t: '120', e: '💰', c: '#ffd84d', c2: '#e3a300' },
     c250: { t: '250', e: '💰', c: '#ff9a1f', c2: '#d96500' }, c500: { t: '500', e: '💎', c: '#ff5aa0', c2: '#c4126a' },

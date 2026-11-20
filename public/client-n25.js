@@ -79,7 +79,7 @@
   function render(v) {
     const fresh = v.gameKey !== key;
     V = v;
-    if (fresh) { key = v.gameKey; build(); selQ = selN = null; revealed = false; }
+    if (fresh) { key = v.gameKey; build(); selQ = selN = null; revealed = false; setTimeout(() => $('#nz-room')?.classList.add('settled'), 1400); }
     $('#nz-mode').textContent = { easy: '😊 Facile', medium: '🧐 Moyen', mix: '🎲 Mélange' }[v.mode] || '';
     const over = v.stage === 'over';
     $('#nz-check').textContent = `🔍 Vérifier (${v.checksLeft})`;

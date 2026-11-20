@@ -172,9 +172,9 @@
         </div>
         <div id="set-bac" class="settings gset hidden">
           <div class="set-block">
-            <h4>🗂️ Catégories</h4>
-            <div class="seg gseg" data-key="mode"><button data-v="classic">📚 Classiques</button><button data-v="fun">😂 Fun</button><button data-v="mix">🎲 Mélange</button></div>
-            <p class="muted small hint2">Fun : « une excuse pour être en retard », « un prénom de mamie », « un truc qui pue », « un super-pouvoir nul »…</p>
+            <h4>🗂️ Mode</h4>
+            <div class="seg gseg" data-key="mode"><button data-v="classic">📚 Mode normal</button><button data-v="special">😈 Mode spécial</button></div>
+            <p class="muted small hint2">Normal : pays, ville, animal, métier… · Spécial : « une excuse à dire à ton patron », « une raison de ne pas faire l'amour ce soir », « un red flag », « un mensonge sur Tinder »…</p>
           </div>
           <div class="set-row">
             <div class="set-block"><h4>🔤 Lettres</h4><div class="seg gseg" data-key="rounds"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="8">8</button></div>
@@ -201,6 +201,15 @@
             <label class="tog qz-tog qz-raretog"><input type="checkbox" class="gtog" data-key="t_rare"><span></span> 🦄 La moins répondue <small>(1 question sur 5)</small></label>
           </div>
           <div class="set-block rules"><h4>📜 Règles</h4><p>4 choix, une seule bonne réponse : <b>500 à 1 000 pts</b> selon ta vitesse, + bonus de série à partir de 3 bonnes réponses d'affilée. <b>🦄 La moins répondue</b> (une question sur 5) : écris une bonne réponse… que les autres n'ont PAS donnée ! La bonne réponse la plus rare rapporte 1 000 pts, une bonne réponse « banale » 300.</p></div>
+        </div>
+        <div id="set-chess" class="settings gset hidden">
+          <div class="set-block"><h4>🎮 Mode</h4><div class="seg gseg" data-key="mode"><button data-v="classic">♟️ Classique</button><button data-v="c960">🎲 Chess960</button><button data-v="hill">⛰️ Colline</button><button data-v="check3">3️⃣ Trois échecs</button><button data-v="fog">🌫️ Brouillard</button></div>
+            <p class="muted small hint2" id="ch-modehelp"></p></div>
+          <div class="set-row">
+            <div class="set-block"><h4>⏱️ Pendule</h4><div class="seg gseg" data-key="time"><button data-v="3+2">⚡ 3+2</button><button data-v="5+3">5+3</button><button data-v="10+0">10 min</button><button data-v="15+10">15+10</button><button data-v="none">♾️ Sans</button></div></div>
+            <div class="set-block"><h4>🔁 Parties</h4><div class="seg gseg" data-key="games"><button data-v="1">1</button><button data-v="3">3</button><button data-v="5">5</button></div></div>
+          </div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>Les vraies règles des échecs (roque, prise en passant, promotion, pat, répétition…). Clique une pièce puis une case, ou fais-la glisser. <b>À plus de 2</b> : deux joueurs s'affrontent, les autres regardent et <b>parient</b> sur le gagnant (pendant les 3 premiers coups) ; le gagnant reste à la table, le perdant passe son tour. Victoire = 3 pts, nulle = 1, bon pari = 1. Personnalise ton plateau et tes pièces dans la boutique !</p></div>
         </div>
         <div id="set-n25" class="settings gset hidden">
           <div class="set-row">
@@ -488,6 +497,7 @@
       <div id="v-top7" class="view"></div>
       <div id="v-quiz" class="view"></div>
       <div id="v-n25" class="view"></div>
+      <div id="v-chess" class="view"></div>
       <!-- SPEED WORD -->
       <div id="v-word" class="view"></div>
 
@@ -637,6 +647,8 @@
       <button data-tab="boards">🎲 Plateaux</button>
       <button data-tab="pcfx">💥 Animations chevaux</button>
       <button data-tab="cardbacks">🃏 Dos de cartes</button>
+      <button data-tab="chessb">♟️ Plateaux d'échecs</button>
+      <button data-tab="chesspc">♞ Pièces d'échecs</button>
       <button data-tab="save">💾 Sauvegarde</button>
     </div>
     <div id="shop-body" class="shop-body"></div>
@@ -661,5 +673,6 @@
 <script src="/client-top7.js"></script>
 <script src="/client-quiz.js"></script>
 <script src="/client-n25.js"></script>
+<script src="/client-chess.js"></script>
 </body>
 </html>

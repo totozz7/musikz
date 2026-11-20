@@ -5,10 +5,10 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
   const id = 'bac';
   const MIN = 1, MAX = 12;
   const LETTERS = 'ABCDEFGHIJLMNOPRSTV'.split('');
-  const defaults = () => ({ mode: 'mix', rounds: 4, time: 90, cats: 7 });
+  const defaults = () => ({ mode: 'classic', rounds: 4, time: 90, cats: 7 });
   function applySettings(room, p) {
     const s = room.gs.bac;
-    if (['classic', 'fun', 'mix'].includes(p.mode)) s.mode = p.mode;
+    if (['classic', 'special'].includes(p.mode)) s.mode = p.mode;
     if ([1, 2, 3, 4, 5, 8].includes(+p.rounds)) s.rounds = +p.rounds;
     if ([60, 90, 120, 180].includes(+p.time)) s.time = +p.time;
     if ([5, 7, 9].includes(+p.cats)) s.cats = +p.cats;
@@ -22,7 +22,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
 
   function start(room) {
     const s = room.gs.bac;
-    const pool = s.mode === 'classic' ? CATS.classic : s.mode === 'fun' ? CATS.fun : [...shuffle([...CATS.fun]).slice(0, Math.ceil(s.cats * .6)), ...shuffle([...CATS.classic]).slice(0, s.cats)];
+    const pool = s.mode === 'classic' ? CATS.classic : CATS.special;
     const cats = shuffle([...pool]).slice(0, s.cats);
     room.g = {
       game: id, stage: 'roll', gameKey: Date.now().toString(36), cats, rounds: s.rounds, time: s.time * 1000, round: 0,

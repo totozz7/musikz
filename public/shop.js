@@ -24,7 +24,7 @@
       // si tu possèdes déjà tout dans cette rareté : pièces de consolation
       fallback: { common: 120, rare: 400, epic: 1000, legendary: 2500 },
       slices: ['c60', 'common', 'c120', 'rare', 'c60', 'common', 'epic', 'c120', 'c250', 'common', 'c500', 'legendary'],
-      kinds: ['icons', 'colors', 'frames', 'nameFx', 'titles', 'winFx', 'pawns', 'boards', 'pcfx', 'cardbacks'],
+      kinds: ['icons', 'colors', 'frames', 'nameFx', 'titles', 'winFx', 'pawns', 'boards', 'pcfx', 'cardbacks', 'chessb', 'chesspc'],
     },
     icons: [
       ...FREE_ICONS.map(e => ({ id: e, price: 0 })),
@@ -154,6 +154,39 @@
       { id: 'or', name: 'Royal doré', emoji: '👑', price: 2400 },
       { id: 'galaxie', name: 'Galaxie', emoji: '🌌', price: 3200 },
       { id: 'holo', name: 'Holographique', emoji: '💿', price: 4500 },
+    ],
+    // ♟️ plateaux d'échecs (chacun voit le plateau qu'il a équipé)
+    chessb: [
+      { id: 'tournoi', name: 'Tournoi', emoji: '🏆', price: 0 },
+      { id: 'bois', name: 'Bois noble', emoji: '🪵', price: 0 },
+      { id: 'glacier', name: 'Glacier', emoji: '🧊', price: 150 },
+      { id: 'bonbon', name: 'Barbe à papa', emoji: '🍭', price: 220 },
+      { id: 'journal', name: 'Papier journal', emoji: '📰', price: 280 },
+      { id: 'marbre', name: 'Marbre', emoji: '🏛️', price: 450 },
+      { id: 'ocean', name: 'Abysses', emoji: '🌊', price: 700 },
+      { id: 'sakura', name: 'Jardin japonais', emoji: '🌸', price: 1000 },
+      { id: 'neon', name: 'Néon synthwave', emoji: '🌆', price: 1400 },
+      { id: 'lave', name: 'Magma', emoji: '🌋', price: 1900 },
+      { id: 'or', name: 'Royal doré', emoji: '👑', price: 2700 },
+      { id: 'galaxie', name: 'Galaxie', emoji: '🌌', price: 3400 },
+      { id: 'holo', name: 'Holographique', emoji: '💿', price: 4800 },
+    ],
+    // ♞ pièces d'échecs : TES pièces s'affichent avec ton skin, chez tout le monde
+    chesspc: [
+      { id: 'classic', name: 'Ivoire & ébène', emoji: '♞', price: 0 },
+      { id: 'bois', name: 'Bois sculpté', emoji: '🪵', price: 120 },
+      { id: 'marbre', name: 'Marbre', emoji: '🏛️', price: 250 },
+      { id: 'verre', name: 'Verre soufflé', emoji: '🔮', price: 400 },
+      { id: 'metal', name: 'Or & argent', emoji: '🥇', price: 650 },
+      { id: 'royaume', name: 'Royaume', emoji: '🤴', price: 800, set: { K: '🤴', Q: '👸', R: '🏰', B: '🧙', N: '🏇', P: '💂' } },
+      { id: 'zoo', name: 'Zoo', emoji: '🦁', price: 900, set: { K: '🦁', Q: '🦄', R: '🐘', B: '🦉', N: '🐴', P: '🐭' } },
+      { id: 'neon', name: 'Néon', emoji: '💡', price: 1300 },
+      { id: 'monstres', name: 'Monstres', emoji: '👹', price: 1500, set: { K: '👹', Q: '🧛', R: '🧟', B: '👻', N: '🐺', P: '💀' } },
+      { id: 'espace', name: 'Conquête spatiale', emoji: '🚀', price: 1800, set: { K: '🪐', Q: '🌟', R: '🚀', B: '🛸', N: '☄️', P: '👽' } },
+      { id: 'feuglace', name: 'Feu & glace', emoji: '🔥', price: 2200 },
+      { id: 'diamant', name: 'Diamant', emoji: '💎', price: 2800 },
+      { id: 'galaxie', name: 'Cosmos', emoji: '🌌', price: 3500 },
+      { id: 'holo', name: 'Prisme', emoji: '🌈', price: 5000 },
     ],
     // animations quand TON cheval en mange un autre ou rentre au centre (tout le monde les voit)
     pcfx: [
