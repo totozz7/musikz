@@ -159,8 +159,8 @@
 // ── petits outils partagés par les 4 nouveaux jeux ──
 function podium(rk) {
   const P = (id) => state?.players.find(p => p.id === id);
-  return `<div class="gp-podium">${rk.slice(0, 3).map((x, i) => { const p = P(x.pid); return `<div class="pod p${i + 1}">${p ? avatarHTML(p, i ? 56 : 76) : ''}<b>${esc(p?.name || '?')}</b><span>${x.pts} pts</span><i>${i + 1}</i></div>`; }).join('')}</div>
-    ${rk.length > 3 ? `<div class="dt-rest">${rk.slice(3).map((x, i) => `<span>#${i + 4} ${esc(P(x.pid)?.name || '?')} — ${x.pts} pts</span>`).join('')}</div>` : ''}`;
+  return `<div class="gp-podium">${rk.slice(0, 3).map((x, i) => { const p = P(x.pid); return `<div class="pod p${i + 1}">${p ? avatarHTML(p, i ? 56 : 76) : ''}<b>${esc(p?.name || '?')}</b><span>${x.pts} ${x.unit || 'pts'}</span><i>${i + 1}</i></div>`; }).join('')}</div>
+    ${rk.length > 3 ? `<div class="dt-rest">${rk.slice(3).map((x, i) => `<span>#${i + 4} ${esc(P(x.pid)?.name || '?')} — ${x.pts} ${x.unit || 'pts'}</span>`).join('')}</div>` : ''}`;
 }
 function endBtns(p) { return `<div class="end-actions">${isHost() ? `<button class="btn btn-primary" id="${p}-replay">🔁 Rejouer</button><button class="btn btn-yellow" id="${p}-lobby">🏠 Salon</button>` : '<p class="muted">L\'hôte peut relancer une partie.</p>'}<button class="btn btn-shop" id="${p}-wheel">🎡 Roue de la chance</button></div>`; }
 function endWire(p, rk) {

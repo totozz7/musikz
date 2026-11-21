@@ -20,7 +20,7 @@ const io = new Server(server);
 const PUB = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : __dirname;
 const INDEX = path.join(PUB, 'index.html');
 const SHOP = require(path.join(PUB, 'shop.js'));
-for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js', 'client-draw.js', 'client-bac.js', 'client-bluff.js', 'client-punch.js', 'client-top7.js', 'client-quiz.js', 'client-n25.js', 'client-sem.js', 'client-chess.js', 'cards.js', 'client-cards.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
+for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js', 'client-draw.js', 'client-bac.js', 'client-bluff.js', 'client-punch.js', 'client-top7.js', 'client-quiz.js', 'client-n25.js', 'client-sem.js', 'client-chess.js', 'cards.js', 'client-cards.js', 'client-c4.js', 'client-poker.js', 'client-golf.js', 'client-trade.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
 app.get('/', (req, res) => res.sendFile(INDEX));
 app.get('/r/:code', (req, res) => res.sendFile(INDEX));
 app.get('/health', (req, res) => res.send('ok'));
@@ -401,6 +401,9 @@ const GAMES = {
   quiz: require('./game-quiz')(gameCtx),
   n25: require('./game-n25')(gameCtx),
   chess: require('./game-chess')(gameCtx),
+  c4: require('./game-c4')(gameCtx),
+  poker: require('./game-poker')(gameCtx),
+  golf: require('./game-golf')(gameCtx),
   sem: require('./game-sem')(gameCtx),
 };
 // infos affichées sur l'écran de choix (nombre de joueurs !)
@@ -414,7 +417,7 @@ const GAME_INFO = {
   guess: { min: 1, max: GAMES.guess.max },
   primo: { min: 1, max: GAMES.primo.max },
   draw: { min: 2, max: GAMES.draw.max },
-  bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, quiz: { min: 1, max: 12 }, n25: { min: 1, max: 12 }, chess: { min: 2, max: 12 },
+  bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, quiz: { min: 1, max: 12 }, n25: { min: 1, max: 12 }, chess: { min: 2, max: 12 }, c4: { min: 2, max: 12 }, poker: { min: 2, max: 8 }, golf: { min: 1, max: 8 },
 };
 app.get('/api/guess-themes', (req, res) => res.json(GAMES.guess.themes));
 app.get('/api/games', (req, res) => res.json({ info: GAME_INFO, ucThemes: GAMES.undercover.themes() }));
@@ -776,7 +779,7 @@ io.on('connection', (socket) => {
   socket.on('create', ({ name, avatar, pid, game, ...look }, cb) => {
     const code = makeCode();
     room = { code, players: new Map(), hostId: pid, phase: 'lobby', settings: defaultSettings(), chat: [], history: [],
-      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults(), draw: GAMES.draw.defaults(), bac: GAMES.bac.defaults(), bluff: GAMES.bluff.defaults(), punch: GAMES.punch.defaults(), sem: GAMES.sem.defaults(), top7: GAMES.top7.defaults(), quiz: GAMES.quiz.defaults(), n25: GAMES.n25.defaults(), chess: GAMES.chess.defaults() }, gscores: {}, g: null };
+      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults(), draw: GAMES.draw.defaults(), bac: GAMES.bac.defaults(), bluff: GAMES.bluff.defaults(), punch: GAMES.punch.defaults(), sem: GAMES.sem.defaults(), top7: GAMES.top7.defaults(), quiz: GAMES.quiz.defaults(), n25: GAMES.n25.defaults(), chess: GAMES.chess.defaults(), c4: GAMES.c4.defaults(), poker: GAMES.poker.defaults(), golf: GAMES.golf.defaults() }, gscores: {}, g: null };
     rooms.set(code, room);
     join(room, { name, avatar, pid, ...look }, cb);
   });
@@ -867,7 +870,7 @@ io.on('connection', (socket) => {
   socket.on('setGame', (game) => {
     if (!isHost() || !['lobby', 'end'].includes(room.phase) || !GAME_INFO[game]) return;
     room.game = game; room.phase = 'lobby'; stopModuleGame(room);
-    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time', bac: '📋 Petit Bac', bluff: '🎭 Le Bluff', punch: '🎤 Punchline', sem: '🌡️ Ça chauffe !', top7: '7️⃣ Top 7', quiz: '❓ Quiz', n25: '🎯 25 Pile', chess: '♟️ Échecs' }[game]}`);
+    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time', bac: '📋 Petit Bac', bluff: '🎭 Le Bluff', punch: '🎤 Punchline', sem: '🌡️ Ça chauffe !', top7: '7️⃣ Top 7', quiz: '❓ Quiz', n25: '🎯 25 Pile', chess: '♟️ Échecs', c4: '🔴🟡 Puissance 4', poker: '🃏 Poker', golf: '⛳ Mini-golf' }[game]}`);
     broadcast(room);
   });
   socket.on('gsettings', (patch = {}) => {
@@ -1048,6 +1051,48 @@ io.on('connection', (socket) => {
     if (act === 'rename') { const n = String(name || '').trim().slice(0, 20); if (!n) return cb?.({ error: 'Nom vide' }); sysMsg(room, `✏️ ${p.name} s'appelle maintenant ${n}`); p.name = n; broadcast(room); return cb?.({ ok: true }); }
     if (act === 'mute') { p.mutedUntil = p.mutedUntil > Date.now() ? 0 : Date.now() + 120000; io.to(p.socketId).emit('toast', { type: 'warn', text: p.mutedUntil ? '🤐 Le modo t\'a coupé le chat pendant 2 minutes' : '🗣️ Tu peux de nouveau parler' }); return cb?.({ ok: true, muted: !!p.mutedUntil }); }
     cb?.({ error: 'Action inconnue' });
+  });
+  // 🔄 ÉCHANGES entre joueurs du même salon (objets de la boutique, cartes, pièces).
+  // Les inventaires vivent dans les navigateurs : le serveur relaie, vérifie le format et demande confirmation aux deux.
+  const cleanPack = (x = {}) => {
+    const items = (Array.isArray(x.items) ? x.items : []).slice(0, 24).filter(it => Array.isArray(it) && SHOP[it[0]] && Array.isArray(SHOP[it[0]]) && SHOP[it[0]].some(o => o.id === it[1] && o.price > 0)).map(it => [it[0], it[1]]);
+    const cards = {}; for (const [n, c] of Object.entries(x.cards || {}).slice(0, 40)) { const k = Math.floor(+c); if (/^\d{1,3}$/.test(n) && k > 0 && k <= 99) cards[n] = k; }
+    const coins = Math.max(0, Math.min(100000, Math.floor(+x.coins || 0)));
+    return { items, cards, coins };
+  };
+  const packEmpty = (p) => !p.items.length && !Object.keys(p.cards).length && !p.coins;
+  socket.on('trade:inv', ({ to } = {}, cb) => {
+    if (!room || !me) return cb?.({ error: 'Rejoins un salon' });
+    const t = room.players.get(to); if (!t?.online || t.id === me.id) return cb?.({ error: 'Joueur introuvable' });
+    io.to(t.socketId).timeout(5000).emit('trade:invq', { from: me.id }, (err, res) => cb?.(err || !res?.[0] ? { error: 'Pas de réponse' } : { ok: true, inv: res[0] }));
+  });
+  socket.on('trade:offer', ({ to, give, want } = {}, cb) => {
+    if (!room || !me) return cb?.({ error: 'Rejoins un salon' });
+    const t = room.players.get(to); if (!t?.online || t.id === me.id) return cb?.({ error: 'Joueur introuvable' });
+    give = cleanPack(give); want = cleanPack(want);
+    if (packEmpty(give) && packEmpty(want)) return cb?.({ error: 'Échange vide' });
+    room.trades = room.trades || {};
+    const id = Math.random().toString(36).slice(2, 9);
+    room.trades[id] = { id, from: me.id, to: t.id, give, want, at: Date.now() };
+    setTimeout(() => { if (room.trades?.[id]) { delete room.trades[id]; io.to(me.socketId).emit('trade:result', { id, ok: false, why: 'Proposition expirée' }); } }, 120000);
+    io.to(t.socketId).emit('trade:offer', { id, from: me.id, fromName: me.name, give, want });
+    cb?.({ ok: true, id });
+  });
+  socket.on('trade:answer', ({ id, ok, why } = {}) => {
+    const tr = room?.trades?.[id]; if (!tr || tr.to !== me?.id) return;
+    const A = room.players.get(tr.from), B = me;
+    const fail = (w) => { delete room.trades[id]; [A, B].forEach(p => p && io.to(p.socketId).emit('trade:result', { id, ok: false, why: w })); };
+    if (!ok) return fail(why || `${B.name} a refusé l'échange`);
+    if (!A?.online) return fail('Le joueur est parti');
+    // le proposeur vérifie qu'il a toujours ce qu'il donne
+    io.to(A.socketId).timeout(5000).emit('trade:confirm', { id, give: tr.give }, (err, res) => {
+      if (!room.trades?.[id]) return;
+      if (err || !res?.[0]?.ok) return fail(res?.[0]?.why || "L'échange n'a pas pu être confirmé");
+      delete room.trades[id];
+      io.to(A.socketId).emit('trade:apply', { id, with: B.name, remove: tr.give, add: tr.want });
+      io.to(B.socketId).emit('trade:apply', { id, with: A.name, remove: tr.want, add: tr.give });
+      sysMsg(room, `🤝 ${A.name} et ${B.name} ont fait un échange !`);
+    });
   });
   socket.on('chat', (text) => {
     if (!room || !me) return;

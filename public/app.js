@@ -256,6 +256,9 @@ const GAME_META = {
   bac: { emoji: '📋', name: 'Petit Bac', desc: 'Une lettre, des catégories classiques ou complètement fun… Remplis tout et crie STOP ! Puis on démonte les réponses des autres.', cls: 'g-bac', lobby: 'Tous à vos stylos ! ✍️' },
   bluff: { emoji: '🎭', name: 'Le Bluff', desc: 'Une anecdote vraie à trou : invente une fausse réponse crédible pour piéger tes potes… et retrouve la vraie !', cls: 'g-bluff', lobby: 'Que le meilleur menteur gagne 😏' },
   quiz: { emoji: '❓', name: 'Quiz', desc: 'Culture G, sport, manga, ciné… 4 choix, réponds vite ! Et des manches « La moins répondue » où il faut la bonne réponse que personne d\'autre n\'a donnée.', cls: 'g-quiz', lobby: 'Buzzers prêts ! ❓' },
+  c4: { emoji: '🔴', name: 'Puissance 4', desc: 'Aligne 4 jetons avant ton adversaire ! Jetons qui tombent et rebondissent, mode Géant (aligne 5) et mode Bombes 💣.', cls: 'g-c4', lobby: 'Qui alignera ses jetons en premier ? 🔴🟡' },
+  poker: { emoji: '🃏', name: 'Poker', desc: "Texas Hold'em entre potes : jetons, relances, tapis et bluff. 3 modes : Classique, Turbo et Tapis !", cls: 'g-poker', lobby: 'Faites vos jeux… et votre meilleur visage de bluffeur 😎' },
+  golf: { emoji: '⛳', name: 'Mini-golf', desc: 'Mini-golf vu de dessus : moulins, eau, sable, vent, glace, bumpers et portails. Tout le monde joue en même temps !', cls: 'g-golf', lobby: 'Sortez les clubs, attention à la mare 🏌️' },
   chess: { emoji: '♟️', name: 'Échecs', desc: 'Le vrai jeu d\'échecs, en beau : pendules, 5 modes (Chess960, Roi de la colline, 3 échecs, Brouillard…), le gagnant reste à la table et les spectateurs parient !', cls: 'g-chess', lobby: 'Que le meilleur stratège gagne ♟️' },
   n25: { emoji: '🎯', name: '25 Pile', desc: '25 questions dans le désordre, et les réponses sont tous les nombres de 1 à 25, chacun une seule fois. Place les boules, déduis, et vise le 25/25 !', cls: 'g-n25', lobby: 'Boules chargées ! 🎯' },
   top7: { emoji: '7️⃣', name: 'Top 7', desc: 'Les 7 réponses préférées des gens sur un thème. Chacun son tour : plus ta réponse est rare dans le top, plus elle rapporte (n°7 = 7 pts) !', cls: 'g-top7', lobby: 'Plateau prêt ! 7️⃣' },
@@ -267,8 +270,23 @@ const GAME_META = {
   horses: { emoji: '🐎', name: 'Petits chevaux', desc: 'Le grand classique : lance le dé, sors tes chevaux, renvoie les autres à l\'écurie ! Choisis le skin de tes pions.', cls: 'g-horses', lobby: 'Tous en selle ! 🐎' },
   note: { emoji: '🔢', name: 'Jeu de la Note', desc: "Une note secrète sur 10, trois thèmes : réponds avec quelque chose qui « vaut » ta note. Les autres devinent !", cls: 'g-note', lobby: 'Sur une échelle de 1 à 10… 🔢' },
 };
-let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, primo: { min: 1, max: 8 }, draw: { min: 2, max: 12 }, bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, quiz: { min: 1, max: 12 }, n25: { min: 1, max: 12 }, chess: { min: 2, max: 12 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [];
+let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, primo: { min: 1, max: 8 }, draw: { min: 2, max: 12 }, bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, quiz: { min: 1, max: 12 }, n25: { min: 1, max: 12 }, chess: { min: 2, max: 12 }, c4: { min: 2, max: 12 }, poker: { min: 2, max: 8 }, golf: { min: 1, max: 8 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [];
 fetch('/api/guess-themes').then(r => r.json()).then(t => { GP_THEMES = t; if (state?.game === 'guess') renderGameLobby?.(); }).catch(() => {});
+const GAME_TAGS = { blindtest: 'musique chanson son audio', undercover: 'mots espion bluff mot secret', word: 'mots lettres rapidité clavier wordle', horses: 'plateau dés course chevaux', liar: 'cartes bluff menteur', guess: 'images photo deviner flou', primo: 'cartes uno', draw: 'dessin dessiner pictionary', bac: 'mots lettres petit bac', bluff: 'questions mensonge bluff', punch: 'humour phrases blague', sem: 'mots proximité sens cemantix', top7: 'classement listes réponses', quiz: 'questions culture qcm', n25: 'nombres chiffres questions', chess: 'plateau stratégie échecs 2 joueurs', note: 'note avis', c4: 'plateau jetons aligner 2 joueurs puissance', poker: 'cartes jetons argent casino bluff', golf: 'sport balle adresse minigolf mini-golf' };
+const normq = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+function gameMatch(id, q) {
+  if (!q) return true;
+  const m = GAME_META[id], i = GAME_INFO[id] || {};
+  const hay = normq(`${m.name} ${m.desc} ${GAME_TAGS[id] || ''} ${id}`);
+  return normq(q).split(/\s+/).filter(Boolean).every(w => /^\d+$/.test(w) ? (+w >= (i.min || 1) && +w <= (i.max || 99)) : hay.includes(w));
+}
+function filterGames(sel, q, none) {
+  let n = 0; $$(sel).forEach(b => { const ok = gameMatch(b.dataset.game || b.dataset.g, q); b.classList.toggle('hidden', !ok); n += ok; });
+  if (none) $(none).classList.toggle('hidden', n > 0);
+}
+$('#g-q').addEventListener('input', () => { filterGames('#games .game-card', $('#g-q').value, '#g-none'); $('#g-q-x').classList.toggle('hidden', !$('#g-q').value); });
+$('#g-q-x').onclick = () => { $('#g-q').value = ''; $('#g-q').dispatchEvent(new Event('input')); $('#g-q').focus(); };
+$('#gs-q').addEventListener('input', () => filterGames('#game-switch .gs', $('#gs-q').value));
 const playersLabel = (g) => { const i = GAME_INFO[g]; return i.min === i.max ? `${i.min} joueurs` : `${i.min} à ${i.max} joueurs`; };
 function renderGames() {
   $('#games').innerHTML = Object.entries(GAME_META).map(([id, m], i) => `
@@ -278,6 +296,7 @@ function renderGames() {
       <span class="g-info"><b>${m.name}</b><small>${m.desc}</small></span>
       <span class="g-go">Jouer ▶</span>
     </button>`).join('');
+  filterGames('#games .game-card', $('#g-q')?.value || '', '#g-none');
   $$('#games .game-card').forEach(b => b.onclick = () => {
     const id = identity(); if (!id) return;
     socket.emit('create', { ...id, game: b.dataset.game }, onJoined);
@@ -383,6 +402,7 @@ function renderGameLobby() {
   $('#game-switch').innerHTML = Object.entries(GAME_META).map(([id, x]) => `<button class="gs ${x.cls} ${id === g ? 'on' : ''}" data-g="${id}" ${isHost() ? '' : 'disabled'}>
     <span>${x.emoji}</span><b>${x.name}</b><small>👥 ${playersLabel(id)}</small></button>`).join('');
   $$('#game-switch .gs').forEach(b => b.onclick = () => { if (isHost() && b.dataset.g !== g) socket.emit('setGame', b.dataset.g); });
+  filterGames('#game-switch .gs', $('#gs-q')?.value || '');
   $('#lobby-title').textContent = m.lobby;
   const ok = n >= info.min && n <= info.max;
   $('#lobby-count').className = 'lobby-count ' + (ok ? 'ok' : 'ko');
@@ -397,8 +417,8 @@ function renderGameLobby() {
   $('#set-guess').classList.toggle('hidden', g !== 'guess');
   $('#set-primo').classList.toggle('hidden', g !== 'primo');
   $('#set-draw').classList.toggle('hidden', g !== 'draw');
-  ['bac', 'bluff', 'punch', 'sem', 'top7', 'quiz', 'n25', 'chess'].forEach(k => $('#set-' + k).classList.toggle('hidden', g !== k));
-  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO', draw: 'Draw Time', bac: 'le Petit Bac', bluff: 'le Bluff', punch: 'Punchline', sem: 'Ça chauffe', top7: 'le Top 7', quiz: 'le Quiz', n25: '25 Pile', chess: 'les Échecs' }[g]}`;
+  ['bac', 'bluff', 'punch', 'sem', 'top7', 'quiz', 'n25', 'chess', 'c4', 'poker', 'golf'].forEach(k => $('#set-' + k).classList.toggle('hidden', g !== k));
+  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO', draw: 'Draw Time', bac: 'le Petit Bac', bluff: 'le Bluff', punch: 'Punchline', sem: 'Ça chauffe', top7: 'le Top 7', quiz: 'le Quiz', n25: '25 Pile', chess: 'les Échecs', c4: 'le Puissance 4', poker: 'le Poker', golf: 'le Mini-golf' }[g]}`;
   $('#btn-start').disabled = !ok;
   if (g === 'blindtest') return;
   const box = $('#set-' + g), gs = state.gs?.[g] || {};
@@ -488,6 +508,7 @@ function renderPlayers() {
       <span class="nm">${nameHTML(p)}${p.host ? ' 👑' : ''}${p.title ? `<small class="ptitle">« ${esc(p.title)} »</small>` : p.id === pid ? ' <small>(toi)</small>' : ''}${p.streak >= 3 ? ` <small>🔥 série de ${p.streak}</small>` : ''}</span>
       <span class="marks">${marks}</span>
       <span class="sc">${p.score}</span>
+      ${p.id !== pid && p.online ? `<button class="trade-btn" data-trade="${p.id}" title="Proposer un échange">🔄</button>` : ''}
       ${isHost() && p.id !== pid && state.phase === 'lobby' ? `<button class="kick" data-kick="${p.id}" title="Exclure">✕</button>` : ''}
     </li>`;
   }).join('');
@@ -651,7 +672,7 @@ socket.on('reward', grantCoins);
 const gAct = (type, data) => new Promise(r => socket.emit('g', { type, data }, (res) => { if (res?.error) toast(res.error, 'error'); r(res); }));
 socket.on('g:state', (v) => {
   if (v.game === 'undercover' && window.UC) { if (!$('#v-uc').classList.contains('active')) showView('v-uc'); window.UC.render(v); }
-  const MODS = { bac: 'BAC', bluff: 'BLUFF', punch: 'PUNCH', sem: 'SEM', top7: 'TOP7', quiz: 'QUIZ', n25: 'N25', chess: 'CHESS' };
+  const MODS = { bac: 'BAC', bluff: 'BLUFF', punch: 'PUNCH', sem: 'SEM', top7: 'TOP7', quiz: 'QUIZ', n25: 'N25', chess: 'CHESS', c4: 'C4', poker: 'POKER', golf: 'GOLF' };
   if (MODS[v.game] && window[MODS[v.game]]) { if (!$('#v-' + v.game).classList.contains('active')) showView('v-' + v.game); window[MODS[v.game]].render(v); }
   if (v.game === 'draw' && window.DRAW) { if (!$('#v-draw').classList.contains('active')) showView('v-draw'); window.DRAW.render(v); }
   if (v.game === 'primo' && window.PRIMO) { if (!$('#v-primo').classList.contains('active')) showView('v-primo'); window.PRIMO.render(v); }
@@ -1100,6 +1121,13 @@ function sfx(name, vol = 1) {
   if (name === 'swell') { shaped(1.2, x => Math.pow(x, 1.6), 400, 1600, 'bandpass', 2.6); }
   if (name === 'roar') { shaped(3.2, x => Math.min(1, x * 12) * Math.pow(1 - x, .8), 700, 900, 'bandpass', 3.2); shaped(2.6, x => Math.min(1, x * 10) * (1 - x), 1800, 1400, 'bandpass', 1.4); }
   if (name === 'boom') { const o = osc('sine', 90, 0, 1.1, 1.6); o.frequency.exponentialRampToValueAtTime(28, t0 + 1.1); noise(.5, 600, 60, 'lowpass', 3.2); }
+  if (name === 'coin') { [0, .05, .1].forEach((d, i) => { osc('triangle', 2400 + i * 300, d, d + .04, .45); noise(.03, 5000, 3000, 'highpass', .5, d); }); }
+  if (name === 'putt') { osc('sine', 900, 0, .06, .9); noise(.05, 3000, 1500, 'bandpass', 1.2); }
+  if (name === 'hole') { [0, .09, .2].forEach((d, i) => { const o = osc('sine', 700 - i * 150, d, d + .12, .9); o.frequency.exponentialRampToValueAtTime(300 - i * 60, t0 + d + .12); }); }
+  if (name === 'splash') { shaped(.9, x => Math.min(1, x * 30) * Math.pow(1 - x, 2), 2500, 500, 'lowpass', 3); shaped(.5, x => Math.pow(1 - x, 3), 6000, 3000, 'highpass', 1.2); }
+  if (name === 'wall') { osc('sine', 260, 0, .07, .7); noise(.04, 1200, 600, 'bandpass', 1); }
+  if (name === 'whoosh') { shaped(.6, x => Math.sin(x * Math.PI), 400, 2200, 'bandpass', 2); }
+  if (name === 'sand') { shaped(.4, x => Math.pow(1 - x, 1.5), 3000, 1800, 'highpass', 1.6); }
   if (name === 'clunk') { noise(.09, 300, 90, 'lowpass', 3); osc('square', 60, 0, .08, .5); }
   if (name === 'crowd') { noise(2.6, 500, 1100, 'bandpass', 2.4); noise(2.2, 1400, 2200, 'bandpass', 1.2); }
   if (name === 'click') { noise(.05, 2500, 1200, 'bandpass', 1.6); osc('square', 1800, 0, .04, .25); }
@@ -1513,6 +1541,68 @@ const ART = (() => {
     chest: () => { const u = 'c' + n++; return `<div class="c-glow"></div><div class="c-lido">${chestLidOpen(u)}</div><div class="c-body">${chestBody(u)}</div><div class="c-gold">${treasure(u)}</div><div class="c-lid">${chestLid(u)}</div><div class="c-lock">${lock(u)}</div>`; },
   };
 })();
+// ── version CARTOON (v27) : gros contours, couleurs vives, cadeau avec une bouille ──
+const TOON = (() => {
+  const O = '#2b1640';
+  const gift = () => `<div class="toon tg"><div class="tg-rays"></div><svg viewBox="0 0 240 250" class="tg-svg">
+      <defs><pattern id="tgDots" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="4" fill="#ffe14d"/><circle cx="19" cy="19" r="3" fill="#fff" opacity=".7"/></pattern></defs>
+      <ellipse cx="120" cy="236" rx="86" ry="10" fill="#000" opacity=".35" class="tg-shadow"/>
+      <g class="tg-body">
+        <rect x="38" y="112" width="164" height="114" rx="16" fill="#ff5fa2" stroke="${O}" stroke-width="7"/>
+        <rect x="38" y="112" width="164" height="114" rx="16" fill="url(#tgDots)"/>
+        <path d="M48 124 v86" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".45"/>
+        <rect x="106" y="112" width="28" height="114" fill="#3fe0c5" stroke="${O}" stroke-width="6"/>
+        <rect x="112" y="116" width="6" height="106" fill="#fff" opacity=".5"/>
+        <g class="tg-face">
+          <g class="tg-eyes"><ellipse cx="78" cy="160" rx="9" ry="12" fill="${O}"/><ellipse cx="162" cy="160" rx="9" ry="12" fill="${O}"/><circle cx="81" cy="155" r="3.5" fill="#fff"/><circle cx="165" cy="155" r="3.5" fill="#fff"/></g>
+          <g class="tg-squint"><path d="M68 154 l14 7 -14 7 M172 154 l-14 7 14 7" fill="none" stroke="${O}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></g>
+          <g class="tg-happy"><path d="M68 164 q10 -14 20 0 M152 164 q10 -14 20 0" fill="none" stroke="${O}" stroke-width="6" stroke-linecap="round"/></g>
+          <ellipse cx="66" cy="182" rx="11" ry="6" fill="#ff2e7a" opacity=".55"/><ellipse cx="174" cy="182" rx="11" ry="6" fill="#ff2e7a" opacity=".55"/>
+          <path d="M84 184 q8 10 16 0" fill="none" stroke="${O}" stroke-width="5" stroke-linecap="round" class="tg-mouth"/>
+          <path d="M140 184 q8 10 16 0" fill="none" stroke="${O}" stroke-width="5" stroke-linecap="round" class="tg-mouth"/>
+        </g>
+      </g>
+      <g class="tg-lid">
+        <rect x="28" y="84" width="184" height="40" rx="12" fill="#ff7ab8" stroke="${O}" stroke-width="7"/>
+        <path d="M40 94 h160" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".5"/>
+        <rect x="104" y="84" width="32" height="40" fill="#3fe0c5" stroke="${O}" stroke-width="6"/>
+        <g class="tg-bow">
+          <path d="M120 82 C96 40 50 46 62 74 C70 92 100 90 120 82Z" fill="#3fe0c5" stroke="${O}" stroke-width="6" stroke-linejoin="round"/>
+          <path d="M120 82 C144 40 190 46 178 74 C170 92 140 90 120 82Z" fill="#3fe0c5" stroke="${O}" stroke-width="6" stroke-linejoin="round"/>
+          <path d="M76 66 q8 -12 22 -6" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+          <path d="M108 86 l-12 26 10 -4 6 9 4 -30Z M132 86 l12 26 -10 -4 -6 9 -4 -30Z" fill="#2cc4aa" stroke="${O}" stroke-width="5" stroke-linejoin="round"/>
+          <circle cx="120" cy="82" r="14" fill="#7dffe6" stroke="${O}" stroke-width="6"/><circle cx="115" cy="77" r="4" fill="#fff"/>
+        </g>
+      </g>
+      <g class="tg-pop"><path d="M120 40 l12 26 28 3 -21 19 6 28 -25 -14 -25 14 6 -28 -21 -19 28 -3Z" fill="#ffe14d" stroke="${O}" stroke-width="6" stroke-linejoin="round"/><circle cx="110" cy="72" r="4" fill="${O}"/><circle cx="130" cy="72" r="4" fill="${O}"/><path d="M112 84 q8 8 16 0" fill="none" stroke="${O}" stroke-width="4" stroke-linecap="round"/></g>
+    </svg></div>`;
+  const chest = () => `<div class="toon tc"><div class="tc-rays"></div><svg viewBox="0 0 260 250" class="tc-svg">
+      <defs><linearGradient id="tcIn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6a8"/><stop offset="1" stop-color="#ffb300"/></linearGradient></defs>
+      <ellipse cx="130" cy="236" rx="100" ry="11" fill="#000" opacity=".35"/>
+      <g class="tc-inside"><path d="M44 128 Q130 96 216 128 L216 142 L44 142Z" fill="#4a1a08" stroke="${O}" stroke-width="6"/>
+        <g class="tc-loot"><path d="M54 132 Q80 92 110 104 Q130 78 156 100 Q186 90 206 130Z" fill="url(#tcIn)" stroke="${O}" stroke-width="5" stroke-linejoin="round"/>
+          ${[[74, 118], [96, 108], [124, 98], [150, 106], [176, 112], [192, 124], [110, 120], [140, 118]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="12" ry="6" fill="#ffd21f" stroke="${O}" stroke-width="3.5"/>`).join('')}
+          <path d="M100 90 l10 -12 10 12 -10 12Z" fill="#3fe0ff" stroke="${O}" stroke-width="4"/><path d="M152 86 l10 -10 10 10 -10 12Z" fill="#ff4d8a" stroke="${O}" stroke-width="4"/><path d="M128 80 l7 -14 7 14 -7 8Z" fill="#7dff8a" stroke="${O}" stroke-width="4"/></g></g>
+      <g class="tc-body">
+        <rect x="34" y="128" width="192" height="98" rx="14" fill="#ff8a3d" stroke="${O}" stroke-width="7"/>
+        <path d="M40 160 H220 M40 192 H220" stroke="#c4541a" stroke-width="5"/>
+        <path d="M46 140 v76" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".4"/>
+        <rect x="58" y="128" width="22" height="98" fill="#ffd21f" stroke="${O}" stroke-width="6"/><rect x="180" y="128" width="22" height="98" fill="#ffd21f" stroke="${O}" stroke-width="6"/>
+        <circle cx="69" cy="146" r="4" fill="${O}"/><circle cx="69" cy="208" r="4" fill="${O}"/><circle cx="191" cy="146" r="4" fill="${O}"/><circle cx="191" cy="208" r="4" fill="${O}"/>
+        <g class="tc-lock"><path d="M130 196 C100 176 104 150 120 150 C126 150 130 156 130 160 C130 156 134 150 140 150 C156 150 160 176 130 196Z" fill="#ffd21f" stroke="${O}" stroke-width="6" stroke-linejoin="round"/><circle cx="130" cy="166" r="5" fill="${O}"/><path d="M127 168 h6 l2 12 h-10Z" fill="${O}"/><circle cx="120" cy="160" r="3" fill="#fff"/></g>
+      </g>
+      <g class="tc-lid">
+        <path d="M30 132 Q30 64 130 60 Q230 64 230 132Z" fill="#ff9d4f" stroke="${O}" stroke-width="7" stroke-linejoin="round"/>
+        <path d="M44 120 Q48 80 120 72" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".45"/>
+        <path d="M56 132 V86 Q62 76 78 72 V132Z M182 72 Q198 76 204 86 V132 H182Z" fill="#ffd21f" stroke="${O}" stroke-width="6" stroke-linejoin="round"/>
+        <rect x="26" y="122" width="208" height="16" rx="6" fill="#ffd21f" stroke="${O}" stroke-width="6"/>
+        <path d="M118 138 h24 v-14 h-24Z" fill="#ffd21f" stroke="${O}" stroke-width="5"/>
+        <circle cx="150" cy="86" r="5" fill="#fff" class="tc-twinkle"/>
+      </g>
+    </svg></div>`;
+  return { gift, chest };
+})();
+ART.gift = TOON.gift; ART.chest = TOON.chest;
 $('#op-box .gift3d').innerHTML = ART.gift();
 $('#op-box .chest3d').innerHTML = ART.chest();
 $('#rw-gift .rw-ico').innerHTML = `<span class="mini-art gift3d">${ART.gift()}</span>`;

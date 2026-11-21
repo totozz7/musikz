@@ -50,6 +50,8 @@
 
       <div class="games-col">
         <h2 class="pick-title">🎮 Choisis ton jeu</h2>
+        <div class="g-search"><span>🔎</span><input id="g-q" type="search" placeholder="Chercher un jeu… (cartes, musique, dessin, 2 joueurs…)" autocomplete="off"><button id="g-q-x" class="hidden">✕</button></div>
+        <p id="g-none" class="muted hidden">Aucun jeu ne correspond 😕</p>
         <div id="games" class="games"></div>
       </div>
     </div>
@@ -82,6 +84,7 @@
     <main class="stage">
       <!-- LOBBY -->
       <div id="v-lobby" class="view">
+        <div class="g-search small"><span>🔎</span><input id="gs-q" type="search" placeholder="Chercher un jeu…" autocomplete="off"></div>
         <div id="game-switch" class="game-switch"></div>
         <div class="lobby-head">
           <h2 id="lobby-title">Préparez vos oreilles 🎧</h2>
@@ -202,6 +205,32 @@
             <label class="tog qz-tog qz-raretog"><input type="checkbox" class="gtog" data-key="t_rare"><span></span> 🦄 La moins répondue <small>(1 question sur 5)</small></label>
           </div>
           <div class="set-block rules"><h4>📜 Règles</h4><p>4 choix, une seule bonne réponse : <b>500 à 1 000 pts</b> selon ta vitesse, + bonus de série à partir de 3 bonnes réponses d'affilée. <b>🦄 La moins répondue</b> (une question sur 5) : écris une bonne réponse… que les autres n'ont PAS donnée ! La bonne réponse la plus rare rapporte 1 000 pts, une bonne réponse « banale » 300.</p></div>
+        </div>
+        <div id="set-c4" class="settings gset hidden">
+          <div class="set-block"><h4>🎮 Mode</h4><div class="seg gseg" data-key="mode"><button data-v="classic">🔴 Classique</button><button data-v="big">🟡 Géant (aligne 5)</button><button data-v="bomb">💣 Bombes</button></div>
+            <p class="muted small hint2">Bombes : chaque joueur a une bombe qui pulvérise les jetons autour de sa case. Après l'explosion, tout retombe… et ça peut créer des lignes !</p></div>
+          <div class="set-row">
+            <div class="set-block"><h4>⏱️ Temps par coup</h4><div class="seg gseg" data-key="time"><button data-v="10">10 s</button><button data-v="20">20 s</button><button data-v="40">40 s</button><button data-v="0">♾️</button></div></div>
+            <div class="set-block"><h4>🔁 Manches</h4><div class="seg gseg" data-key="games"><button data-v="1">1</button><button data-v="3">3</button><button data-v="5">5</button></div></div>
+          </div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>Chacun son tour, fais tomber un jeton dans une colonne. Le premier qui en aligne 4 (5 en mode Géant), à l'horizontale, à la verticale ou en diagonale, gagne la manche. À plus de 2 : le gagnant reste, le perdant passe son tour.</p></div>
+        </div>
+        <div id="set-poker" class="settings gset hidden">
+          <div class="set-block"><h4>🎮 Mode</h4><div class="seg gseg" data-key="mode"><button data-v="classic">♠️ Classique</button><button data-v="turbo">⚡ Turbo</button><button data-v="push">💥 Tapis !</button></div>
+            <p class="muted small hint2">Classique : 1 000 jetons, blinds ×1,5 toutes les 8 mains · Turbo : 600 jetons, blinds ×2 toutes les 4 mains · Tapis ! : on ne peut que se coucher ou faire tapis.</p></div>
+          <div class="set-row">
+            <div class="set-block"><h4>🂠 Mains max</h4><div class="seg gseg" data-key="hands"><button data-v="15">15</button><button data-v="30">30</button><button data-v="0">♾️ Jusqu'au bout</button></div></div>
+            <div class="set-block"><h4>⏱️ Temps pour jouer</h4><div class="seg gseg" data-key="time"><button data-v="20">20 s</button><button data-v="30">30 s</button><button data-v="60">60 s</button></div></div>
+          </div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>Texas Hold'em sans limite : 2 cartes pour toi, 5 au milieu, la meilleure main de 5 cartes gagne. Couche-toi, suis, relance ou fais tapis. Les jetons sont pour le jeu ; à la fin, le classement rapporte des 🪙.</p></div>
+        </div>
+        <div id="set-golf" class="settings gset hidden">
+          <div class="set-row">
+            <div class="set-block"><h4>⛳ Trous</h4><div class="seg gseg" data-key="holes"><button data-v="3">3</button><button data-v="6">6</button><button data-v="9">9</button></div></div>
+            <div class="set-block"><h4>🔀 Parcours</h4><div class="seg gseg" data-key="order"><button data-v="shuffle">🎲 Au hasard</button><button data-v="fixed">📋 Dans l'ordre</button></div></div>
+            <div class="set-block"><h4>⏱️ Temps par trou</h4><div class="seg gseg" data-key="time"><button data-v="60">1 min</button><button data-v="120">2 min</button><button data-v="180">3 min</button></div></div>
+          </div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>Tout le monde joue en même temps (les balles des autres sont des fantômes). Tire en arrière pour viser, lâche pour frapper. Eau = +1 coup et retour au point de tir. Sable = ça freine, glace = ça glisse, vent = ça pousse, flèches = accélération, portails = téléportation ! Le moins de coups gagne.</p></div>
         </div>
         <div id="set-chess" class="settings gset hidden">
           <div class="set-block"><h4>🎮 Mode</h4><div class="seg gseg" data-key="mode"><button data-v="classic">♟️ Classique</button><button data-v="c960">🎲 Chess960</button><button data-v="hill">⛰️ Colline</button><button data-v="check3">3️⃣ Trois échecs</button><button data-v="fog">🌫️ Brouillard</button></div>
@@ -499,6 +528,9 @@
       <div id="v-quiz" class="view"></div>
       <div id="v-n25" class="view"></div>
       <div id="v-chess" class="view"></div>
+      <div id="v-c4" class="view"></div>
+      <div id="v-poker" class="view"></div>
+      <div id="v-golf" class="view"></div>
       <!-- SPEED WORD -->
       <div id="v-word" class="view"></div>
 
@@ -677,7 +709,11 @@
 <script src="/client-quiz.js"></script>
 <script src="/client-n25.js"></script>
 <script src="/client-chess.js"></script>
+<script src="/client-c4.js"></script>
+<script src="/client-poker.js"></script>
+<script src="/client-golf.js"></script>
 <script src="/cards.js"></script>
 <script src="/client-cards.js"></script>
+<script src="/client-trade.js"></script>
 </body>
 </html>

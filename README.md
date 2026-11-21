@@ -99,6 +99,15 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Boutique : **22 skins de pions** (🐎 Pions), **12 plateaux** (🎲 Plateaux : Bois verni gratuit → Prisme arc-en-ciel légendaire, chacun voit le plateau qu'il a équipé) et **12 animations** de capture / cheval rentré (💥 Animations chevaux, vues par tout le monde, aperçu en cliquant dans la boutique).
 - Pièces : selon la durée de la partie (≈ 4 à 7 🪙/min), +2 par cheval rentré, +2 par capture, gros bonus au vainqueur.
 
+### 🔴 Puissance 4 (2 à 12 joueurs)
+Duel au tour par tour, le gagnant reste et affronte le suivant. Modes : Classique (7×6), Géant (9×7, aligner 5), Bombes (1 bombe par joueur qui pulvérise une zone 3×3).
+
+### 🂡 Poker Texas Hold'em (2 à 8 joueurs)
+No-limit avec pots secondaires. Modes : Classique, Turbo (blindes qui montent vite), Tapis ou couché.
+
+### ⛳ Mini-golf (1 à 8 joueurs)
+9 trous animés vus du dessus : moulin, lac, sable, vent, flipper, patinoire, téléporteurs… Tout le monde joue en même temps, on vise en tirant la balle en arrière comme un lance-pierre.
+
 ### 🔢 Jeu de la Note
 - 70 thèmes avec leur échelle (« Un animal : 1 = inoffensif, 10 = terrifiant »…), dans `data-note.js`.
 - Le questionneur choisit 3 thèmes parmi 12 (2 relances), le répondeur répond, les autres devinent.
@@ -127,6 +136,12 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - 203 cartes : 10 séries de 20 (Bestiaire fantastique, Zoo déjanté, Malbouffe & Cie, Cosmos, Le Stade, Arcade rétro, Frissons, Mythes & Légendes, Héros de PlayZup, Forces de la nature) + 3 cartes **✹ DIVINES**. Données dans `public/cards.js` (modifiable), interface dans `public/client-cards.js`.
 - Booster 50 🪙 = 1 carte ; Méga booster 225 🪙 = 5 cartes dont au moins une rare. Chances : commune 62 %, rare 25 %, épique 9,5 %, légendaire 3 %, divine 0,5 %. Les doubles se recyclent en pièces.
 - Collection avec filtres (série, rareté, « seulement les miennes »), zoom avec effet 3D holographique. Les cartes sont dans la sauvegarde du navigateur (et dans le code de sauvegarde).
+
+### 🔄 Échanges
+Dans un salon, clique sur 🔄 à côté d'un joueur (ou depuis le casier) pour lui proposer un échange de cartes, d'objets de la boutique et/ou de pièces. Il accepte ou refuse.
+
+### 🔎 Chercheur de jeu
+Barre de recherche en haut de la liste des jeux (nom, mots-clés ou nombre de joueurs).
 
 ### 🎒 Casier
 - Tout ce que tu as débloqué, rangé par catégorie, et équipable en un clic (accueil, barre du bas ou depuis les cartes).

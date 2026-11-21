@@ -190,7 +190,9 @@
     $('#lk-avatar').innerHTML = avatarHTML ? avatarHTML({ ...m, avatar: m.avatar }, 64) : '';
     $('#lk-name').textContent = m.name;
     $('#lk-sub').textContent = `${own} objets débloqués sur ${tot} · ${cards} cartes sur ${C.list.length}`;
-    $('#lk-body').innerHTML = html;
+    const others = (typeof state !== 'undefined' && state?.players || []).filter(p => p.online && p.id !== pid);
+    $('#lk-body').innerHTML = (others.length ? `<div class="lk-trade">🔄 Échanger avec : ${others.map(p => `<button class="btn btn-ghost btn-sm" data-trade="${p.id}">${avatarHTML(p, 22)} ${esc(p.name)}</button>`).join('')}</div>` : '') + html;
+    $$('#lk-body [data-trade]').forEach(b => b.addEventListener('click', () => $('#locker').classList.add('hidden')));
     $$('#lk-body .lk-it').forEach(b => b.onclick = () => {
       const k = b.dataset.k, id = b.dataset.id, lk = LOOK_KEY[k];
       if (save.look[lk] === id) return;
