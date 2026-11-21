@@ -132,7 +132,7 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Tout ce que tu as débloqué, rangé par catégorie, et équipable en un clic (accueil, barre du bas ou depuis les cartes).
 
 ### ✹ Rareté DIVINE
-- Au-dessus de Légendaire (prix ≥ 10 000 🪙). Premier objet : l'effet de victoire **SIUUU** (15 000 🪙) — le n°7 court, saute en tournant et retombe dans la pose, sous les projecteurs.
+- Au-dessus de Légendaire (prix ≥ 10 000 🪙). Premier objet : l'effet de victoire **SIUUU** (15 000 🪙) : stade de nuit, projecteurs, sprint du n°7, saut avec vrille (on voit le dos « SIUUU 7 »), atterrissage dans la pose avec flash, onde, pyrotechnie, confettis et « SIUUUUU » géant.
 
 ### 🪙 Progression, pièces et boutique
 - Chaque partie rapporte : **10 🪙 de participation + 4 🪙 par bonne réponse + podium 30 / 15 / 8 🪙**

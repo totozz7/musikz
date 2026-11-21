@@ -1090,6 +1090,17 @@ function sfx(name, vol = 1) {
     g.gain.value = gain; src.buffer = buf; src.connect(f); f.connect(g); g.connect(out); src.start(t0 + start);
   };
   if (name === 'tick') { noise(.03, 4000, 2500, 'highpass', .8); }
+  const shaped = (dur, env, f0, f1, type, gain, start = 0) => {
+    const len = Math.floor(actx.sampleRate * dur), buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * env(i / len);
+    const src = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
+    f.type = type; f.frequency.setValueAtTime(f0, t0 + start); f.frequency.exponentialRampToValueAtTime(f1, t0 + start + dur); f.Q.value = .7;
+    g.gain.value = gain; src.buffer = buf; src.connect(f); f.connect(g); g.connect(out); src.start(t0 + start);
+  };
+  if (name === 'swell') { shaped(1.2, x => Math.pow(x, 1.6), 400, 1600, 'bandpass', 2.6); }
+  if (name === 'roar') { shaped(3.2, x => Math.min(1, x * 12) * Math.pow(1 - x, .8), 700, 900, 'bandpass', 3.2); shaped(2.6, x => Math.min(1, x * 10) * (1 - x), 1800, 1400, 'bandpass', 1.4); }
+  if (name === 'boom') { const o = osc('sine', 90, 0, 1.1, 1.6); o.frequency.exponentialRampToValueAtTime(28, t0 + 1.1); noise(.5, 600, 60, 'lowpass', 3.2); }
+  if (name === 'clunk') { noise(.09, 300, 90, 'lowpass', 3); osc('square', 60, 0, .08, .5); }
   if (name === 'crowd') { noise(2.6, 500, 1100, 'bandpass', 2.4); noise(2.2, 1400, 2200, 'bandpass', 1.2); }
   if (name === 'click') { noise(.05, 2500, 1200, 'bandpass', 1.6); osc('square', 1800, 0, .04, .25); }
   if (name === 'card') { noise(.14, 1500, 5000, 'bandpass', .9); }
@@ -1142,7 +1153,7 @@ function burst(fxId, n = 16) {
   const fx = SHOP.winFx.find(x => x.id === fxId) || SHOP.winFx[0];
   if (fx.kind && CELEBRATIONS[fx.kind]) {
     if (Date.now() < burst.lock) return; // une célébration animée à la fois
-    burst.lock = Date.now() + (fx.kind === 'goat' ? 3200 : fx.kind === 'siuuu' ? 4200 : 1800);
+    burst.lock = Date.now() + (fx.kind === 'goat' ? 3200 : fx.kind === 'siuuu' ? 5400 : 1800);
     return CELEBRATIONS[fx.kind](Math.min(1.3, Math.max(.45, n / 22)));
   }
   const em = [...fx.emojis];
@@ -1168,31 +1179,89 @@ function fxEl(cls, css = {}, html = '', life = 2500) {
 }
 const rnd = (a, b) => a + Math.random() * (b - a);
 const CELEBRATIONS = {
-  // ⚽ SIUUU : le n°7 court, saute en tournant et retombe dans LA pose (rareté divine)
+  // ⚽ SIUUU (rareté DIVINE) : stade de nuit, sprint, saut avec vrille, atterrissage sur LA pose, pyrotechnie
   siuuu(k) {
-    const kit = `<defs><linearGradient id="sjers" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#dfe6f0"/></linearGradient></defs>`;
-    const head = `<circle cx="100" cy="46" r="17" fill="#c98b5e" stroke="#2a1a10" stroke-width="3"/><path d="M83 42c0-14 9-20 18-20s17 5 17 18c-5-6-12-8-18-8s-11 3-17 10z" fill="#1d140e"/>`;
-    const shirt = `<path d="M72 70q28-10 56 0l6 52h-68z" fill="url(#sjers)" stroke="#2a1a10" stroke-width="3" stroke-linejoin="round"/><text x="100" y="106" text-anchor="middle" font-family="Bungee,sans-serif" font-size="26" fill="#d4a020" stroke="#5a3a00" stroke-width="1.5">7</text>`;
-    const run = `<g class="sx-run">${head}
-      <path d="M74 76l-22 24 10 6" fill="none" stroke="#c98b5e" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M126 76l20 -20" fill="none" stroke="#c98b5e" stroke-width="9" stroke-linecap="round"/>
-      ${shirt}<path d="M68 120h64l-2 18h-60z" fill="#1c2a4a" stroke="#2a1a10" stroke-width="3"/>
-      <path class="sx-legA" d="M86 136l-14 34 -18 12" fill="none" stroke="#c98b5e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><path class="sx-legB" d="M114 136l20 28 6 26" fill="none" stroke="#c98b5e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="52" cy="183" r="7" fill="#111"/><circle cx="141" cy="192" r="7" fill="#111"/></g>`;
-    const pose = `<g class="sx-pose">${head}
-      <path d="M74 76l-26 40 -6 16" fill="none" stroke="#c98b5e" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M126 76l26 40 6 16" fill="none" stroke="#c98b5e" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
-      ${shirt}<path d="M68 120h64l2 18h-68z" fill="#1c2a4a" stroke="#2a1a10" stroke-width="3"/>
-      <path d="M82 136l-30 64" fill="none" stroke="#c98b5e" stroke-width="11" stroke-linecap="round"/><path d="M118 136l30 64" fill="none" stroke="#c98b5e" stroke-width="11" stroke-linecap="round"/>
-      <ellipse cx="46" cy="204" rx="13" ry="7" fill="#111"/><ellipse cx="154" cy="204" rx="13" ry="7" fill="#111"/></g>`;
-    fxEl('sx-dark', {}, '', 4400);
-    fxEl('sx-spot l', {}, '', 4400); fxEl('sx-spot r', {}, '', 4400);
-    fxEl('sx-stage', {}, `<div class="sx-mover"><svg viewBox="0 0 200 220" class="sx-svg">${kit}${run}${pose}</svg></div><div class="sx-shadow"></div><div class="sx-wave"></div>`, 4400);
-    fxEl('sx-title', {}, [...'SIUUU'].map((c, i) => `<span style="--i:${i}">${c}</span>`).join('') + '<small>✹ CÉLÉBRATION DIVINE ✹</small>', 4400);
-    for (let i = 0; i < (innerWidth < 700 ? 24 : 46); i++) fxEl('sx-flashbulb', { left: rnd(0, 100) + 'vw', bottom: rnd(0, 22) + 'vh', animationDelay: rnd(1.6, 3.6) + 's' }, '', 4400);
-    for (let i = 0; i < Math.round(24 + 24 * k); i++) fxEl('goat-glit', { left: rnd(0, 100) + 'vw', '--d': rnd(.9, 2) + 's', '--x': rnd(-60, 60) + 'px', fontSize: rnd(.9, 2) + 'rem', animationDelay: rnd(1.7, 2.6) + 's' }, ['✦', '⚽', '✨', '🏆', '7'][i % 5], 4400);
-    setTimeout(() => { try { sfx('crowd'); sfx('bang', .7); } catch (e) {} if ($('#shop').classList.contains('hidden')) { document.body.classList.add('sn-shake'); setTimeout(() => document.body.classList.remove('sn-shake'), 500); } }, 1650);
-    setTimeout(() => { try { const u = new SpeechSynthesisUtterance('Siiiiuuuuuu'); u.lang = 'es-ES'; u.rate = .55; u.pitch = .6; u.volume = Math.max(.3, baseVolume); speechSynthesis.speak(u); } catch (e) {} }, 1600);
-    setTimeout(() => { try { sfx('legend'); } catch (e) {} }, 2000);
+    const O = '#1c120a', SK = '#c98d5f', SKD = '#a56a3e', WH = '#ffffff', WHD = '#d5dde8', GD = '#e6b325', GDD = '#9a6c00';
+    const limb = (d, c, w, cls = '') => `<path d="${d}" fill="none" stroke="${O}" stroke-width="${w + 5}" stroke-linecap="round" stroke-linejoin="round" class="${cls}"/><path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" class="${cls}"/>`;
+    const boot = (x, y, flip) => `<g transform="translate(${x} ${y}) scale(${flip ? -1 : 1} 1)"><path d="M-9 -6 Q-10 4 -4 6 L16 6 Q20 5 18 0 Q12 -2 6 -7 Z" fill="#111" stroke="${O}" stroke-width="2.5" stroke-linejoin="round"/><path d="M-2 -1 Q6 1 14 1" stroke="${GD}" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>`;
+    const sock = (d) => limb(d, WH, 14) + `<path d="${d}" fill="none" stroke="${GD}" stroke-width="15" stroke-dasharray="3 30" stroke-dashoffset="-2"/>`;
+    const head = (front, tilt = -8) => `<g transform="rotate(${tilt} 100 62)">
+        <rect x="92" y="70" width="16" height="20" rx="5" fill="${SKD}" stroke="${O}" stroke-width="3"/>
+        <ellipse cx="82.5" cy="62" rx="4" ry="6" fill="${SK}" stroke="${O}" stroke-width="2.5"/><ellipse cx="117.5" cy="62" rx="4" ry="6" fill="${SK}" stroke="${O}" stroke-width="2.5"/>
+        <ellipse cx="100" cy="60" rx="17" ry="21" fill="${SK}" stroke="${O}" stroke-width="3"/>
+        ${front ? `<path d="M90 50 q4 -3 8 0 M102 50 q4 -3 8 0" stroke="${O}" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          <path d="M90 56 q4 3 7 0 M103 56 q4 3 7 0" stroke="${O}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <path d="M99 58 q-3 7 1 8" stroke="${SKD}" stroke-width="2" fill="none"/>
+          <ellipse cx="100" cy="71" rx="5.5" ry="6.5" fill="#3a0d0d" stroke="${O}" stroke-width="2"/><ellipse cx="100" cy="74" rx="3" ry="2" fill="#d65a5a"/>
+          <path d="M84 48 Q82 30 100 28 Q119 28 118 48 Q114 38 104 38 Q96 36 90 41 Q86 43 84 48Z" fill="#1d140e"/>
+          <path d="M96 30 Q104 22 114 30 Q106 28 98 33Z" fill="#2a1d14"/>`
+        : `<path d="M83 52 Q80 30 100 28 Q121 28 117 52 Q118 70 112 76 Q100 80 88 76 Q82 70 83 52Z" fill="#1d140e"/><path d="M88 72 Q100 78 112 72" stroke="#2a1d14" stroke-width="3" fill="none"/>`}
+      </g>`;
+    const shorts = `<path d="M74 160 H126 L135 198 Q120 203 106 200 L100 186 L94 200 Q80 203 65 198 Z" fill="${WH}" stroke="${O}" stroke-width="3" stroke-linejoin="round"/><path d="M100 168 L100 186" stroke="${WHD}" stroke-width="3"/><path d="M66 194 L76 196 M134 194 L124 196" stroke="${GD}" stroke-width="3"/>`;
+    const shirt = (front) => `<path d="M70 92 Q100 80 130 92 L142 112 L130 120 L128 166 Q100 174 72 166 L70 120 L58 112 Z" fill="${WH}" stroke="${O}" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M128 120 L128 166 Q114 171 104 172 L110 120Z" fill="${WHD}" opacity=".7"/>
+      <path d="M58 112 L70 120 M142 112 L130 120" stroke="${GD}" stroke-width="3"/>
+      ${front ? `<path d="M88 88 L100 103 L112 88" fill="none" stroke="${GD}" stroke-width="4" stroke-linejoin="round"/><circle cx="86" cy="116" r="6" fill="${GD}" stroke="${GDD}" stroke-width="1.5"/><text x="116" y="124" font-family="Bungee,sans-serif" font-size="14" fill="${GD}" stroke="${GDD}" stroke-width=".8" text-anchor="middle">7</text>`
+        : `<text x="100" y="112" font-family="Bungee,sans-serif" font-size="11" letter-spacing="1" fill="${GD}" stroke="${GDD}" stroke-width=".6" text-anchor="middle">SIUUU</text><text x="100" y="158" font-family="Bungee,sans-serif" font-size="44" fill="${GD}" stroke="${GDD}" stroke-width="1.5" text-anchor="middle">7</text>`}`;
+    const fig = ({ front = true, arms = 'pose', legs = 'wide', tilt = -8 }) => {
+      const A = { pose: ['M66 106 Q54 138 44 168', 'M134 106 Q146 138 156 168'], tuck: ['M66 106 Q52 130 72 148', 'M134 106 Q148 130 128 148'], up: ['M66 106 Q48 84 40 56', 'M134 106 Q152 84 160 56'] }[arms];
+      const hands = { pose: [[44, 170], [156, 170]], tuck: [[74, 150], [126, 150]], up: [[40, 52], [160, 52]] }[arms];
+      const L = { wide: ['M88 192 L66 232 L54 268', 'M112 192 L134 232 L146 268'], tuck: ['M90 192 L74 222 L94 246', 'M110 192 L126 222 L106 246'] }[legs];
+      const ft = { wide: [[50, 276, 1], [150, 276, 0]], tuck: [[98, 252, 0], [102, 252, 1]] }[legs];
+      return `${limb(L[0], SK, 13)}${limb(L[1], SK, 13)}
+        ${sock(legs === 'wide' ? 'M60 246 L54 268' : 'M86 238 L94 246')}${sock(legs === 'wide' ? 'M140 246 L146 268' : 'M114 238 L106 246')}
+        ${boot(...ft[0])}${boot(...ft[1])}${shorts}
+        ${limb(A[0], SK, 12)}${limb(A[1], SK, 12)}
+        ${hands.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="${SK}" stroke="${O}" stroke-width="2.8"/>`).join('')}
+        ${shirt(front)}
+        ${limb(A[0].split(' ').slice(0, 2).join(' ') + ' 60 122', WH, 17)}${limb(A[1].split(' ').slice(0, 2).join(' ') + ' 140 122', WH, 17)}
+        ${head(front, tilt)}`;
+    };
+    const runFrame = (a) => {
+      const legs = a ? ['M104 178 L128 196 L124 236', 'M96 178 L80 214 L52 226'] : ['M104 178 L114 216 L136 236', 'M96 178 L94 206 L70 196'];
+      const feet = a ? [[126, 244, 0], [48, 230, 1]] : [[140, 242, 0], [66, 200, 1]];
+      const arms = a ? ['M96 104 Q80 128 66 120', 'M108 104 Q124 128 140 110'] : ['M96 104 Q112 132 128 128', 'M108 104 Q92 128 74 136'];
+      return `<g class="sv-rf ${a ? 'a' : 'b'}"><g transform="rotate(14 100 160)">
+        ${limb(legs[1], SKD, 13)}${boot(...feet[1])}${limb(arms[0], SKD, 11)}
+        <path d="M80 158 H120 L124 196 L100 200 L76 196 Z" fill="${WH}" stroke="${O}" stroke-width="3" stroke-linejoin="round"/>
+        ${limb(legs[0], SK, 13)}${boot(...feet[0])}
+        <path d="M82 90 Q104 82 120 92 L122 166 Q100 172 80 166 Z" fill="${WH}" stroke="${O}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M108 92 L122 166 Q112 170 104 170 Z" fill="${WHD}" opacity=".7"/>
+        ${limb(arms[1], SK, 11)}
+        <g transform="translate(6 2)">${head(true, 6)}</g></g></g>`;
+    };
+    const V = 'viewBox="-10 0 220 300"';
+    fxEl('sv-scene', {}, `<div class="sv-cam">
+        <div class="sv-sky"></div>
+        <div class="sv-stands"><i></i><i></i><i></i></div>
+        <div class="sv-beam l"></div><div class="sv-beam r"></div><div class="sv-tower l"><b></b></div><div class="sv-tower r"><b></b></div><div class="sv-lamp l"></div><div class="sv-lamp r"></div>
+        <div class="sv-pitch"></div>
+        <div class="sv-rays"></div>
+        <div class="sv-pyro l"><i></i><i></i><i></i></div><div class="sv-pyro r"><i></i><i></i><i></i></div>
+        <div class="sv-hero">
+          <div class="sv-runner"><svg ${V}>${runFrame(1)}${runFrame(0)}</svg></div>
+          <div class="sv-air"><div class="sv-spin"><svg ${V} class="sv-f">${fig({ front: true, arms: 'tuck', legs: 'tuck', tilt: 0 })}</svg><svg ${V} class="sv-b">${fig({ front: false, arms: 'tuck', legs: 'tuck', tilt: 0 })}</svg></div></div>
+          <div class="sv-pose"><div class="sv-glow"></div><svg ${V}>${fig({ front: true, arms: 'pose', legs: 'wide', tilt: -12 })}</svg></div>
+          <div class="sv-dust l"></div><div class="sv-dust r"></div><div class="sv-ring"></div><div class="sv-ring two"></div>
+        </div>
+        <div class="sv-flash"></div>
+        <div class="sv-title"><div class="sv-word">${[...'SIUUUUU'].map((c, i) => `<span style="--i:${i}">${c}</span>`).join('')}</div><small>✹ CÉLÉBRATION DIVINE ✹</small></div>
+      </div>`, 5600);
+    const sc = $('#reactions-layer .sv-scene:last-child');
+    // flashs de téléphones dans les tribunes
+    for (let i = 0; i < (innerWidth < 700 ? 40 : 90); i++) fxEl('sv-ph', { left: rnd(0, 100) + 'vw', top: rnd(20, 58) + 'vh', animationDelay: rnd(.4, 5) + 's', '--s': rnd(.5, 1.4) }, '', 5600);
+    // confettis dorés à l'atterrissage
+    for (let i = 0; i < (innerWidth < 700 ? 50 : 110); i++) fxEl('sv-conf', { left: rnd(0, 100) + 'vw', background: ['#ffe58a', '#fff', '#e6b325', '#fff6c9', '#ff5a5a'][i % 5], '--d': rnd(2, 3.6) + 's', '--x': rnd(-120, 120) + 'px', '--r': rnd(360, 1440) + 'deg', animationDelay: rnd(2.2, 3) + 's', width: rnd(6, 12) + 'px', height: rnd(10, 20) + 'px' }, '', 5600);
+    for (let i = 0; i < 40; i++) fxEl('sv-spark', { left: `calc(50vw + ${rnd(-30, 30)}vmin)`, bottom: '16vh', '--x': rnd(-40, 40) + 'vmin', '--y': rnd(30, 70) + 'vh', animationDelay: rnd(2.2, 3.4) + 's' }, '', 5600);
+    const S = (n, v, t) => setTimeout(() => { try { sfx(n, v); } catch (e) {} }, t);
+    [0, 140, 280, 420].forEach(t => S('clunk', .9, 80 + t));
+    for (let t = 650; t < 1700; t += 135) S('tick', .9, t);
+    S('swell', 1, 1500);
+    setTimeout(() => { try { const u = new SpeechSynthesisUtterance('Siiiiiuuuuuuu'); u.lang = 'pt-PT'; u.rate = .5; u.pitch = .5; u.volume = 1; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {} }, 1550);
+    S('boom', 1, 2350); S('roar', 1, 2350); S('bang', .8, 2350); S('legend', 1, 2650);
+    setTimeout(() => { document.body.classList.add('sn-shake'); setTimeout(() => document.body.classList.remove('sn-shake'), 600); }, 2350);
   },
+
   // 🎆 bouquets de particules colorées
   fireworks(k) {
     const colors = ['#ff2e4d', '#ffc21a', '#00e5ff', '#7dff8a', '#ff4fa3', '#c13cff', '#fff'];
