@@ -4,11 +4,11 @@ const HOLES = require('./data-golf');
 module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
   const id = 'golf';
   const BR = 9, CUP = 15, DT = 1 / 240, FPS = 30;
-  const defaults = () => ({ holes: 6, order: 'shuffle', time: 120 });
+  const defaults = () => ({ holes: 9, course: 'mix', time: 120 });
   function applySettings(room, p) {
     const s = room.gs.golf;
-    if ([3, 6, 9].includes(+p.holes)) s.holes = +p.holes;
-    if (['shuffle', 'fixed'].includes(p.order)) s.order = p.order;
+    if ([3, 6, 9, 18].includes(+p.holes)) s.holes = +p.holes;
+    if (['mix', '0', '1', '2', 'all'].includes(String(p.course))) s.course = String(p.course);
     if ([60, 120, 180].includes(+p.time)) s.time = +p.time;
   }
   const clear = (g) => { clearTimeout(g.timer); g.timer = null; };
@@ -64,12 +64,12 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
       t += DT; acc += DT; portalCD -= DT; boostCD -= DT; wallCD -= DT;
       const T = t0 + t;
       // surface
-      const surf = (h.water || []).some(p => inPoly(b.x, b.y, p)) ? 'water' : (h.sand || []).some(p => inPoly(b.x, b.y, p)) ? 'sand' : (h.ice || []).some(p => inPoly(b.x, b.y, p)) ? 'ice' : 'grass';
+      const surf = (h.water || []).some(p => inPoly(b.x, b.y, p)) && !(h.bridges || []).some(p => inPoly(b.x, b.y, p)) && !(h.islands || []).some(p => inPoly(b.x, b.y, p)) ? 'water' : (h.sand || []).some(p => inPoly(b.x, b.y, p)) ? 'sand' : (h.ice || []).some(p => inPoly(b.x, b.y, p)) ? 'ice' : 'grass';
       if (surf === 'water') { ev.push({ t, k: 'splash', x: Math.round(b.x), y: Math.round(b.y) }); result = 'water'; break; }
       if (surf !== lastSurf && surf === 'sand') ev.push({ t, k: 'sand' });
       lastSurf = surf;
       // vent
-      (h.wind || []).forEach(w => { if (inPoly(b.x, b.y, w.poly)) { b.vx += w.dir[0] * w.f * DT; b.vy += w.dir[1] * w.f * DT; } });
+      [...(h.wind || []), ...(h.slopes || [])].forEach(w => { if (inPoly(b.x, b.y, w.poly)) { b.vx += w.dir[0] * w.f * DT; b.vy += w.dir[1] * w.f * DT; } });
       // accélérateurs
       (h.boosts || []).forEach(o => { if (boostCD <= 0 && Math.hypot(b.x - o.x, b.y - o.y) < 30) { const sp = Math.max(780, Math.hypot(b.vx, b.vy)); b.vx = o.dir[0] * sp; b.vy = o.dir[1] * sp; boostCD = .4; ev.push({ t, k: 'boost' }); } });
       // portails
@@ -101,7 +101,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
         const pull = 900 * DT; b.vx += (h.cup[0] - b.x) / cd * pull; b.vy += (h.cup[1] - b.y) / cd * pull; // la balle « lèche » le bord
       } else if (cd < CUP + 10 && spd < 140) { b.vx += (h.cup[0] - b.x) / cd * 120 * DT; b.vy += (h.cup[1] - b.y) / cd * 120 * DT; }
       if (acc >= 1 / FPS) { acc = 0; frames.push([Math.round(b.x * 10) / 10, Math.round(b.y * 10) / 10]); }
-      if (Math.hypot(b.vx, b.vy) < 3 && !(h.wind || []).some(w => inPoly(b.x, b.y, w.poly))) break;
+      if (Math.hypot(b.vx, b.vy) < 3 && ![...(h.wind || []), ...(h.slopes || [])].some(w => inPoly(b.x, b.y, w.poly))) break;
       if (Math.hypot(b.vx, b.vy) < 3 && t > 6) break;
     }
     if (result === 'stop') frames.push([Math.round(b.x * 10) / 10, Math.round(b.y * 10) / 10]);
@@ -112,14 +112,17 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
   function start(room) {
     const s = room.gs.golf, pl = online(room);
     if (pl.length > 8) throw new Error('8 joueurs maximum');
-    let order = HOLES.map((_, i) => i);
-    if (s.order === 'shuffle') order = [...shuffle(order.slice(0, -1)).slice(0, s.holes - 1), HOLES.length - 1];
-    else order = order.slice(0, s.holes);
-    if (s.order === 'fixed' && s.holes < HOLES.length) order[order.length - 1] = HOLES.length - 1;
+    // parcours : un des 3 (dans l'ordre, difficulté croissante), mélange (tirage au sort trié par difficulté) ou les 30 trous
+    const all = HOLES.map((_, i) => i);
+    let pool = s.course === 'mix' || s.course === 'all' ? all : all.filter(i => HOLES[i].course === +s.course);
+    let order;
+    if (s.course === 'all') order = all;
+    else if (s.holes >= pool.length) order = pool;
+    else { const last = pool[pool.length - 1]; order = [...shuffle(pool.slice(0, -1)).slice(0, s.holes - 1), last].sort((a, b) => a - b); }
     room.g = { game: id, stage: 'play', gameKey: Date.now().toString(36), order, n: -1, time: s.time, players: pl.map(p => p.id),
       cards: Object.fromEntries(pl.map(p => [p.id, []])), timer: null, deadline: 0, fx: null };
     room.phase = 'game';
-    sysMsg(room, `⛳ MINI-GOLF — ${order.length} trous. Vise, tire, et évite l'eau !`);
+    sysMsg(room, `⛳ MINI-GOLF — ${order.length} trous (${{ mix: 'mélange', all: 'intégrale', 0: 'Le Jardin', 1: "L'Aventure", 2: "L'Extrême" }[s.course]}). Vise, tire, et évite l'eau !`);
     broadcast(room);
     nextHole(room);
   }
@@ -154,17 +157,20 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
   }
   function over(room) {
     const g = room.g; clear(g); g.stage = 'over';
-    const tot = (p) => g.cards[p].reduce((a, b) => a + (b || 0), 0);
+    // seuls les trous terminés comptent (si l'hôte arrête en plein trou, celui-ci est ignoré)
+    let nh = 0; while (nh < g.order.length && g.players.every(p => g.cards[p][nh] != null)) nh++;
+    const tot = (p) => g.cards[p].slice(0, nh).reduce((a, b) => a + (b || 0), 0);
     g.ranking = g.players.map(p => ({ pid: p, pts: tot(p) })).sort((a, b) => a.pts - b.pts);
-    const par = g.order.reduce((a, i) => a + HOLES[i].par, 0);
+    const par = g.order.slice(0, nh).reduce((a, i) => a + HOLES[i].par, 0);
     g.coins = {};
-    g.ranking.forEach((r, i) => { const hio = g.cards[r.pid].filter(x => x === 1).length; g.coins[r.pid] = { coins: Math.max(10, 20 + (g.ranking.length - i) * 10 + (i === 0 ? 30 : 0) + Math.max(0, par - r.pts) * 5 + hio * 25), win: i === 0 && g.ranking.length > 1 }; });
+    g.ranking.forEach((r, i) => { const hio = g.cards[r.pid].slice(0, nh).filter(x => x === 1).length; g.coins[r.pid] = nh === 0 ? { coins: 5, win: false } : { coins: Math.max(10, Math.round((20 + (g.ranking.length - i) * 10 + (i === 0 ? 30 : 0)) * Math.min(1, nh / 6)) + Math.max(0, par - r.pts) * 5 + hio * 25), win: i === 0 && g.ranking.length > 1 }; });
     room.gscores.golf = room.gscores.golf || {};
     if (g.ranking.length > 1) room.gscores.golf[g.ranking[0].pid] = (room.gscores.golf[g.ranking[0].pid] || 0) + 1;
     reward(room, g.coins);
     pushState(room); broadcast(room);
   }
   const handlers = {
+    replay(room, me) { if (room.hostId === me.id && room.g.stage === 'over') { try { start(room); } catch (e) { return { error: e.message }; } } },
     shoot(room, me, { ang, pow } = {}) {
       const g = room.g; if (g.stage !== 'play') return { error: 'Pas maintenant' };
       const b = g.balls[me.id]; if (!b) return { error: 'Tu regardes 👀' };

@@ -106,7 +106,7 @@ Duel au tour par tour, le gagnant reste et affronte le suivant. Modes : Classiqu
 No-limit avec pots secondaires. Modes : Classique, Turbo (blindes qui montent vite), Tapis ou couché.
 
 ### ⛳ Mini-golf (1 à 8 joueurs)
-9 trous animés vus du dessus : moulin, lac, sable, vent, flipper, patinoire, téléporteurs… Tout le monde joue en même temps, on vise en tirant la balle en arrière comme un lance-pierre.
+30 trous vus du dessus en 3 parcours de 10 (🌳 Le Jardin, 🗺️ L'Aventure, 🔥 L'Extrême), de difficulté croissante, plus le mode 🎲 Mélange et l'intégrale des 30 trous. 11 décors (jardin, désert, plage, neige, jungle, bonbons, volcan, espace, nuit, château, billard). Obstacles : moulins, eau / lave / trou noir, ponts, îles, sable, glace, vent, pentes et tapis roulants, bumpers, accélérateurs, herses mobiles, téléporteurs. Tout le monde joue en même temps ; on vise en tirant la balle en arrière comme un lance-pierre.
 
 ### 🔢 Jeu de la Note
 - 70 thèmes avec leur échelle (« Un animal : 1 = inoffensif, 10 = terrifiant »…), dans `data-note.js`.
@@ -147,6 +147,7 @@ Barre de recherche en haut de la liste des jeux (nom, mots-clés ou nombre de jo
 - Tout ce que tu as débloqué, rangé par catégorie, et équipable en un clic (accueil, barre du bas ou depuis les cartes).
 
 ### ✹ Rareté DIVINE
+Effets de victoire divins : ⚽ SIUUU (15 000 🪙), 🚀 Décollage (12 000 🪙), ⚡ Colère de Zeus (20 000 🪙), 🐉 Dragon céleste (30 000 🪙) — des scènes animées plein écran de ~6 s (fichier `public/client-divine.js`).
 - Au-dessus de Légendaire (prix ≥ 10 000 🪙). Premier objet : l'effet de victoire **SIUUU** (15 000 🪙) : stade de nuit, projecteurs, sprint du n°7, saut avec vrille (on voit le dos « SIUUU 7 »), atterrissage dans la pose avec flash, onde, pyrotechnie, confettis et « SIUUUUU » géant.
 
 ### 🪙 Progression, pièces et boutique

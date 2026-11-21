@@ -121,6 +121,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
     pushState(room); broadcast(room);
   }
   const handlers = {
+    replay(room, me) { if (room.hostId === me.id && room.g.stage === 'over') { try { start(room); } catch (e) { return { error: e.message }; } } },
     drop(room, me, { col, bomb } = {}) {
       const g = room.g; if (g.stage !== 'play') return { error: 'Pas maintenant' };
       const v = me.id === g.p1 ? 1 : me.id === g.p2 ? 2 : 0;

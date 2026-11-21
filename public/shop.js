@@ -218,6 +218,9 @@
       { id: 'goat', name: 'G.O.A.T.', emojis: '🐐👑', kind: 'goat', price: 7500 },
       // ✹ rareté DIVINE (au-dessus de légendaire)
       { id: 'siuuu', name: 'SIUUU', emojis: '⚽7️⃣', kind: 'siuuu', price: 15000 },
+      { id: 'decollage', name: 'Décollage', emojis: '🚀🌕', kind: 'rocket', price: 12000, dur: 6000 },
+      { id: 'zeus', name: 'Colère de Zeus', emojis: '⚡🌩️', kind: 'zeus', price: 20000, dur: 5800 },
+      { id: 'celeste', name: 'Dragon céleste', emojis: '🐉🏮', kind: 'celeste', price: 30000, dur: 6400 },
     ],
   };
   SHOP.ids = (k) => SHOP[k].map(x => x.id);

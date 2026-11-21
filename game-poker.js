@@ -232,6 +232,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
     pushState(room); broadcast(room);
   }
   const handlers = {
+    replay(room, me) { if (room.hostId === me.id && room.g.stage === 'over') { try { start(room); } catch (e) { return { error: e.message }; } } },
     act(room, me, p) { return act(room, me.id, p || {}); },
     show(room, me) { const H = room.g.hand; if (room.g.stage === 'payout' && H?.p[me.id] && H.uncontested) { H.shown[me.id] = true; pushState(room); } },
     emote(room, me, { e } = {}) { if (['😎', '🤑', '😱', '🤡', '🙄', '🔥', '😭', '👏'].includes(e)) { room.g.fx = { e, pid: me.id, k: Date.now() }; pushState(room); } },

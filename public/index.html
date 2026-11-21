@@ -226,11 +226,11 @@
         </div>
         <div id="set-golf" class="settings gset hidden">
           <div class="set-row">
-            <div class="set-block"><h4>⛳ Trous</h4><div class="seg gseg" data-key="holes"><button data-v="3">3</button><button data-v="6">6</button><button data-v="9">9</button></div></div>
-            <div class="set-block"><h4>🔀 Parcours</h4><div class="seg gseg" data-key="order"><button data-v="shuffle">🎲 Au hasard</button><button data-v="fixed">📋 Dans l'ordre</button></div></div>
+            <div class="set-block"><h4>🗺️ Parcours</h4><div class="seg gseg" data-key="course"><button data-v="mix">🎲 Mélange</button><button data-v="0">🌳 Le Jardin</button><button data-v="1">🗺️ L'Aventure</button><button data-v="2">🔥 L'Extrême</button><button data-v="all">🏆 Les 30 trous</button></div></div>
+            <div class="set-block"><h4>⛳ Trous</h4><div class="seg gseg" data-key="holes"><button data-v="3">3</button><button data-v="6">6</button><button data-v="9">9</button><button data-v="18">18</button></div></div>
             <div class="set-block"><h4>⏱️ Temps par trou</h4><div class="seg gseg" data-key="time"><button data-v="60">1 min</button><button data-v="120">2 min</button><button data-v="180">3 min</button></div></div>
           </div>
-          <div class="set-block rules"><h4>📜 Règles</h4><p>Tout le monde joue en même temps (les balles des autres sont des fantômes). Tire en arrière pour viser, lâche pour frapper. Eau = +1 coup et retour au point de tir. Sable = ça freine, glace = ça glisse, vent = ça pousse, flèches = accélération, portails = téléportation ! Le moins de coups gagne.</p></div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>Tout le monde joue en même temps (les balles des autres sont des fantômes). Tire en arrière pour viser, lâche pour frapper. Eau = +1 coup et retour au point de tir. Sable = ça freine, glace = ça glisse, vent et pentes = ça pousse, flèches = accélération, portails = téléportation, lave et trous noirs = comme l'eau ! 30 trous en 3 parcours (un parcours = 10 trous de difficulté croissante). Le moins de coups gagne.</p></div>
         </div>
         <div id="set-chess" class="settings gset hidden">
           <div class="set-block"><h4>🎮 Mode</h4><div class="seg gseg" data-key="mode"><button data-v="classic">♟️ Classique</button><button data-v="c960">🎲 Chess960</button><button data-v="hill">⛰️ Colline</button><button data-v="check3">3️⃣ Trois échecs</button><button data-v="fog">🌫️ Brouillard</button></div>
@@ -714,6 +714,7 @@
 <script src="/client-golf.js"></script>
 <script src="/cards.js"></script>
 <script src="/client-cards.js"></script>
+<script src="/client-divine.js"></script>
 <script src="/client-trade.js"></script>
 </body>
 </html>

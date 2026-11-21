@@ -1128,6 +1128,16 @@ function sfx(name, vol = 1) {
   if (name === 'wall') { osc('sine', 260, 0, .07, .7); noise(.04, 1200, 600, 'bandpass', 1); }
   if (name === 'whoosh') { shaped(.6, x => Math.sin(x * Math.PI), 400, 2200, 'bandpass', 2); }
   if (name === 'sand') { shaped(.4, x => Math.pow(1 - x, 1.5), 3000, 1800, 'highpass', 1.6); }
+  // sons des célébrations divines
+  if (name === 'beep') { osc('sine', 880, 0, .16, .9); osc('sine', 1760, 0, .08, .25); }
+  if (name === 'beep2') { osc('sine', 1320, 0, .5, .9); osc('triangle', 660, 0, .5, .5); }
+  if (name === 'rumble') { shaped(4.2, x => Math.min(1, x * 3) * Math.pow(1 - x, .6), 260, 90, 'lowpass', 5.5); shaped(3.4, x => Math.min(1, x * 4) * Math.pow(1 - x, 1.2), 1400, 500, 'bandpass', 1.6); }
+  if (name === 'thunder') { noise(.12, 5000, 1500, 'highpass', 2.2); shaped(2.4, x => Math.min(1, x * 25) * Math.pow(1 - x, 1.4) * (.7 + .3 * Math.sin(x * 40)), 380, 70, 'lowpass', 6); }
+  if (name === 'rain') { shaped(4.6, x => Math.min(1, x * 4) * Math.min(1, (1 - x) * 5), 5200, 4200, 'highpass', .9); }
+  if (name === 'zap') { const o = osc('sawtooth', 1800, 0, .18, .35); o.frequency.exponentialRampToValueAtTime(240, t0 + .18); noise(.12, 7000, 2500, 'highpass', 1.2); }
+  if (name === 'crackle') { for (let i = 0; i < 16; i++) noise(.02, 4000 + Math.random() * 3000, 1800, 'bandpass', 1.6 * Math.random() + .4, i * .045 + Math.random() * .03); }
+  if (name === 'gong') { [110, 166, 231, 297, 412].forEach((f, i) => { const o = actx.createOscillator(), g = actx.createGain(); o.type = 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(.7 / (i + 1), t0 + .01); g.gain.exponentialRampToValueAtTime(.0008, t0 + 3.2 - i * .3); o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + 3.3); }); noise(.15, 900, 200, 'lowpass', 1.8); }
+  if (name === 'dragon') { const o = osc('sawtooth', 120, 0, 1.6, .7), l = actx.createOscillator(), lg = actx.createGain(); l.frequency.value = 28; lg.gain.value = 30; l.connect(lg); lg.connect(o.frequency); l.start(t0); l.stop(t0 + 1.7); o.frequency.linearRampToValueAtTime(70, t0 + 1.6); shaped(1.6, x => Math.min(1, x * 6) * Math.pow(1 - x, .9), 900, 300, 'bandpass', 3.2); }
   if (name === 'clunk') { noise(.09, 300, 90, 'lowpass', 3); osc('square', 60, 0, .08, .5); }
   if (name === 'crowd') { noise(2.6, 500, 1100, 'bandpass', 2.4); noise(2.2, 1400, 2200, 'bandpass', 1.2); }
   if (name === 'click') { noise(.05, 2500, 1200, 'bandpass', 1.6); osc('square', 1800, 0, .04, .25); }
@@ -1181,7 +1191,7 @@ function burst(fxId, n = 16) {
   const fx = SHOP.winFx.find(x => x.id === fxId) || SHOP.winFx[0];
   if (fx.kind && CELEBRATIONS[fx.kind]) {
     if (Date.now() < burst.lock) return; // une célébration animée à la fois
-    burst.lock = Date.now() + (fx.kind === 'goat' ? 3200 : fx.kind === 'siuuu' ? 5400 : 1800);
+    burst.lock = Date.now() + (fx.dur || (fx.kind === 'goat' ? 3200 : fx.kind === 'siuuu' ? 5400 : 1800));
     return CELEBRATIONS[fx.kind](Math.min(1.3, Math.max(.45, n / 22)));
   }
   const em = [...fx.emojis];

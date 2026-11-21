@@ -25,6 +25,7 @@
         <div id="gf-end"></div>
       </div>`;
     $$('#gf-room .gf-emotes button').forEach(b => b.onclick = () => gAct('emote', { e: b.dataset.e }));
+    $('#gf-score').onclick = e => { if (e.target.id === 'gf-score') e.target.classList.add('hidden'); };
     $('#gf-card').onclick = () => { const s = $('#gf-score'); s.classList.toggle('hidden'); if (!s.classList.contains('hidden')) scorecard(V, true); };
     $('#gf-skip').onclick = () => { if (confirm('Passer au trou suivant ?')) gAct('skip'); };
     $('#gf-stop').onclick = () => { if (confirm('Terminer la partie ?')) gAct('end'); };
@@ -36,17 +37,38 @@
   }
 
   // ───────── dessin du trou ─────────
+  // thèmes : couleurs du gazon (g1/g2), du décor autour (bg + taches), et type de danger (eau / lave / vide)
+  const THEMES = {
+    garden: { g1: '#4caf3e', g2: '#56bd47', bg: '#1f5e2a', b1: '#28733a', b2: '#256b35', b3: '#2d7e3f', f1: '#ff7ab0', f2: '#fff6a0' },
+    desert: { g1: '#7cb342', g2: '#89c34c', bg: '#e2b45e', b1: '#d6a24a', b2: '#ecc47a', b3: '#c99140', f1: '#a86b2d', f2: '#fff0c0' },
+    beach: { g1: '#43b54a', g2: '#4fc457', bg: '#f3d68e', b1: '#ead08a', b2: '#fbe4a6', b3: '#e3c271', f1: '#ffffff', f2: '#ff9e7a' },
+    snow: { g1: '#5fae7c', g2: '#6abb88', bg: '#e9f4ff', b1: '#d6e9f8', b2: '#ffffff', b3: '#c6def3', f1: '#9fd0ff', f2: '#ffffff' },
+    jungle: { g1: '#2e9a3e', g2: '#37a948', bg: '#0f3d1d', b1: '#17592a', b2: '#13492a', b3: '#1f6e33', f1: '#ff5d8f', f2: '#ffcf3d' },
+    candy: { g1: '#ff8fc8', g2: '#ff9fd3', bg: '#7b3fa0', b1: '#9450bd', b2: '#6c3590', b3: '#a865cf', f1: '#ffe14d', f2: '#7dffe6' },
+    volcano: { g1: '#5f7f3b', g2: '#688a41', bg: '#2a1a14', b1: '#3b2418', b2: '#24150f', b3: '#4a2c1b', f1: '#ff6a1f', f2: '#ffb23d', haz: 'lava' },
+    space: { g1: '#3c51b9', g2: '#465cc6', bg: '#0b0a2a', b1: '#15134a', b2: '#0f0d38', b3: '#1d1a5c', f1: '#ffffff', f2: '#c6a8ff', haz: 'void' },
+    night: { g1: '#1d7a50', g2: '#22885a', bg: '#0d1630', b1: '#14224a', b2: '#0f1a3c', b3: '#1a2c5c', f1: '#7dfff0', f2: '#ff7ae6' },
+    castle: { g1: '#4caf3e', g2: '#56bd47', bg: '#6f6f7c', b1: '#82828f', b2: '#5d5d69', b3: '#8e8e9b', f1: '#4a4a55', f2: '#a9a9b6' },
+    felt: { g1: '#0f7d4c', g2: '#118452', bg: '#6b3a1c', b1: '#7d4521', b2: '#5c3117', b3: '#8a4f27', f1: '#a0642f', f2: '#4a2611' },
+  };
   function drawHole(v) {
-    const h = v.hole, svg = $('#gf-svg');
+    const h = v.hole, svg = $('#gf-svg'), T = THEMES[h.theme] || THEMES.garden, haz = T.haz || 'water';
     rot = $('#gf-wrap').clientWidth < 560 && innerHeight > innerWidth;
     svg.setAttribute('viewBox', rot ? '0 0 600 1000' : '0 0 1000 600');
     $('#gf-wrap').classList.toggle('rot', rot);
     const id = (s) => `gf${s}`;
     const water = (h.water || []).map((p, i) => `<clipPath id="${id('wc' + i)}"><polygon points="${pts(p)}"/></clipPath>
-        <polygon points="${pts(p)}" fill="url(#gfWater)" class="gf-water"/>
+        <polygon points="${pts(p)}" fill="url(#gfWater)" class="gf-water gf-${haz}"/>
         <g clip-path="url(#${id('wc' + i)})"><g class="gf-waves">${Array.from({ length: 14 }, (_, k) => `<path d="M-200 ${k * 45} q25 -10 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0" class="gf-wave" style="animation-delay:${-k * .7}s"/>`).join('')}</g>
         ${Array.from({ length: 6 }, (_, k) => `<circle cx="${p[0][0] + 40 + k * 70}" cy="${p[0][1] + 50 + (k % 3) * 60}" r="4" class="gf-glint" style="animation-delay:${k * .5}s"/>`).join('')}</g>
         <polygon points="${pts(p)}" class="gf-shore"/>`).join('');
+    const islands = (h.islands || []).map(p => `<polygon points="${pts(p)}" class="gf-shoreland"/><polygon points="${pts(p)}" fill="url(#gfGrass)" class="gf-island"/>`).join('');
+    const bridges = (h.bridges || []).map((p, i) => { const xs = p.map(q => q[0]), ys = p.map(q => q[1]); const a = p[0], b = p[1], ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
+      return `<clipPath id="${id('br' + i)}"><polygon points="${pts(p)}"/></clipPath><polygon points="${pts(p)}" class="gf-bridge ${haz}"/><g clip-path="url(#${id('br' + i)})"><g transform="translate(${(Math.min(...xs) + Math.max(...xs)) / 2} ${(Math.min(...ys) + Math.max(...ys)) / 2}) rotate(${Math.abs(ang) > 45 && Math.abs(ang) < 135 ? ang : 0})">${Array.from({ length: 40 }, (_, k) => `<line x1="${-400 + k * 20}" y1="-300" x2="${-400 + k * 20}" y2="300" class="gf-plank"/>`).join('')}</g></g><polygon points="${pts(p)}" class="gf-bridgeedge"/>`; }).join('');
+    const slopes = (h.slopes || []).map((w, i) => { const xs = w.poly.map(p => p[0]), ys = w.poly.map(p => p[1]); const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys); const ang = Math.atan2(w.dir[1], w.dir[0]) * 180 / Math.PI; const big = Math.hypot(x1 - x0, y1 - y0);
+      const rows = Math.ceil(big / 46) + 2, cols = Math.ceil(big / 60) + 2;
+      return `<clipPath id="${id('sl' + i)}"><polygon points="${pts(w.poly)}"/></clipPath><polygon points="${pts(w.poly)}" class="gf-slope"/>
+        <g clip-path="url(#${id('sl' + i)})"><g transform="translate(${(x0 + x1) / 2} ${(y0 + y1) / 2}) rotate(${ang})"><g class="gf-chev" style="animation-duration:${(700 / w.f).toFixed(2)}s">${Array.from({ length: rows * cols }, (_, k) => { const r = Math.floor(k / cols) - rows / 2, c = k % cols - cols / 2; return `<path d="M${c * 60 - 8} ${r * 46 - 12} l12 12 l-12 12" class="gf-chv"/>`; }).join('')}</g></g></g>`; }).join('');
     const sand = (h.sand || []).map(p => `<polygon points="${pts(p)}" fill="url(#gfSand)" class="gf-sand"/>`).join('');
     const ice = (h.ice || []).map((p, i) => `<clipPath id="${id('ic' + i)}"><polygon points="${pts(p)}"/></clipPath><polygon points="${pts(p)}" fill="url(#gfIce)" class="gf-ice"/><g clip-path="url(#${id('ic' + i)})"><rect x="-300" y="0" width="160" height="1000" class="gf-iceshine" transform="skewX(-25)"/>${Array.from({ length: 8 }, (_, k) => `<path d="M${p[0][0] + 60 + k * 85} ${p[0][1] + 30 + (k * 53) % 180} l14 6 l-6 10" class="gf-scratch"/>`).join('')}</g>`).join('');
     const wind = (h.wind || []).map((w, i) => { const xs = w.poly.map(p => p[0]), ys = w.poly.map(p => p[1]); const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys); const ang = Math.atan2(w.dir[1], w.dir[0]) * 180 / Math.PI;
@@ -63,21 +85,23 @@
     const deco = (h.deco || []).map(d => `<text x="${d.x}" y="${d.y}" font-size="${d.s}" class="gf-deco ${d.float ? 'float' : ''}">${d.e}</text>`).join('');
     const [cx, cy] = h.cup;
     svg.innerHTML = `<defs>
-        <pattern id="gfGrass" width="80" height="80" patternUnits="userSpaceOnUse"><rect width="80" height="80" fill="#4caf3e"/><rect width="40" height="80" fill="#56bd47"/><circle cx="12" cy="20" r="1.4" fill="#3d9a31"/><circle cx="58" cy="60" r="1.4" fill="#68cf58"/></pattern>
-        <pattern id="gfHedge" width="60" height="60" patternUnits="userSpaceOnUse"><rect width="60" height="60" fill="#1f5e2a"/><circle cx="15" cy="15" r="16" fill="#28733a"/><circle cx="45" cy="40" r="18" fill="#256b35"/><circle cx="10" cy="50" r="10" fill="#2d7e3f"/><circle cx="20" cy="10" r="3" fill="#ff7ab0"/><circle cx="48" cy="30" r="2.5" fill="#fff6a0"/></pattern>
+        <pattern id="gfGrass" width="80" height="80" patternUnits="userSpaceOnUse"><rect width="80" height="80" fill="${T.g1}"/><rect width="40" height="80" fill="${T.g2}"/><circle cx="12" cy="20" r="1.4" fill="#0002"/><circle cx="58" cy="60" r="1.4" fill="#fff3"/></pattern>
+        <pattern id="gfHedge" width="60" height="60" patternUnits="userSpaceOnUse"><rect width="60" height="60" fill="${T.bg}"/><circle cx="15" cy="15" r="16" fill="${T.b1}"/><circle cx="45" cy="40" r="18" fill="${T.b2}"/><circle cx="10" cy="50" r="10" fill="${T.b3}"/><circle cx="20" cy="10" r="3" fill="${T.f1}"/><circle cx="48" cy="30" r="2.5" fill="${T.f2}"/></pattern>
         <pattern id="gfSand" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#f1d58a"/><circle cx="5" cy="6" r="1.3" fill="#d9b762"/><circle cx="17" cy="15" r="1.1" fill="#c9a24a"/><circle cx="11" cy="21" r=".9" fill="#fff3c4"/></pattern>
-        <linearGradient id="gfWater" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4fd3ff"/><stop offset=".6" stop-color="#1f8fe0"/><stop offset="1" stop-color="#1667b8"/></linearGradient>
+        ${haz === 'lava' ? `<linearGradient id="gfWater" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd23d"/><stop offset=".45" stop-color="#ff6a1f"/><stop offset="1" stop-color="#c0221a"/></linearGradient>`
+          : haz === 'void' ? `<radialGradient id="gfWater"><stop offset="0" stop-color="#000"/><stop offset=".55" stop-color="#160a33"/><stop offset=".85" stop-color="#5b2bb3"/><stop offset="1" stop-color="#d9a8ff"/></radialGradient>`
+          : `<linearGradient id="gfWater" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4fd3ff"/><stop offset=".6" stop-color="#1f8fe0"/><stop offset="1" stop-color="#1667b8"/></linearGradient>`}
         <linearGradient id="gfIce" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eafcff"/><stop offset=".5" stop-color="#bfefff"/><stop offset="1" stop-color="#a6dcf5"/></linearGradient>
         <radialGradient id="gfBall" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset=".7" stop-color="#f1f1f1"/><stop offset="1" stop-color="#c9c9c9"/></radialGradient>
         <filter id="gfShadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="5" stdDeviation="3" flood-color="#000" flood-opacity=".35"/></filter>
       </defs>
-      <g id="gf-root" ${rot ? 'transform="translate(600 0) rotate(90)"' : ''}>
+      <g id="gf-root" class="th-${h.theme || 'garden'} hz-${haz}" ${rot ? 'transform="translate(600 0) rotate(90)"' : ''}>
         <rect x="-40" y="-40" width="1080" height="680" fill="url(#gfHedge)"/>
         ${deco}
         <polygon points="${pts(h.outline)}" class="gf-wallshadow"/>
         <polygon points="${pts(h.outline)}" fill="url(#gfGrass)" class="gf-green"/>
         <polygon points="${pts(h.outline)}" class="gf-innershade"/>
-        ${water}${sand}${ice}${wind}${boosts}${portals}
+        <clipPath id="gfOut"><polygon points="${pts(h.outline)}"/></clipPath><g clip-path="url(#gfOut)">${ice}${sand}${water}${islands}${bridges}${slopes}${wind}</g>${boosts}${portals}
         <circle cx="${h.start[0]}" cy="${h.start[1]}" r="18" class="gf-tee"/>
         <g class="gf-cupg" transform="translate(${cx} ${cy})"><circle r="22" class="gf-cupring"/><circle r="15" class="gf-cup"/><ellipse cx="0" cy="-3" rx="13" ry="10" class="gf-cupin"/>
           <g class="gf-flagpole"><line x1="0" y1="0" x2="0" y2="-70" /><path d="M0 -70 q18 6 34 0 q-8 9 0 18 q-16 6 -34 0z" class="gf-flagcloth"/></g></g>
@@ -190,7 +214,7 @@
       else if (e.k === 'boost') { sfx('whoosh', vol); fx(ps.x, ps.y, '⚡'); }
       else if (e.k === 'portal') { sfx('whoosh', vol); fx(ps.x, ps.y, '✨'); }
       else if (e.k === 'sand') { sfx('sand', vol); fx(ps.x, ps.y, '', 'puff'); }
-      else if (e.k === 'splash') { sfx('splash', vol); splash(e.x, e.y); if (p === pid) toast('💦 Plouf ! +1 coup de pénalité'); }
+      else if (e.k === 'splash') { sfx('splash', vol); splash(e.x, e.y); if (p === pid) toast({ lava: '🔥 Grillée dans la lave ! +1 coup', void: '🕳️ Aspirée par le vide ! +1 coup' }[THEMES[V.hole.theme]?.haz] || '💦 Plouf ! +1 coup de pénalité'); }
       else if (e.k === 'hole') {
         sfx('hole', vol); holeFx(p, b);
       }
@@ -203,7 +227,7 @@
   }
   function splash(x, y) {
     const g = document.createElementNS(NS, 'g'); g.setAttribute('transform', `translate(${x} ${y})`);
-    g.innerHTML = `<g class="gf-splash"><circle r="10" class="r1"/><circle r="10" class="r2"/><circle r="10" class="r3"/>${Array.from({ length: 10 }, (_, k) => `<circle r="4" class="drop" style="--a:${k * 36}deg;--d:${20 + (k % 3) * 12}px"/>`).join('')}</g>`;
+    g.innerHTML = `<g class="gf-splash ${THEMES[V.hole.theme]?.haz || ''}"><circle r="10" class="r1"/><circle r="10" class="r2"/><circle r="10" class="r3"/>${Array.from({ length: 10 }, (_, k) => `<circle r="4" class="drop" style="--a:${k * 36}deg;--d:${20 + (k % 3) * 12}px"/>`).join('')}</g>`;
     $('#gf-fx')?.appendChild(g); setTimeout(() => g.remove(), 1600);
   }
   function holeFx(p, b) {
@@ -222,7 +246,7 @@
 
   // ───────── interface ─────────
   function hud(v) {
-    $('#gf-hole').innerHTML = `Trou <b>${v.n + 1}</b>/${v.total} · ${esc(v.hole.name)}`;
+    $('#gf-hole').innerHTML = `${['🌳', '🗺️', '🔥'][v.hole.course] || '⛳'} Trou <b>${v.n + 1}</b>/${v.total} · ${esc(v.hole.name)}`;
     $('#gf-par').textContent = `Par ${v.hole.par}`;
     const b = myBall();
     $('#gf-me').innerHTML = b ? `<span class="gf-strokes">🏌️ ${b.strokes} coup${b.strokes > 1 ? 's' : ''}</span>${b.done ? `<span class="gf-done">${b.capped ? '⛔ Maximum atteint' : '✅ ' + esc(b.label || 'Dans le trou')}</span>` : `<span class="muted">max ${v.cap}</span>`}` : '<span class="muted">Tu regardes 👀</span>';
@@ -234,14 +258,14 @@
     $('#gf-stop').classList.toggle('hidden', !isHost() || v.stage === 'over');
     $('#gf-wrap').classList.toggle('can', !!canShoot());
   }
-  function scorecard(v, manual) {
+  function scorecard(v, manual, inline) {
     const el = $('#gf-score');
     const head = `<tr><th>Trou</th>${v.pars.map((_, i) => `<th class="${i === v.n ? 'cur' : ''}">${i + 1}</th>`).join('')}<th>Total</th></tr><tr class="par"><td>Par</td>${v.pars.map(p => `<td>${p}</td>`).join('')}<td>${v.pars.reduce((a, b) => a + b, 0)}</td></tr>`;
     const rows = v.players.slice().sort((a, b) => (v.cards[a] || []).reduce((x, y) => x + (y || 0), 0) - (v.cards[b] || []).reduce((x, y) => x + (y || 0), 0)).map(p => {
       const pl = P(p); const c = v.cards[p] || []; const tot = c.reduce((a, x) => a + (x || 0), 0);
       return `<tr class="${p === pid ? 'me' : ''}"><td><i style="background:${colOf(p)}"></i>${esc(pl?.name || '?')}</td>${v.pars.map((par, i) => { const s = c[i]; const cls = s == null ? '' : s === 1 ? 'ace' : s < par ? 'under' : s === par ? 'par' : 'over'; return `<td class="${cls}">${s ?? ''}</td>`; }).join('')}<td class="tot">${tot}</td></tr>`;
     }).join('');
-    el.innerHTML = `<div class="gf-sc"><h3>📋 Carte de score ${v.stage === 'score' && !manual ? `<small>· trou suivant dans quelques secondes…</small>` : ''}</h3><div class="gf-scroll"><table>${head}${rows}</table></div>${manual ? '<button class="btn btn-ghost btn-sm" onclick="this.closest(\'.gf-score\').classList.add(\'hidden\')">Fermer</button>' : ''}</div>`;
+    el.innerHTML = `<div class="gf-sc"><h3>📋 Carte de score ${v.stage === 'score' && !manual ? `<small>· trou suivant dans quelques secondes…</small>` : ''}</h3><div class="gf-scroll"><table>${head}${rows}</table></div>${inline ? '' : '<button class="btn btn-ghost btn-sm" onclick="this.closest(\'.gf-score\').classList.add(\'hidden\')">Fermer</button>'}</div>`;
   }
   function render(v) {
     if (v.gameKey !== key) { key = v.gameKey; build(); ended = false; played = {}; scoreShown = null; }
@@ -255,8 +279,8 @@
     if (v.fx && v.fx.k !== lastFx) { lastFx = v.fx.k; const b = v.balls[v.fx.pid]; if (b) fx(b.x, b.y - 30, v.fx.e); }
     if (v.stage === 'over' && !ended) {
       ended = true; cancelAnimationFrame(raf);
-      scorecard(v); $('#gf-score').classList.remove('hidden');
-      $('#gf-end').innerHTML = `<div class="pz-end"><h2>⛳ ${v.ranking?.[0]?.pid === pid && v.ranking.length > 1 ? 'Roi du green !' : 'Partie terminée'}</h2>${podium((v.ranking || []).map(r => ({ pid: r.pid, pts: r.pts, unit: 'coups' })))}${v.coins ? `<p class="gp-coins">+${v.coins.coins} 🪙</p>` : ''}${endBtns('gf')}</div>`;
+      $('#gf-score').classList.add('hidden'); scorecard(v, false, true);
+      $('#gf-end').innerHTML = `<div class="pz-end"><h2>⛳ ${v.ranking?.[0]?.pid === pid && v.ranking.length > 1 ? 'Roi du green !' : 'Partie terminée'}</h2>${podium((v.ranking || []).map(r => ({ pid: r.pid, pts: r.pts, unit: 'coups' })))}${v.coins ? `<p class="gp-coins">+${v.coins.coins} 🪙</p>` : ''}<div class="gf-endcard">${$('#gf-score').innerHTML}</div>${endBtns('gf')}</div>`;
       endWire('gf', v.ranking || []);
     }
   }
