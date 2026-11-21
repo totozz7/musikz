@@ -142,7 +142,7 @@
       <div class="sx-gains">${Object.entries(L.gains).filter(([p]) => p !== L.winner).map(([p, g]) => `<span>${esc(P(p)?.name || '?')} +${g}</span>`).join('')}</div>
       <p class="sx-next">Prochain mot dans quelques secondes…</p></div>`;
     r.className = 'sx-reveal on';
-    if (me) { burst(save.look.winFx, 40); sfx('legend'); setTimeout(() => sfx('legend'), 300); } else { sfx(L.winner ? 'pop' : 'buzzer', .6); if (L.winner) burst('fireworks', 14); }
+    if (me) { burst('fireworks', 18); sfx('legend'); } else { sfx(L.winner ? 'pop' : 'buzzer', .6); if (L.winner) burst('fireworks', 14); }
   }
   function showEnd(v) {
     if ($('#sx-end-card').innerHTML) return;
@@ -167,6 +167,6 @@ function endWire(p, rk) {
   $(`#${p}-replay`)?.addEventListener('click', () => gAct('replay'));
   $(`#${p}-lobby`)?.addEventListener('click', () => socket.emit('stop'));
   $(`#${p}-wheel`)?.addEventListener('click', () => window.WHEEL?.open());
-  if (rk[0]?.pid === pid && rk.length > 1) { burst(save.look.winFx, 34); sfx('legend'); }
+  if (rk[0]?.pid) celebrateWinner(rk[0].pid);
   setTimeout(() => document.querySelector('.pz-end')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
 }

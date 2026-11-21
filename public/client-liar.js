@@ -255,7 +255,7 @@
     $('#lb-replay')?.addEventListener('click', () => gAct('replay'));
     $('#lb-lobby')?.addEventListener('click', () => socket.emit('stop'));
     $('#lb-shop')?.addEventListener('click', () => window.WHEEL?.open());
-    if (meWon) { burst(save.look.winFx, 34); sfx('legend'); setTimeout(() => sfx('legend'), 300); }
+    if (W?.pid) celebrateWinner(W.pid);
     setTimeout(() => $('#lb-end .lb-endcard')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
   }
 

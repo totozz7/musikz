@@ -261,7 +261,7 @@
       case 'win': {
         const w = v.seats[e.seat];
         banner(`<span>🏆</span><b>${esc(w.name)}</b><small>n'a plus de cartes !</small>`, 'win', 3000);
-        if (e.seat === v.me) { burst(save.look.winFx, 40); sfx('legend'); setTimeout(() => sfx('legend'), 300); } else burst('party', 20);
+        if (v.seats[e.seat]?.pid) celebrateWinner(v.seats[e.seat].pid); else burst('party', 20);
         break;
       }
     }

@@ -90,7 +90,7 @@
     const tb = document.querySelector('#screen-room .topbar, .screen.active .topbar'); if (tb) $('#nz-room').style.setProperty('--hdr', tb.offsetHeight + 'px');
     clock(v); race(v); grid(v); tray(v);
     $('#nz-room').classList.toggle('over', over);
-    if (over && !revealed) { revealed = true; const ok = v.questions.filter(q => v.mine[q.i] === q.n).length; sfx(ok >= 20 ? 'legend' : 'drum'); if (ok === 25) burst(save.look.winFx, 30); setTimeout(() => showEnd(v, ok), 25 * 90 + 600); }
+    if (over && !revealed) { revealed = true; const ok = v.questions.filter(q => v.mine[q.i] === q.n).length; sfx(ok >= 20 ? 'legend' : 'drum'); if (ok === 25) burst('fireworks', 20); setTimeout(() => showEnd(v, ok), 25 * 90 + 600); }
   }
   function showEnd(v, ok) {
     if ($('#nz-end').innerHTML) return;

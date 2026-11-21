@@ -45,7 +45,7 @@
       ${title('VERS LES ÉTOILES', '✹ CÉLÉBRATION DIVINE ✹', 'rk-t')}`, 6000);
     [300, 900, 1500].forEach((t, i) => S('beep', 1, t));
     S('beep2', 1, 2050);
-    say('Trois', 300); say('Deux', 900); say('Un', 1500); say('Décollage !', 2050, { rate: 1.15, pitch: 1.1 });
+    S('tick', 1, 1300); S('tick', 1, 1420); S('swell', .7, 1100); S('crackle', .6, 1650); S('whoosh', 1, 2100); S('roar', .7, 2150);
     S('clunk', 1, 1600); S('rumble', 1, 1600); S('boom', .8, 2050); S('swell', .8, 3000); S('whoosh', 1, 3300);
     later(1650, () => shake(400)); later(2100, () => shake(700));
     // explosion en feu d'artifice tout là-haut
@@ -57,7 +57,7 @@
       later(520, () => firework(W * .8, H * .26, ['#ff7ae6', '#ffffff', '#c6a8ff'], 30, .7));
       later(820, () => firework(W * .35, H * .5, ['#ffd23f', '#ff8a1f'], 26, .6));
       later(1000, () => firework(W * .68, H * .48, ['#3fd0ff', '#ffffff'], 26, .6));
-      for (let i = 0; i < (sm ? 50 : 100); i++) fxEl('sv-conf', { left: r(0, 100) + 'vw', background: ['#ffd23f', '#fff', '#ff3b5c', '#3fd0ff', '#7dff8a'][i % 5], '--d': r(2, 3.2) + 's', '--x': r(-120, 120) + 'px', '--r': r(360, 1440) + 'deg', animationDelay: r(.1, .7) + 's', width: r(6, 12) + 'px', height: r(10, 18) + 'px' }, '', 3400);
+      for (let i = 0; i < (sm ? 50 : 100); i++) fxEl('sv-conf', { left: r(0, 100) + 'vw', background: ['#ffd23f', '#fff', '#ff3b5c', '#3fd0ff', '#7dff8a'][i % 5], '--d': r(2, 3.2) + 's', '--mx': r(-120, 120) + 'px', '--r': r(360, 1440) + 'deg', animationDelay: r(.1, .7) + 's', width: r(6, 12) + 'px', height: r(10, 18) + 'px' }, '', 3400);
     });
   }
 
@@ -169,5 +169,76 @@
     });
   }
 
+
+  // ═══════════════════ effets de victoire RARES / ÉPIQUES / LÉGENDAIRES (v29) ═══════════════════
+  const COLS = ['#ff2e4d', '#ffc21a', '#00e5ff', '#7dff8a', '#ff4fa3', '#c13cff', '#ff8a1f'];
+  // 🫧 Bulles (rare) : des bulles irisées montent et éclatent
+  function bubbles() {
+    const n = small() ? 22 : 36;
+    for (let i = 0; i < n; i++) {
+      const life = r(1.6, 2.4), sz = r(26, 70), d = r(0, .7);
+      fxEl('cb-bub', { left: r(2, 95) + 'vw', width: sz + 'px', height: sz + 'px', '--h': r(35, 85) + 'vh', '--sw': r(-40, 40) + 'px', animationDuration: life + 's', animationDelay: d + 's' }, '', (life + d) * 1000 + 400);
+      if (i % 4 === 0) S('pop', .5, (d + life * .95) * 1000);
+    }
+  }
+  // 🎊 Canons à confettis (rare)
+  function cannon() {
+    ['l', 'r'].forEach(side => {
+      fxEl('cn-gun ' + side, {}, '🎉', 2300);
+      for (let i = 0; i < (small() ? 34 : 60); i++) {
+        const x = (side === 'l' ? 1 : -1) * r(20, 70), up = r(45, 90), life = r(1.4, 2.1);
+        fxEl('cn-p ' + side, { '--mx': x + 'vw', '--up': -up + 'vh', animationDuration: life + 's', animationDelay: r(0, .25) + 's' }, `<i style="background:${COLS[i % COLS.length]};--r:${r(360, 1440)}deg;animation-duration:${life}s"></i>`, life * 1000 + 400);
+      }
+    });
+    S('bang', 1, 0); S('crackle', .8, 80); S('pop', .8, 120);
+  }
+  // 🎈 Lâcher de ballons (épique)
+  function balloons() {
+    const n = small() ? 14 : 24;
+    for (let i = 0; i < n; i++) {
+      const c = COLS[i % COLS.length], life = r(2.4, 3), d = r(0, .5);
+      fxEl('bl-b', { left: r(0, 94) + 'vw', '--c': c, '--sw': r(-30, 30) + 'px', '--sz': r(.7, 1.25), animationDuration: life + 's', animationDelay: d + 's' }, '<b></b><i></i>', (life + d) * 1000 + 300);
+    }
+    fxEl('bl-banner', {}, '<div class="bl-trio"><b style="--c:#ff2e4d"></b><b style="--c:#ffc21a"></b><b style="--c:#00e5ff"></b></div><span>BRAVO !</span>', 3000);
+    S('whoosh', .7, 100); S('legend', .8, 900); S('pop', 1, 2300); S('pop', .8, 2450);
+    later(2350, () => firework(innerWidth / 2, innerHeight * .4, COLS, 26, .6));
+  }
+  // 🪩 Boule disco (épique)
+  function disco() {
+    scene('dc', `<div class="dc-dim"></div><div class="dc-beams">${[0, 1, 2, 3, 4, 5].map(k => `<i style="--a:${k * 60}deg;--c:${COLS[k]}"></i>`).join('')}</div>
+      <div class="dc-ball"><s></s><div class="dc-orb"></div></div>
+      <div class="dc-spots">${Array.from({ length: small() ? 16 : 30 }, (_, k) => `<i style="left:${r(0, 100)}%;top:${r(30, 100)}%;--c:${COLS[k % COLS.length]};animation-delay:${r(0, 1)}s"></i>`).join('')}</div>
+      ${title('DANCE !', '🪩 Boule disco', 'dc-t')}`, 3200);
+    [0, 400, 800, 1200, 1600, 2000, 2400].forEach((t, i) => { S('boom', .45, t); S('tick', .9, t + 200); if (i % 2) S('tick', .7, t + 300); });
+    S('swell', .6, 0);
+  }
+  // 🌌 Aurore boréale (légendaire)
+  function aurora() {
+    scene('au', `<div class="au-sky"></div><div class="au-stars">${Array.from({ length: small() ? 40 : 90 }, () => `<i style="left:${r(0, 100)}%;top:${r(0, 70)}%;--s:${r(1, 2.6)}px;animation-delay:${r(0, 2)}s"></i>`).join('')}</div>
+      <div class="au-band a"></div><div class="au-band b"></div><div class="au-band c"></div>
+      <div class="au-shoot" style="--y:14vh;animation-delay:.8s"></div><div class="au-shoot" style="--y:30vh;animation-delay:1.9s"></div>
+      <div class="au-hills"></div>
+      ${title('MAGNIFIQUE', '🌌 Aurore boréale', 'au-t')}`, 3600);
+    S('swell', .8, 0); S('legend', .7, 900); S('whoosh', .5, 800); S('whoosh', .5, 1900);
+  }
+  // 🏆 Champion (légendaire)
+  const CUP = `<svg viewBox="0 0 200 240" class="ch-cup"><defs><linearGradient id="cupG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b8860b"/><stop offset=".35" stop-color="#fff3b0"/><stop offset=".55" stop-color="#ffc21a"/><stop offset="1" stop-color="#8a5a00"/></linearGradient></defs>
+      <path d="M48 30 C10 30 8 90 58 104 M152 30 C190 30 192 90 142 104" fill="none" stroke="#5a3a00" stroke-width="16" stroke-linecap="round"/><path d="M48 30 C10 30 8 90 58 104 M152 30 C190 30 192 90 142 104" fill="none" stroke="url(#cupG)" stroke-width="9" stroke-linecap="round"/>
+      <path d="M44 18 H156 C156 90 136 126 100 132 C64 126 44 90 44 18Z" fill="url(#cupG)" stroke="#5a3a00" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M62 30 C64 76 76 104 96 116" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" opacity=".7"/>
+      <rect x="88" y="130" width="24" height="40" fill="url(#cupG)" stroke="#5a3a00" stroke-width="5"/>
+      <path d="M62 170 H138 L148 206 H52Z" fill="url(#cupG)" stroke="#5a3a00" stroke-width="6" stroke-linejoin="round"/>
+      <rect x="40" y="204" width="120" height="26" rx="5" fill="#3a2a5a" stroke="#1a1030" stroke-width="5"/><text x="100" y="223" text-anchor="middle" font-family="Bungee,sans-serif" font-size="15" fill="#ffd23f">N°1</text>
+      <text x="100" y="80" text-anchor="middle" font-size="40">⭐</text></svg>`;
+  function champion() {
+    scene('cp', `<div class="cp-dim"></div><div class="cp-spot"></div><div class="cp-rays"></div>
+      <div class="cp-laurel l">🌿</div><div class="cp-laurel r">🌿</div>
+      <div class="cp-cup">${CUP}<i class="cp-glint"></i></div>
+      ${title('CHAMPION !', '🏆 Le meilleur, tout simplement', 'cp-t')}`, 3600);
+    for (let i = 0; i < (small() ? 50 : 90); i++) fxEl('sv-conf', { left: r(0, 100) + 'vw', background: ['#ffd23f', '#fff', '#ffe98a', '#ff2e4d', '#00e5ff'][i % 5], '--d': r(2, 3) + 's', '--mx': r(-100, 100) + 'px', '--r': r(360, 1440) + 'deg', animationDelay: r(.9, 1.6) + 's', width: r(6, 11) + 'px', height: r(10, 18) + 'px' }, '', 3600);
+    S('swell', .8, 0); S('boom', .8, 900); S('roar', .8, 950); S('legend', 1, 1000); S('crackle', .7, 1100);
+    later(1000, () => shake(400));
+  }
+  Object.assign(CELEBRATIONS, { bubbles, cannon, balloons, disco, aurora, champion });
   Object.assign(CELEBRATIONS, { rocket, zeus, celeste });
 })();

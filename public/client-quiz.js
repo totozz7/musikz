@@ -83,7 +83,7 @@
     const st = v.streak?.[pid] || 0;
     fx.innerHTML = my ? `<div class="qz-gain"><b>+${my}</b>${st >= 3 ? `<span>🔥 Série de ${st} !</span>` : ''}</div>` : (v.mine ? '<div class="qz-gain miss"><b>RATÉ</b><span>😵</span></div>' : '<div class="qz-gain miss"><b>TROP TARD</b><span>⏰</span></div>');
     setTimeout(() => fx.firstChild?.classList.add('out'), 1700);
-    if (my) { sfx(my >= 900 ? 'legend' : 'pop'); if (my >= 900) burst(save.look.winFx, 10); } else sfx('buzzer');
+    if (my) { sfx(my >= 900 ? 'legend' : 'pop'); if (my >= 900) burst('stars', 10); } else sfx('buzzer');
   }
   function board(v) {
     const order = Object.entries(v.scores).sort((a, b) => b[1] - a[1]);

@@ -92,7 +92,7 @@
       const row = $('#t7-board').children[r.i];
       row?.classList.add('flash');
       fx.innerHTML = `<div class="t7-hit r${r.pts}"><b>+${r.pts}</b><span>${r.pts >= 6 ? '🔥 ÉNORME !' : r.pts >= 4 ? '👏 Bien vu !' : r.pts === 1 ? '😅 Trop facile…' : '✅ Dans le top !'}</span></div>`;
-      sfx(r.pts >= 5 ? 'legend' : 'pop'); if (r.pts >= 5) burst(r.pid === pid ? save.look.winFx : 'fireworks', r.pts * 3);
+      sfx(r.pts >= 5 ? 'legend' : 'pop'); if (r.pts >= 5) burst('fireworks', r.pts * 2);
       t.innerHTML = `<div class="t7-said ok">${p ? avatarHTML(p, 40) : ''}<span>« ${esc(r.text)} »</span><b>N°${r.i + 1}</b></div>`;
     } else {
       fx.innerHTML = `<div class="t7-x"><span>✖</span><small>${r.why === 'late' ? '⏰ Trop tard !' : r.why === 'dup' ? 'Déjà sur le plateau !' : 'Pas dans le top 7…'}</small></div>`;

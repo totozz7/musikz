@@ -93,12 +93,14 @@ let tick = null;
 
 // ───────────── Accueil ─────────────
 $('#name').value = store.get('mz_name', '') || 'Zuppy';
+// classe de couleur d'un titre selon sa rareté (épique, légendaire, divin)
+function ttlCls(name) { const t = SHOP.titles.find(x => x.name === name); const r = t?.price ? SHOP.rarity(t.price) : ''; return ['epic', 'legendary', 'divine'].includes(r) ? 'ttl-' + r : ''; }
 function renderProfile() {
   const m = me();
   for (const [av, nm, tt] of [['#pv-avatar', '#pv-name', '#pv-title'], ['#sp-avatar', '#sp-name', '#sp-title']]) {
     $(av).innerHTML = avatarHTML(m, 76);
     $(nm).innerHTML = nameHTML(m);
-    $(tt).textContent = m.titleName ? '« ' + m.titleName + ' »' : '';
+    $(tt).textContent = m.titleName ? '« ' + m.titleName + ' »' : ''; $(tt).className = $(tt).className.replace(/ ?ttl-\S+/g, '') + (m.titleName ? ' ' + ttlCls(m.titleName) : '');
   }
   $$('.coins-n').forEach(e => e.textContent = save.coins);
 }
@@ -121,7 +123,7 @@ function itemPreview(kind, it, m, big = false) {
   if (kind === 'colors') return `<div class="nprev">${nameHTML({ ...m, nameFx: 'none', color: it.id })}</div>`;
   if (kind === 'frames') return avatarHTML({ ...m, frame: it.id }, s);
   if (kind === 'nameFx') return `<div class="nprev">${nameHTML({ ...m, nameFx: it.id })}</div>`;
-  if (kind === 'titles') return `<div class="tprev">${it.id === 'none' ? '—' : '« ' + esc(it.name) + ' »'}</div>`;
+  if (kind === 'titles') return `<div class="tprev"><span class="${ttlCls(it.name)}">${it.id === 'none' ? '—' : '« ' + esc(it.name) + ' »'}</span></div>`;
   if (kind === 'pawns') { const k = big ? 70 : 50; return `<span class="pc-tok pc-preview sk-${it.id} ${it.fx ? 'fx-' + it.fx : ''} ${it.anim ? 'an-' + it.anim : ''}" style="--k:${SHOP.colorBase(m.color)};width:${k}px;height:${k}px"><span>${it.emoji}</span></span>`; }
   if (kind === 'boards') return `<div class="bd-prev pc-board bd-${it.id} ${big ? 'big' : ''}"><s class="q0"></s><s class="q1"></s><s class="q2"></s><s class="q3"></s><b></b><em></em><span>${it.emoji}</span></div>`;
   if (kind === 'pcfx') return `<div class="pf-prev ${it.special ? 'sp' : ''}" style="--fc:${it.color}"><span>${it.emoji}</span><u></u><small>${esc(it.text)}</small></div>`;
@@ -505,7 +507,7 @@ function renderPlayers() {
     return `<li style="--c:${p.color}" class="${p.online ? '' : 'off'} ${done ? 'done' : ''}">
       ${inGame || state.phase === 'end' ? `<span class="rank">${i + 1}</span>` : ''}
       ${avatarHTML(p, 38)}
-      <span class="nm">${nameHTML(p)}${p.host ? ' 👑' : ''}${p.title ? `<small class="ptitle">« ${esc(p.title)} »</small>` : p.id === pid ? ' <small>(toi)</small>' : ''}${p.streak >= 3 ? ` <small>🔥 série de ${p.streak}</small>` : ''}</span>
+      <span class="nm">${nameHTML(p)}${p.host ? ' 👑' : ''}${p.title ? `<small class="ptitle ${ttlCls(p.title)}">« ${esc(p.title)} »</small>` : p.id === pid ? ' <small>(toi)</small>' : ''}${p.streak >= 3 ? ` <small>🔥 série de ${p.streak}</small>` : ''}</span>
       <span class="marks">${marks}</span>
       <span class="sc">${p.score}</span>
       ${p.id !== pid && p.online ? `<button class="trade-btn" data-trade="${p.id}" title="Proposer un échange">🔄</button>` : ''}
@@ -613,7 +615,7 @@ $('#guess-form').onsubmit = (e) => {
 
 socket.on('found', (f) => {
   addChat({ found: true, text: `${f.avatar} ${f.name} a trouvé ${f.what} !` });
-  burst(f.winFx, f.id === pid ? 22 : 9);
+  burst(f.id === pid ? 'stars' : 'party', f.id === pid ? 12 : 5);
 });
 
 // ───────────── Révélation ─────────────
@@ -695,9 +697,10 @@ function renderEnd() {
   $('#earned').classList.add('hidden');
   showView('v-end');
   const ps = [...state.players].sort((a, b) => b.score - a.score);
+  if (ps[0] && ps[0].score > 0) setTimeout(() => celebrateWinner(ps[0].id), 600);
   const order = [ps[1], ps[0], ps[2]];
   $('#podium').innerHTML = order.map((p, i) => p ? `<div class="step p${[2, 1, 3][i]}">
-    ${avatarHTML(p, 70)}<span class="nm">${nameHTML(p)}</span>${p.title ? `<small class="ptitle">« ${esc(p.title)} »</small>` : ''}<span class="pts">${p.score} pts</span>
+    ${avatarHTML(p, 70)}<span class="nm">${nameHTML(p)}</span>${p.title ? `<small class="ptitle ${ttlCls(p.title)}">« ${esc(p.title)} »</small>` : ''}<span class="pts">${p.score} pts</span>
     <div class="block">${[2, 1, 3][i]}</div></div>` : '').join('');
   $('#final-list').innerHTML = ps.slice(3).map((p, i) => `<li value="${i + 4}">${avatarHTML(p, 28)} ${nameHTML(p)} — ${p.score} pts</li>`).join('');
   if (ps[0]?.id === pid) confetti(60); else confetti(20);
@@ -1206,6 +1209,16 @@ function burst(fxId, n = 16) {
     setTimeout(() => el.remove(), 3300);
   }
 }
+// 🏆 l'effet de victoire ne se joue qu'à la FIN d'une partie : celui du gagnant, visible par tout le salon
+function celebrateWinner(wpid, n = 34) {
+  if (!wpid) return;
+  const k = wpid + ':' + Math.floor(Date.now() / 5000);
+  if (celebrateWinner.k === k) return; celebrateWinner.k = k;
+  const p = state?.players?.find(x => x.id === wpid);
+  const fx = wpid === pid ? save.look.winFx : (p?.winFx || 'fireworks');
+  burst(fx, wpid === pid ? n : Math.round(n * .7));
+  if (wpid === pid) { sfx('legend'); setTimeout(() => sfx('legend'), 300); }
+}
 function divineFlash() { fxEl('dv-flash', {}, '<b>✹ DIVIN ✹</b>', 2200); }
 function fxEl(cls, css = {}, html = '', life = 2500) {
   const el = document.createElement('div');
@@ -1289,7 +1302,7 @@ const CELEBRATIONS = {
     // flashs de téléphones dans les tribunes
     for (let i = 0; i < (innerWidth < 700 ? 40 : 90); i++) fxEl('sv-ph', { left: rnd(0, 100) + 'vw', top: rnd(20, 58) + 'vh', animationDelay: rnd(.4, 5) + 's', '--s': rnd(.5, 1.4) }, '', 5600);
     // confettis dorés à l'atterrissage
-    for (let i = 0; i < (innerWidth < 700 ? 50 : 110); i++) fxEl('sv-conf', { left: rnd(0, 100) + 'vw', background: ['#ffe58a', '#fff', '#e6b325', '#fff6c9', '#ff5a5a'][i % 5], '--d': rnd(2, 3.6) + 's', '--x': rnd(-120, 120) + 'px', '--r': rnd(360, 1440) + 'deg', animationDelay: rnd(2.2, 3) + 's', width: rnd(6, 12) + 'px', height: rnd(10, 20) + 'px' }, '', 5600);
+    for (let i = 0; i < (innerWidth < 700 ? 50 : 110); i++) fxEl('sv-conf', { left: rnd(0, 100) + 'vw', background: ['#ffe58a', '#fff', '#e6b325', '#fff6c9', '#ff5a5a'][i % 5], '--d': rnd(2, 3.6) + 's', '--mx': rnd(-120, 120) + 'px', '--r': rnd(360, 1440) + 'deg', animationDelay: rnd(2.2, 3) + 's', width: rnd(6, 12) + 'px', height: rnd(10, 20) + 'px' }, '', 5600);
     for (let i = 0; i < 40; i++) fxEl('sv-spark', { left: `calc(50vw + ${rnd(-30, 30)}vmin)`, bottom: '16vh', '--x': rnd(-40, 40) + 'vmin', '--y': rnd(30, 70) + 'vh', animationDelay: rnd(2.2, 3.4) + 's' }, '', 5600);
     const S = (n, v, t) => setTimeout(() => { try { sfx(n, v); } catch (e) {} }, t);
     [0, 140, 280, 420].forEach(t => S('clunk', .9, 80 + t));

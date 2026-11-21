@@ -43,6 +43,12 @@
       { id: '🕷️', price: 1600, anim: 'swing', name: 'Araignée suspendue' },
       { id: '🦇', price: 1400, anim: 'flap', name: 'Chauve-souris' },
       { id: '💥', price: 2000, anim: 'boom', name: 'Explosion comics' },
+      // v29 : épiques, légendaires et ✹ divin
+      { id: '🧸', price: 1300, anim: 'wobble', name: 'Nounours câlin' },
+      { id: '🌪️', price: 1500, anim: 'twister', name: 'Tornade' },
+      { id: '🔮', price: 2700, anim: 'orb', name: 'Boule de cristal' },
+      { id: '🦋', price: 3000, anim: 'flutter', name: 'Papillon magique' },
+      { id: '😇', price: 12000, anim: 'angel', name: 'Ange céleste' },
 
     ],
     colors: [
@@ -53,6 +59,10 @@
       { id: 'anim:vapor', name: 'Vaporwave', price: 900, base: '#ff71ce' },
       { id: 'anim:gold', name: 'Or massif', price: 1500, base: '#ffc21a' },
       { id: 'anim:rainbow', name: 'Arc-en-ciel', price: 2500, base: '#ff4fa3' },
+      { id: 'anim:aurora', name: 'Aurore boréale', price: 1400, base: '#3dffb0' },
+      { id: 'anim:lava', name: 'Lave en fusion', price: 2800, base: '#ff5a00' },
+      { id: 'anim:chrome', name: 'Chrome liquide', price: 3200, base: '#c9d6e8' },
+      { id: 'anim:divine', name: 'Lumière divine', price: 11000, base: '#ffe9a8' },
     ],
     frames: [
       { id: 'none', name: 'Aucun', price: 0 }, { id: 'classic', name: 'Classique', price: 0 },
@@ -76,6 +86,10 @@
       { id: 'hpbar', name: 'Barre de vie', price: 1500 },
       { id: 'gameover', name: 'Game Over', price: 1400 },
       { id: 'boss', name: 'Boss final', price: 3800 },
+      // v29
+      { id: 'bubble', name: 'Bulles', price: 1300 }, { id: 'sakura', name: 'Sakura', price: 1700 },
+      { id: 'abyss', name: 'Abysses', price: 3000 }, { id: 'phoenix', name: 'Phénix', price: 4200 },
+      { id: 'divine', name: 'Auréole divine', price: 15000 },
     ],
     nameFx: [
       { id: 'none', name: 'Normal', price: 0 }, { id: 'shadow', name: '3D', price: 100 }, { id: 'ice', name: 'Givré', price: 150 },
@@ -86,6 +100,9 @@
       { id: 'comics', name: 'Comics', price: 600 }, { id: 'arcade', name: 'Arcade', price: 800 },
       { id: 'heroic', name: 'Héroïque', price: 1800 }, { id: 'web', name: 'Toile', price: 2200 },
       { id: 'boss', name: 'Boss final', price: 3000 },
+      { id: 'wave', name: 'Vague', price: 1400 }, { id: 'candy', name: "Sucre d'orge", price: 1500 },
+      { id: 'lava', name: 'Magma', price: 2900 }, { id: 'aurora', name: 'Aurore boréale', price: 3300 },
+      { id: 'olympe', name: 'Olympien', price: 13000 },
     ],
     titles: [
       { id: 'debutant', name: 'Débutant', price: 0 },
@@ -99,6 +116,9 @@
       { id: 'justicier', name: 'Justicier masqué', price: 1300 }, { id: 'speedrun', name: 'Speedrunner', price: 1800 },
       { id: 'tisseur', name: 'Le Tisseur', price: 2200 }, { id: 'boss', name: 'Boss final', price: 2500 },
       { id: 'multivers', name: 'Gardien du multivers', price: 4500 },
+      { id: 'maestro', name: 'Maestro', price: 1500 }, { id: 'insomniaque', name: 'Insomniaque des soirées', price: 1700 },
+      { id: 'mvp', name: 'MVP de la soirée', price: 2800 }, { id: 'empereur', name: 'Empereur du salon', price: 5000 },
+      { id: 'dieu', name: 'Divinité du jeu', price: 20000 },
     ],
     // 🐎 Skins de pions pour les Petits chevaux (le cercle garde la couleur de ton camp)
     pawns: [
@@ -124,6 +144,11 @@
       { id: 'royal', name: 'Destrier royal', emoji: '🐎', price: 3600, fx: 'royal' },
       { id: 'fantome', name: 'Cavalier fantôme', emoji: '👻', price: 4200, fx: 'ghost' },
       { id: 'pegase', name: 'Pégase cosmique', emoji: '🪽', price: 5000, fx: 'cosmic' },
+      { id: 'abeille', name: 'Abeille', emoji: '🐝', price: 1250, anim: 'buzz' },
+      { id: 'requin', name: 'Requin', emoji: '🦈', price: 1400, fx: 'water' },
+      { id: 'cristal', name: 'Licorne de cristal', emoji: '🦄', price: 2700, fx: 'crystal' },
+      { id: 'phenix', name: 'Phénix', emoji: '🦅', price: 3300, fx: 'phoenix' },
+      { id: 'olympe', name: 'Pégase divin', emoji: '🐎', price: 14000, fx: 'divine' },
     ],
     // plateaux des Petits chevaux (chacun voit le plateau qu'il a équipé)
     boards: [
@@ -139,6 +164,11 @@
       { id: 'galaxie', name: 'Galaxie', emoji: '🌌', price: 3200 },
       { id: 'trone', name: "Trône d'or", emoji: '👑', price: 4000 },
       { id: 'prisme', name: 'Prisme arc-en-ciel', emoji: '🌈', price: 5500 },
+      { id: 'glace', name: 'Banquise', emoji: '❄️', price: 1300 },
+      { id: 'sakura', name: 'Jardin sakura', emoji: '🌸', price: 1600 },
+      { id: 'abysses', name: 'Abysses', emoji: '🐙', price: 2900 },
+      { id: 'cyber', name: 'Cyberpunk', emoji: '🤖', price: 3500 },
+      { id: 'olympe', name: 'Olympe', emoji: '⚡', price: 16000 },
     ],
     // 🃏 dos de cartes (PRIMO & Bar des Menteurs) — chacun voit les dos qu'il a équipés
     cardbacks: [
@@ -154,6 +184,11 @@
       { id: 'or', name: 'Royal doré', emoji: '👑', price: 2400 },
       { id: 'galaxie', name: 'Galaxie', emoji: '🌌', price: 3200 },
       { id: 'holo', name: 'Holographique', emoji: '💿', price: 4500 },
+      { id: 'sakura', name: 'Sakura', emoji: '🌸', price: 1500 },
+      { id: 'circuit', name: 'Circuit imprimé', emoji: '💾', price: 1900 },
+      { id: 'aurore', name: 'Aurore boréale', emoji: '🌠', price: 2900 },
+      { id: 'dragon', name: 'Écailles de dragon', emoji: '🐉', price: 3600 },
+      { id: 'olympe', name: 'Relique divine', emoji: '✨', price: 12000 },
     ],
     // ♟️ plateaux d'échecs (chacun voit le plateau qu'il a équipé)
     chessb: [
@@ -170,6 +205,11 @@
       { id: 'or', name: 'Royal doré', emoji: '👑', price: 2700 },
       { id: 'galaxie', name: 'Galaxie', emoji: '🌌', price: 3400 },
       { id: 'holo', name: 'Holographique', emoji: '💿', price: 4800 },
+      { id: 'desert', name: 'Dunes', emoji: '🏜️', price: 1500 },
+      { id: 'foret', name: 'Forêt enchantée', emoji: '🍄', price: 2000 },
+      { id: 'cyber', name: 'Cyberpunk', emoji: '🤖', price: 3000 },
+      { id: 'aurore', name: 'Aurore boréale', emoji: '🌠', price: 3600 },
+      { id: 'olympe', name: 'Olympe', emoji: '⚡', price: 15000 },
     ],
     // ♞ pièces d'échecs : TES pièces s'affichent avec ton skin, chez tout le monde
     chesspc: [
@@ -187,6 +227,10 @@
       { id: 'diamant', name: 'Diamant', emoji: '💎', price: 2800 },
       { id: 'galaxie', name: 'Cosmos', emoji: '🌌', price: 3500 },
       { id: 'holo', name: 'Prisme', emoji: '🌈', price: 5000 },
+      { id: 'pirates', name: 'Pirates', emoji: '🦜', price: 1600, set: { K: '🧔', Q: '🦜', R: '⚓', B: '🗺️', N: '🦈', P: '💣' } },
+      { id: 'dragons', name: 'Dragons', emoji: '🐉', price: 3000, set: { K: '🐉', Q: '🐲', R: '🌋', B: '🔥', N: '🦎', P: '🥚' } },
+      { id: 'lave', name: 'Obsidienne & lave', emoji: '🌋', price: 3300 },
+      { id: 'olympe', name: 'Panthéon divin', emoji: '⚡', price: 15000, set: { K: '⚡', Q: '🌙', R: '🏛️', B: '🦉', N: '🦄', P: '⭐' } },
     ],
     // animations quand TON cheval en mange un autre ou rentre au centre (tout le monde les voit)
     pcfx: [
@@ -202,12 +246,23 @@
       { id: 'meteore', name: 'Météore', emoji: '☄️', price: 2900, color: '#ff5a00', parts: '🔥☄️💥', text: 'IMPACT !', special: 'meteor', victim: 'burn', flash: '#ff5a00' },
       { id: 'dragon', name: 'Souffle du dragon', emoji: '🐉', price: 3600, color: '#ff2e4d', parts: '🔥🔥✨', text: 'GRAAAH !', special: 'dragon', victim: 'burn', flash: '#ff2e00' },
       { id: 'bigbang', name: 'Big Bang', emoji: '🌌', price: 4800, color: '#c13cff', parts: '🌟🪐✨💫', text: 'BIG BANG !', special: 'cosmic', victim: 'launch', flash: '#ffffff' },
+      { id: 'blizzard', name: 'Blizzard', emoji: '❄️', price: 1500, color: '#bfefff', parts: '❄️🧊✨', text: 'GELÉ !', special: 'vortex', victim: 'suck', flash: '#e8fbff' },
+      { id: 'kraken', name: 'Kraken', emoji: '🐙', price: 1900, color: '#7a4dff', parts: '🐙🦑💧', text: 'KRAKEN !', special: 'splash', victim: 'launch' },
+      { id: 'eclipse', name: 'Éclipse', emoji: '🌑', price: 3000, color: '#ffb23d', parts: '🌑✨🌟', text: 'ÉCLIPSE !', special: 'hole', victim: 'suck', flash: '#120020' },
+      { id: 'tsunami', name: 'Tsunami', emoji: '🌊', price: 3400, color: '#1fa8ff', parts: '🌊💦🐟🐚', text: 'TSUNAMI !', special: 'splash', victim: 'launch', flash: '#7fd6ff' },
+      { id: 'jugement', name: 'Jugement divin', emoji: '⚡', price: 14000, color: '#ffd23f', parts: '⚡✨🌟🪽', text: 'JUGEMENT DIVIN !', special: 'divine', victim: 'zap', flash: '#fff6c9' },
     ],
     winFx: [
       { id: 'party', name: 'Fête', emojis: '🎉🎊✨', price: 0 }, { id: 'stars', name: 'Étoiles', emojis: '⭐🌟✨', price: 150 },
       { id: 'hearts', name: 'Cœurs', emojis: '💖💘💕', price: 150 }, { id: 'pizza', name: 'Pizzas', emojis: '🍕🍕🧀', price: 250 },
       { id: 'ducks', name: 'Canards', emojis: '🦆🦆🐥', price: 350 }, { id: 'fire', name: 'Flammes', emojis: '🔥🔥💥', price: 500 },
       { id: 'money', name: 'Billets', emojis: '💸💵🪙', price: 900 }, { id: 'music', name: 'Notes', emojis: '🎵🎶🎸', price: 900 },
+      { id: 'bubbles', name: 'Bulles', emojis: '🫧', kind: 'bubbles', price: 500, dur: 2600 },
+      { id: 'cannon', name: 'Canons à confettis', emojis: '🎊', kind: 'cannon', price: 700, dur: 2400 },
+      { id: 'balloons', name: 'Lâcher de ballons', emojis: '🎈', kind: 'balloons', price: 1300, dur: 3000 },
+      { id: 'disco', name: 'Boule disco', emojis: '🪩', kind: 'disco', price: 1800, dur: 3200 },
+      { id: 'aurora', name: 'Aurore boréale', emojis: '🌌', kind: 'aurora', price: 2800, dur: 3600 },
+      { id: 'champion', name: 'Champion', emojis: '🏆', kind: 'champion', price: 4000, dur: 3600 },
       // célébrations animées (pas juste une pluie d'emojis)
       { id: 'comics', name: 'BAM ! POW !', emojis: '💥', kind: 'comics', price: 900 },
       { id: 'levelup', name: 'Level up', emojis: '⬆️', kind: 'levelup', price: 1000 },

@@ -55,7 +55,7 @@
       const t = $('#dt-in').value.trim(); if (!t) return;
       $('#dt-in').value = '';
       const r = await gAct('guess', t);
-      if (r?.verdict === 'ok') { sfx('legend'); burst(save.look.winFx, 14); flash('ok', `+${r.pts}`); }
+      if (r?.verdict === 'ok') { sfx('legend'); burst('party', 10); flash('ok', `+${r.pts}`); }
       else if (r?.verdict === 'close') { toast('🔥 Presque ! Tu y es presque…'); sfx('pop'); }
       else if (r?.verdict === 'leak') toast('🤫 Ne donne pas la réponse !', 'error');
     };
@@ -236,7 +236,7 @@
     $('#dt-replay')?.addEventListener('click', () => gAct('replay'));
     $('#dt-lobby')?.addEventListener('click', () => socket.emit('stop'));
     $('#dt-wheel')?.addEventListener('click', () => window.WHEEL?.open());
-    if (rk[0]?.pid === pid) { burst(save.look.winFx, 34); sfx('legend'); }
+    if (rk[0]?.pid) celebrateWinner(rk[0].pid);
     setTimeout(() => $('#dt-end .dt-endcard')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
   }
 

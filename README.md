@@ -147,6 +147,8 @@ Barre de recherche en haut de la liste des jeux (nom, mots-clés ou nombre de jo
 - Tout ce que tu as débloqué, rangé par catégorie, et équipable en un clic (accueil, barre du bas ou depuis les cartes).
 
 ### ✹ Rareté DIVINE
+v29 : au moins un objet ✹ DIVIN dans chaque catégorie de la boutique (Ange céleste, Lumière divine, Auréole divine, Olympien, « Divinité du jeu », Pégase divin, plateau Olympe, Jugement divin, Relique divine, échiquier Olympe, Panthéon divin) + de nouveaux objets épiques et légendaires partout, et 6 nouveaux effets de victoire animés (Bulles, Canons à confettis, Lâcher de ballons, Boule disco, Aurore boréale, Champion).
+**L'effet de victoire ne se joue plus qu'en fin de partie** : celui du gagnant, visible par tout le salon (`celebrateWinner()` dans `app.js`).
 Effets de victoire divins : ⚽ SIUUU (15 000 🪙), 🚀 Décollage (12 000 🪙), ⚡ Colère de Zeus (20 000 🪙), 🐉 Dragon céleste (30 000 🪙) — des scènes animées plein écran de ~6 s (fichier `public/client-divine.js`).
 - Au-dessus de Légendaire (prix ≥ 10 000 🪙). Premier objet : l'effet de victoire **SIUUU** (15 000 🪙) : stade de nuit, projecteurs, sprint du n°7, saut avec vrille (on voit le dos « SIUUU 7 »), atterrissage dans la pose avec flash, onde, pyrotechnie, confettis et « SIUUUUU » géant.
 

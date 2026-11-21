@@ -119,7 +119,7 @@
     const w = v.result.wp ? P(v.result.wp) : null, mineW = v.result.wp === pid;
     b.innerHTML = `<div class="c4-bn ${v.result.winner === 1 ? 'r' : v.result.winner === 2 ? 'y' : 'd'}"><span>${w ? (mineW ? '🏆' : '🔥') : '🤝'}</span><b>${w ? esc(w.name) + ' gagne !' : 'Match nul'}</b><small>${{ ligne: `${v.K} alignés !`, plein: 'Grille pleine', double: 'Double ligne après la bombe', abandon: 'Abandon', depart: 'Adversaire parti' }[v.result.why] || ''}</small></div>`;
     setTimeout(() => b.classList.remove('hidden'), 700);
-    setTimeout(() => { if (mineW) { sfx('legend'); burst(save.look.winFx, 22); } else sfx(w ? (v.me ? 'wrong' : 'drum') : 'drum'); }, 700);
+    setTimeout(() => { if (mineW) { sfx('legend'); burst('fireworks', 16); } else sfx(w ? (v.me ? 'wrong' : 'drum') : 'drum'); }, 700);
   }
   function render(v) {
     if (v.gameKey !== key || !$('#c4-board') || +$('#c4-board').style.getPropertyValue('--W') !== v.W) { key = v.gameKey; build(v); shown = null; ended = false; blastK = 0; }

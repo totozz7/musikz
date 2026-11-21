@@ -258,7 +258,7 @@
     $('#wd-replay')?.addEventListener('click', () => gAct('replay'));
     $('#wd-lobby')?.addEventListener('click', () => socket.emit('stop'));
     $('#wd-shop')?.addEventListener('click', openShop);
-    if (v.winner === pid) { burst(save.look.winFx, 34); sfx('legend'); setTimeout(() => sfx('legend'), 300); }
+    if (v.winner && v.multi) celebrateWinner(v.winner); else if (v.winner === pid) burst('fireworks', 20);
     $('#wd-end').scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 

@@ -92,7 +92,7 @@
         ${v.coins ? `<div class="earned"><span class="coin-spin">🪙</span> +${v.coins.coins} pièces · Total : <b>${save.coins} 🪙</b></div>` : ''}
         <div class="end-actions">${host ? '<button class="btn btn-primary" id="nt-replay">🔁 Rejouer</button><button class="btn btn-yellow" id="nt-lobby">🏠 Retour au salon</button>' : '<p class="muted">L\'hôte peut relancer une partie.</p>'}
         <button class="btn btn-shop open-shop2">🛍️ Boutique</button></div>`;
-      if (key !== lastKey) { if (rk[0]?.pid === pid) burst(save.look.winFx, 30); sfx('legend'); }
+      if (key !== lastKey) { if (rk[0]?.pid) celebrateWinner(rk[0].pid); else sfx('legend'); }
     }
 
     // garde ce qui est en cours de saisie

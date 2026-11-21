@@ -238,7 +238,7 @@
     const w = r.wp ? P(r.wp) : null, mine = r.wp === pid;
     b.innerHTML = `<div class="ch-bn ${r.wp ? (mine ? 'win' : v.color ? 'lose' : 'neu') : 'draw'}"><span class="big">${r.wp ? (mine ? '🏆' : v.color ? '💀' : '♚') : '🤝'}</span><b>${r.wp ? esc(w?.name || '?') + ' gagne !' : 'Partie nulle'}</b><small>${WHY[r.why] || ''}</small>${v.n < v.total ? '<i>Partie suivante dans quelques secondes…</i>' : ''}</div>`;
     b.classList.remove('hidden');
-    if (mine) { sfx('legend'); burst(save.look.winFx, 24); } else if (!r.wp) sfx('drum'); else sfx(v.color ? 'wrong' : 'drum');
+    if (mine) { sfx('legend'); burst('fireworks', 16); } else if (!r.wp) sfx('drum'); else sfx(v.color ? 'wrong' : 'drum');
     if (r.why === 'mat' || r.why === 'roi' || r.why === 'colline') { const lc = r.winner === 'w' ? 'b' : 'w'; const kel = [...$$('#ch-pcs .ch-pc')].find(e => e.dataset.sig?.[0] === 'K' && V.board[+e.dataset.sq]?.c === lc); kel?.classList.add('fall'); $('#ch-frame').classList.add('shake'); setTimeout(() => $('#ch-frame')?.classList.remove('shake'), 600); }
   }
   function soundFor(v) {

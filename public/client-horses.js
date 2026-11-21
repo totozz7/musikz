@@ -261,15 +261,16 @@
     const rar = it.price ? SHOP.rarity(it.price) : 'free';
     layer.style.setProperty('--fc', it.color); layer.style.setProperty('--pk', hex || it.color);
     const parts = [...it.parts];
-    const big = rar === 'legendary' ? 1.5 : rar === 'epic' ? 1.25 : 1;
-    const impact = type === 'capture' && ['meteor', 'dragon'].includes(it.special) ? 500 : 0;
+    const big = rar === 'divine' ? 1.9 : rar === 'legendary' ? 1.5 : rar === 'epic' ? 1.25 : 1;
+    const impact = type === 'capture' && ['meteor', 'dragon', 'divine'].includes(it.special) ? 500 : 0;
     const board = layer.closest('.pc-board');
     if (type === 'finish') {
       node(layer, 'pf-beam', r, c);
       node(layer, 'pf-ring', r, c, '', { '--d': '0s' }); node(layer, 'pf-ring', r, c, '', { '--d': '.18s' });
       node(layer, 'pf-text fin', r, c, '🏁 RENTRÉ !');
       for (let k = 0; k < 14 * big; k++) node(layer, 'pf-part', r, c, parts[k % parts.length], { '--dx': rnd(-3, 3) * big + '', '--dy': rnd(-3.6, -.5) * big + '', '--rot': rnd(-360, 360) + 'deg', '--d': rnd(0, .25) + 's' });
-      if (rar === 'legendary') node(layer, 'pf-cosmic small', r, c);
+      if (rar === 'legendary' || rar === 'divine') node(layer, 'pf-cosmic small', r, c);
+      if (rar === 'divine') { node(layer, 'pf-dvbeam', r, c); node(layer, 'pf-dvhalo', r, c); }
       sfx('legend');
       return it;
     }
@@ -277,6 +278,7 @@
     const sp = it.special;
     if (sp === 'meteor') node(layer, 'pf-meteor', r, c, it.emoji);
     if (sp === 'dragon') { node(layer, 'pf-dragon', r, c, '🐉'); later(250, () => node(layer, 'pf-breath', r, c)); }
+    if (sp === 'divine') { node(layer, 'pf-dvbeam', r, c); later(120, () => { node(layer, 'pf-bolt dv', r, c); node(layer, 'pf-bolt dv b2', r, c); }); sfx('zap', .8); }
     if (sp === 'bolt') { node(layer, 'pf-bolt', r, c); later(90, () => node(layer, 'pf-bolt b2', r, c)); }
     later(impact, () => {
       if (board && type === 'capture') { board.classList.remove('shake-hard'); void board.offsetWidth; board.classList.add('shake-hard'); }
@@ -287,6 +289,7 @@
       if (sp === 'splash') { node(layer, 'pf-wave', r, c); node(layer, 'pf-wave', r, c, '', { '--d': '.2s' }); }
       if (sp === 'flame' || sp === 'meteor' || sp === 'dragon') { node(layer, 'pf-fireball', r, c); node(layer, 'pf-smoke', r, c, '', { '--d': '.25s' }); }
       if (sp === 'hole') node(layer, 'pf-hole', r, c);
+      if (sp === 'divine') { node(layer, 'pf-dvhalo', r, c); node(layer, 'pf-cosmic', r, c); node(layer, 'pf-dvring', r, c); node(layer, 'pf-dvring', r, c, '', { '--d': '.2s' }); divineFlash?.(); sfx('thunder', .8); }
       if (sp === 'cosmic') { node(layer, 'pf-cosmic', r, c); node(layer, 'pf-cosmic', r, c, '', { '--d': '.25s' }); }
       if (sp === 'rain') for (let k = 0; k < 16; k++) node(layer, 'pf-fall', r, c, parts[k % parts.length], { '--dx': rnd(-2.2, 2.2) + '', '--d': rnd(0, .6) + 's' });
       node(layer, 'pf-ring', r, c, '', { '--d': '0s' }); node(layer, 'pf-ring', r, c, '', { '--d': '.15s' });
@@ -295,7 +298,7 @@
         node(layer, 'pf-part', r, c, parts[k % parts.length], { '--dx': Math.cos(a) * d + '', '--dy': Math.sin(a) * d + '', '--rot': rnd(-400, 400) + 'deg', '--d': rnd(0, .12) + 's' });
       }
       node(layer, 'pf-text', r, c, esc(it.text), { '--tilt': rnd(-12, 12) + 'deg' });
-      sfx(rar === 'legendary' || rar === 'epic' ? 'legend' : 'buzzer', .6);
+      sfx(rar === 'legendary' || rar === 'epic' || rar === 'divine' ? 'legend' : 'buzzer', .6);
     });
     return it;
   }
@@ -376,7 +379,7 @@
     $('#pc-shop')?.addEventListener('click', () => { shopTab = 'pawns'; openShop(); });
     $('#pc-shop2')?.addEventListener('click', () => { shopTab = 'boards'; openShop(); });
     $('#pc-shop3')?.addEventListener('click', () => { shopTab = 'pcfx'; openShop(); });
-    if (meWon) { burst(save.look.winFx, 34); sfx('legend'); setTimeout(() => sfx('legend'), 300); }
+    if (W?.pid) celebrateWinner(W.pid);
     $('#pc-end').scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 

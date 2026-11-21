@@ -54,7 +54,7 @@
     const el = $('#gp-fb'); if (!r) return;
     el.className = 'gp-fb show ' + (r.verdict || '');
     el.innerHTML = r.verdict === 'ok' ? `✅ ${r.all ? 'Bravo, tout trouvé !' : 'Bien vu !'} <b>+${r.gain} pts</b>` : r.verdict === 'close' ? '🔥 Presque ! Vérifie l\'orthographe' : r.verdict === 'wait' ? '⏳ Attends que l\'image apparaisse…' : '❌ Non…';
-    if (r.verdict === 'ok') { sfx('legend', .6); burst(r.all ? save.look.winFx : 'party', r.all ? 16 : 8); $('#gp-pol').classList.remove('win'); void $('#gp-pol').offsetWidth; $('#gp-pol').classList.add('win'); }
+    if (r.verdict === 'ok') { sfx('legend', .6); burst(r.all ? 'fireworks' : 'party', r.all ? 14 : 8); $('#gp-pol').classList.remove('win'); void $('#gp-pol').offsetWidth; $('#gp-pol').classList.add('win'); }
     else if (r.verdict === 'close') sfx('pop'); else if (r.verdict === 'no') { sfx('buzzer', .3); $('#gp-form').classList.remove('shake'); void $('#gp-form').offsetWidth; $('#gp-form').classList.add('shake'); }
     clearTimeout(fb.t); fb.t = setTimeout(() => el.classList.remove('show'), 2200);
   }
@@ -220,7 +220,7 @@
     $('#gp-replay')?.addEventListener('click', () => gAct('replay'));
     $('#gp-lobby')?.addEventListener('click', () => socket.emit('stop'));
     $('#gp-wheel')?.addEventListener('click', () => window.WHEEL?.open());
-    if (rk[0]?.pid === pid && rk.length > 1) { burst(save.look.winFx, 34); sfx('legend'); }
+    if (rk[0]?.pid) celebrateWinner(rk[0].pid);
     setTimeout(() => $('#gp-end .gp-endcard')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
     cancelAnimationFrame(raf);
   }
