@@ -58,7 +58,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
   function simulate(h, x, y, ang, pow, t0) {
     const b = { x, y, vx: Math.cos(ang) * (60 + pow * 1180), vy: Math.sin(ang) * (60 + pow * 1180) };
     const segs = segsOf(h), frames = [[Math.round(x), Math.round(y)]], ev = [];
-    let t = 0, acc = 0, portalCD = 0, lastSurf = 'grass', boostCD = 0, wallCD = 0, result = 'stop';
+    let t = 0, acc = 0, portalCD = 0, lastSurf = 'grass', boostCD = 0, wallCD = 0, result = 'stop'; const usedB = {}; // chaque flèche ne pousse qu'une fois par tir (sinon boucle infinie flèche → mur → flèche)
     const MAXT = 14;
     while (t < MAXT) {
       t += DT; acc += DT; portalCD -= DT; boostCD -= DT; wallCD -= DT;
@@ -71,12 +71,13 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
       // vent
       [...(h.wind || []), ...(h.slopes || [])].forEach(w => { if (inPoly(b.x, b.y, w.poly)) { b.vx += w.dir[0] * w.f * DT; b.vy += w.dir[1] * w.f * DT; } });
       // accélérateurs
-      (h.boosts || []).forEach(o => { if (boostCD <= 0 && Math.hypot(b.x - o.x, b.y - o.y) < 30) { const sp = Math.max(780, Math.hypot(b.vx, b.vy)); b.vx = o.dir[0] * sp; b.vy = o.dir[1] * sp; boostCD = .4; ev.push({ t, k: 'boost' }); } });
+      (h.boosts || []).forEach((o, bi) => { if (boostCD <= 0 && !usedB[bi] && Math.hypot(b.x - o.x, b.y - o.y) < 30) { usedB[bi] = 1; const sp = Math.max(780, Math.hypot(b.vx, b.vy)); b.vx = o.dir[0] * sp; b.vy = o.dir[1] * sp; boostCD = .4; ev.push({ t, k: 'boost' }); } });
       // portails
       (h.portals || []).forEach(o => { if (portalCD <= 0 && Math.hypot(b.x - o.a[0], b.y - o.a[1]) < 22) { b.x = o.b[0]; b.y = o.b[1]; portalCD = .6; ev.push({ t, k: 'portal' }); frames.push(null); } });
       // frottements
       const sp = Math.hypot(b.vx, b.vy);
-      const [dec, lin] = surf === 'sand' ? [1300, 2.6] : surf === 'ice' ? [22, .05] : [150, .42];
+      const [dec0, lin] = surf === 'sand' ? [1300, 2.6] : surf === 'ice' ? [45, .09] : [150, .42];
+      const dec = dec0 + (t > 6 ? (t - 6) * 500 : 0); // sécurité : après 6 s la balle finit toujours par s'arrêter (pas de boucle sans fin)
       const nsp = Math.max(0, sp - (dec + lin * sp) * DT);
       if (sp > 0) { b.vx *= nsp / sp; b.vy *= nsp / sp; }
       b.x += b.vx * DT; b.y += b.vy * DT;
@@ -101,7 +102,7 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
         const pull = 900 * DT; b.vx += (h.cup[0] - b.x) / cd * pull; b.vy += (h.cup[1] - b.y) / cd * pull; // la balle « lèche » le bord
       } else if (cd < CUP + 10 && spd < 140) { b.vx += (h.cup[0] - b.x) / cd * 120 * DT; b.vy += (h.cup[1] - b.y) / cd * 120 * DT; }
       if (acc >= 1 / FPS) { acc = 0; frames.push([Math.round(b.x * 10) / 10, Math.round(b.y * 10) / 10]); }
-      if (Math.hypot(b.vx, b.vy) < 3 && ![...(h.wind || []), ...(h.slopes || [])].some(w => inPoly(b.x, b.y, w.poly))) break;
+      if (Math.hypot(b.vx, b.vy) < 3 && (t > 7 || ![...(h.wind || []), ...(h.slopes || [])].some(w => inPoly(b.x, b.y, w.poly)))) break;
       if (Math.hypot(b.vx, b.vy) < 3 && t > 6) break;
     }
     if (result === 'stop') frames.push([Math.round(b.x * 10) / 10, Math.round(b.y * 10) / 10]);

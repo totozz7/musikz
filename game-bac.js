@@ -73,8 +73,9 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
     if (g.stopper && g.cats.every((_, i) => g.valid[g.stopper + ':' + i])) g.roundPts[g.stopper] = (g.roundPts[g.stopper] || 0) + 5;
     Object.entries(g.roundPts).forEach(([pid, p]) => { g.scores[pid] = (g.scores[pid] || 0) + p; });
     g.history.push({ letter: g.letter, pts: { ...g.roundPts } });
-    g.stage = 'results';
-    later(room, 7000, () => nextRound(room));
+    // on laisse le temps de lire : chacun clique « Suivant » (ou 60 s max, ou l'hôte passe)
+    g.stage = 'results'; g.ready = {};
+    later(room, 60000, () => { g.ready = {}; nextRound(room); });
     pushState(room);
   }
   function finish(room) {
@@ -113,8 +114,8 @@ module.exports = ({ sysMsg, broadcast, pushState, shuffle, reward }) => {
       if (v[me.id]) delete v[me.id]; else v[me.id] = 1;
       pushState(room);
     },
-    ready(room, me) { const g = room.g; if (g.stage === 'vote') { g.ready = g.ready || {}; g.ready[me.id] = 1; if (players(room).every(p => g.ready[p.id])) { g.ready = {}; score(room); } else pushState(room); } },
-    next(room, me) { if (room.hostId === me.id && room.g.stage === 'vote') { room.g.ready = {}; score(room); } },
+    ready(room, me) { const g = room.g; if (g.stage === 'vote' || g.stage === 'results') { g.ready = g.ready || {}; g.ready[me.id] = 1; if (players(room).every(p => g.ready[p.id])) { const st = g.stage; g.ready = {}; st === 'vote' ? score(room) : nextRound(room); } else pushState(room); } },
+    next(room, me) { if (room.hostId !== me.id) return; const g = room.g; if (g.stage === 'vote') { g.ready = {}; score(room); } else if (g.stage === 'results') { g.ready = {}; nextRound(room); } },
     replay(room, me) { if (room.hostId === me.id && room.g.stage === 'over') { try { start(room); } catch (e) { return { error: e.message }; } } },
   };
 

@@ -20,7 +20,7 @@ const io = new Server(server);
 const PUB = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : __dirname;
 const INDEX = path.join(PUB, 'index.html');
 const SHOP = require(path.join(PUB, 'shop.js'));
-for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js', 'client-draw.js', 'client-bac.js', 'client-bluff.js', 'client-punch.js', 'client-top7.js', 'client-quiz.js', 'client-n25.js', 'client-sem.js', 'client-chess.js', 'cards.js', 'client-cards.js', 'client-c4.js', 'client-poker.js', 'client-golf.js', 'client-trade.js', 'client-divine.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
+for (const f of ['app.js', 'style.css', 'shop.js', 'client-undercover.js', 'client-note.js', 'client-word.js', 'client-horses.js', 'client-liar.js', 'client-guess.js', 'client-primo.js', 'client-draw.js', 'client-bac.js', 'client-bluff.js', 'client-punch.js', 'client-top7.js', 'client-quiz.js', 'client-n25.js', 'client-sem.js', 'client-chess.js', 'cards.js', 'client-cards.js', 'client-c4.js', 'client-poker.js', 'client-golf.js', 'client-trade.js', 'client-divine.js', 'client-spy.js', 'client-tank.js']) app.get('/' + f, (req, res) => res.sendFile(path.join(PUB, f)));
 app.get('/', (req, res) => res.sendFile(INDEX));
 app.get('/r/:code', (req, res) => res.sendFile(INDEX));
 app.get('/health', (req, res) => res.send('ok'));
@@ -404,6 +404,8 @@ const GAMES = {
   c4: require('./game-c4')(gameCtx),
   poker: require('./game-poker')(gameCtx),
   golf: require('./game-golf')(gameCtx),
+  spy: require('./game-spy')(gameCtx),
+  tank: require('./game-tank')(gameCtx),
   sem: require('./game-sem')(gameCtx),
 };
 // infos affichées sur l'écran de choix (nombre de joueurs !)
@@ -417,11 +419,13 @@ const GAME_INFO = {
   guess: { min: 1, max: GAMES.guess.max },
   primo: { min: 1, max: GAMES.primo.max },
   draw: { min: 2, max: GAMES.draw.max },
-  bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, quiz: { min: 1, max: 12 }, n25: { min: 1, max: 12 }, chess: { min: 2, max: 12 }, c4: { min: 2, max: 12 }, poker: { min: 2, max: 8 }, golf: { min: 1, max: 8 },
+  bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, quiz: { min: 1, max: 12 }, n25: { min: 1, max: 12 }, chess: { min: 2, max: 12 }, c4: { min: 2, max: 12 }, poker: { min: 2, max: 8 }, golf: { min: 1, max: 8 }, spy: { min: 3, max: 12 }, tank: { min: 1, max: 8 },
 };
 app.get('/api/guess-themes', (req, res) => res.json(GAMES.guess.themes));
+app.get('/api/spy-themes', (req, res) => res.json(GAMES.spy.THEMES.map(t => ({ id: t.id, name: t.name, emoji: t.emoji, n: t.items.length }))));
+app.get('/api/tank-maps', (req, res) => res.json(require('./data-tank').map(m => ({ id: m.id, name: m.name, emoji: m.emoji, desc: m.desc }))));
 app.get('/api/games', (req, res) => res.json({ info: GAME_INFO, ucThemes: GAMES.undercover.themes() }));
-function stopModuleGame(room) { if (room.g) { clearTimeout(room.g.timer); room.g = null; } }
+function stopModuleGame(room) { if (room.g) { clearTimeout(room.g.timer); if (room.g.loop) clearInterval(room.g.loop); room.g = null; } }
 function sysMsg(room, text) {
   const m = { id: Date.now() + Math.random(), sys: true, text, at: Date.now() };
   room.chat.push(m); room.chat = room.chat.slice(-100);
@@ -779,7 +783,7 @@ io.on('connection', (socket) => {
   socket.on('create', ({ name, avatar, pid, game, ...look }, cb) => {
     const code = makeCode();
     room = { code, players: new Map(), hostId: pid, phase: 'lobby', settings: defaultSettings(), chat: [], history: [],
-      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults(), draw: GAMES.draw.defaults(), bac: GAMES.bac.defaults(), bluff: GAMES.bluff.defaults(), punch: GAMES.punch.defaults(), sem: GAMES.sem.defaults(), top7: GAMES.top7.defaults(), quiz: GAMES.quiz.defaults(), n25: GAMES.n25.defaults(), chess: GAMES.chess.defaults(), c4: GAMES.c4.defaults(), poker: GAMES.poker.defaults(), golf: GAMES.golf.defaults() }, gscores: {}, g: null };
+      game: GAME_INFO[game] ? game : 'blindtest', gs: { undercover: GAMES.undercover.defaults(), note: GAMES.note.defaults(), word: GAMES.word.defaults(), horses: GAMES.horses.defaults(), liar: GAMES.liar.defaults(), guess: GAMES.guess.defaults(), primo: GAMES.primo.defaults(), draw: GAMES.draw.defaults(), bac: GAMES.bac.defaults(), bluff: GAMES.bluff.defaults(), punch: GAMES.punch.defaults(), sem: GAMES.sem.defaults(), top7: GAMES.top7.defaults(), quiz: GAMES.quiz.defaults(), n25: GAMES.n25.defaults(), chess: GAMES.chess.defaults(), c4: GAMES.c4.defaults(), poker: GAMES.poker.defaults(), golf: GAMES.golf.defaults(), spy: GAMES.spy.defaults(), tank: GAMES.tank.defaults() }, gscores: {}, g: null };
     rooms.set(code, room);
     join(room, { name, avatar, pid, ...look }, cb);
   });
@@ -870,7 +874,7 @@ io.on('connection', (socket) => {
   socket.on('setGame', (game) => {
     if (!isHost() || !['lobby', 'end'].includes(room.phase) || !GAME_INFO[game]) return;
     room.game = game; room.phase = 'lobby'; stopModuleGame(room);
-    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time', bac: '📋 Petit Bac', bluff: '🎭 Le Bluff', punch: '🎤 Punchline', sem: '🌡️ Ça chauffe !', top7: '7️⃣ Top 7', quiz: '❓ Quiz', n25: '🎯 25 Pile', chess: '♟️ Échecs', c4: '🔴🟡 Puissance 4', poker: '🃏 Poker', golf: '⛳ Mini-golf' }[game]}`);
+    sysMsg(room, `🎮 Jeu choisi : ${{ blindtest: '🎵 Blind test', undercover: '🕵️ Undercover', note: '🔢 Jeu de la Note', word: '🔤 Speed Word', horses: '🐎 Petits chevaux', liar: '🃏 Bar des Menteurs', guess: '🖼️ Guess Party', primo: '🎴 PRIMO !', draw: '🎨 Draw Time', bac: '📋 Petit Bac', bluff: '🎭 Le Bluff', punch: '🎤 Punchline', sem: '🌡️ Ça chauffe !', top7: '7️⃣ Top 7', quiz: '❓ Quiz', n25: '🎯 25 Pile', chess: '♟️ Échecs', c4: '🔴🟡 Puissance 4', poker: '🃏 Poker', golf: '⛳ Mini-golf', spy: '📸 Photo Espion', tank: '💥 Tank Arena' }[game]}`);
     broadcast(room);
   });
   socket.on('gsettings', (patch = {}) => {
@@ -885,6 +889,9 @@ io.on('connection', (socket) => {
     const res = h(room, me, data);
     cb?.(res || { ok: true });
   });
+
+  // entrées rapides (jeux en temps réel : Tank Arena)
+  socket.on('gi', (d) => { if (!room || !me || room.phase !== 'game' || !room.g) return; GAMES[room.g.game]?.input?.(room, me, d); });
 
   socket.on('start', () => {
     if (!isHost() || !['lobby', 'end'].includes(room.phase)) return;
@@ -1019,7 +1026,7 @@ io.on('connection', (socket) => {
     const n = Math.max(-1000000, Math.min(1000000, Math.round(+coins || 0))); if (!n) return cb?.({ error: 'Montant invalide' });
     const targets = to === '*' ? [...room.players.values()].filter(p => p.online && p.id !== me?.id) : [room.players.get(to)].filter(Boolean);
     if (!targets.length) return cb?.({ error: 'Joueur introuvable' });
-    targets.forEach(p => io.to(p.socketId).emit('modoGift', { coins: n }));
+    targets.forEach(p => io.to(p.socketId).emit('modoGift', { coins: n, self: p.id === me?.id }));
     cb?.({ ok: true, n: targets.length });
   });
   // 🛡️ modo : effets marrants sur l'écran des autres + pouvoirs de salon
@@ -1033,11 +1040,12 @@ io.on('connection', (socket) => {
     t.forEach(p => io.to(p.socketId).emit('modoFx', payload));
     cb?.({ ok: true, n: t.length });
   });
-  socket.on('modoItem', ({ to, kind, id } = {}, cb) => {
+  socket.on('modoItem', ({ to, kind, id, remove } = {}, cb) => {
     if (!socket.data.modo) return cb?.({ error: 'Pas autorisé' });
-    if (!SHOP[kind] || !Array.isArray(SHOP[kind]) || !SHOP[kind].some(x => x.id === id)) return cb?.({ error: 'Objet inconnu' });
+    if (!SHOP[kind] || !Array.isArray(SHOP[kind]) || !(SHOP[kind].some(x => x.id === id) || (remove && id === '*'))) return cb?.({ error: 'Objet inconnu' });
     const t = modoTargets(to); if (!t.length) return cb?.({ error: 'Joueur introuvable' });
-    t.forEach(p => io.to(p.socketId).emit('modoItem', { kind, id }));
+    // remove = le modo retire l'objet (marche aussi sur les autres modos et sur soi-même)
+    t.forEach(p => io.to(p.socketId).emit('modoItem', { kind, id, remove: !!remove, self: p.id === me?.id }));
     cb?.({ ok: true, n: t.length });
   });
   socket.on('modoAct', ({ act, to, name } = {}, cb) => {

@@ -260,6 +260,8 @@ const GAME_META = {
   quiz: { emoji: '❓', name: 'Quiz', desc: 'Culture G, sport, manga, ciné… 4 choix, réponds vite ! Et des manches « La moins répondue » où il faut la bonne réponse que personne d\'autre n\'a donnée.', cls: 'g-quiz', lobby: 'Buzzers prêts ! ❓' },
   c4: { emoji: '🔴', name: 'Puissance 4', desc: 'Aligne 4 jetons avant ton adversaire ! Jetons qui tombent et rebondissent, mode Géant (aligne 5) et mode Bombes 💣.', cls: 'g-c4', lobby: 'Qui alignera ses jetons en premier ? 🔴🟡' },
   poker: { emoji: '🃏', name: 'Poker', desc: "Texas Hold'em entre potes : jetons, relances, tapis et bluff. 3 modes : Classique, Turbo et Tapis !", cls: 'g-poker', lobby: 'Faites vos jeux… et votre meilleur visage de bluffeur 😎' },
+  spy: { emoji: '📸', name: 'Photo Espion', desc: "Tout le monde voit la même image… sauf l'espion ! Posez-vous des questions à tour de rôle pour le démasquer.", cls: 'g-spy', lobby: "Qui n'a pas vu la photo ? 🕵️" },
+  tank: { emoji: '💥', name: 'Tank Arena', desc: 'Combat de tanks vu de dessus : choisis ton canon, 10 cartes avec lave, glace, mines, téléporteurs… Dernier en vie gagne !', cls: 'g-tank', lobby: 'Chargez les obus ! 💣' },
   golf: { emoji: '⛳', name: 'Mini-golf', desc: 'Mini-golf vu de dessus : moulins, eau, sable, vent, glace, bumpers et portails. Tout le monde joue en même temps !', cls: 'g-golf', lobby: 'Sortez les clubs, attention à la mare 🏌️' },
   chess: { emoji: '♟️', name: 'Échecs', desc: 'Le vrai jeu d\'échecs, en beau : pendules, 5 modes (Chess960, Roi de la colline, 3 échecs, Brouillard…), le gagnant reste à la table et les spectateurs parient !', cls: 'g-chess', lobby: 'Que le meilleur stratège gagne ♟️' },
   n25: { emoji: '🎯', name: '25 Pile', desc: '25 questions dans le désordre, et les réponses sont tous les nombres de 1 à 25, chacun une seule fois. Place les boules, déduis, et vise le 25/25 !', cls: 'g-n25', lobby: 'Boules chargées ! 🎯' },
@@ -272,9 +274,11 @@ const GAME_META = {
   horses: { emoji: '🐎', name: 'Petits chevaux', desc: 'Le grand classique : lance le dé, sors tes chevaux, renvoie les autres à l\'écurie ! Choisis le skin de tes pions.', cls: 'g-horses', lobby: 'Tous en selle ! 🐎' },
   note: { emoji: '🔢', name: 'Jeu de la Note', desc: "Une note secrète sur 10, trois thèmes : réponds avec quelque chose qui « vaut » ta note. Les autres devinent !", cls: 'g-note', lobby: 'Sur une échelle de 1 à 10… 🔢' },
 };
-let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, primo: { min: 1, max: 8 }, draw: { min: 2, max: 12 }, bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, quiz: { min: 1, max: 12 }, n25: { min: 1, max: 12 }, chess: { min: 2, max: 12 }, c4: { min: 2, max: 12 }, poker: { min: 2, max: 8 }, golf: { min: 1, max: 8 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [];
+let GAME_INFO = { blindtest: { min: 1, max: 12 }, undercover: { min: 3, max: 12 }, word: { min: 1, max: 12 }, horses: { min: 1, max: 4 }, liar: { min: 1, max: 6 }, guess: { min: 1, max: 12 }, primo: { min: 1, max: 8 }, draw: { min: 2, max: 12 }, bac: { min: 1, max: 12 }, bluff: { min: 2, max: 10 }, punch: { min: 3, max: 10 }, sem: { min: 1, max: 12 }, top7: { min: 1, max: 10 }, quiz: { min: 1, max: 12 }, n25: { min: 1, max: 12 }, chess: { min: 2, max: 12 }, c4: { min: 2, max: 12 }, poker: { min: 2, max: 8 }, golf: { min: 1, max: 8 }, spy: { min: 3, max: 12 }, tank: { min: 1, max: 8 }, note: { min: 2, max: 10 } }, UC_THEMES = [], GP_THEMES = [], SPY_THEMES = [], TK_MAPS = [];
+fetch('/api/spy-themes').then(r => r.json()).then(t => { SPY_THEMES = t; if (state?.game === 'spy') renderGameLobby?.(); }).catch(() => {});
+fetch('/api/tank-maps').then(r => r.json()).then(t => { TK_MAPS = t; if (state?.game === 'tank') renderGameLobby?.(); }).catch(() => {});
 fetch('/api/guess-themes').then(r => r.json()).then(t => { GP_THEMES = t; if (state?.game === 'guess') renderGameLobby?.(); }).catch(() => {});
-const GAME_TAGS = { blindtest: 'musique chanson son audio', undercover: 'mots espion bluff mot secret', word: 'mots lettres rapidité clavier wordle', horses: 'plateau dés course chevaux', liar: 'cartes bluff menteur', guess: 'images photo deviner flou', primo: 'cartes uno', draw: 'dessin dessiner pictionary', bac: 'mots lettres petit bac', bluff: 'questions mensonge bluff', punch: 'humour phrases blague', sem: 'mots proximité sens cemantix', top7: 'classement listes réponses', quiz: 'questions culture qcm', n25: 'nombres chiffres questions', chess: 'plateau stratégie échecs 2 joueurs', note: 'note avis', c4: 'plateau jetons aligner 2 joueurs puissance', poker: 'cartes jetons argent casino bluff', golf: 'sport balle adresse minigolf mini-golf' };
+const GAME_TAGS = { blindtest: 'musique chanson son audio', undercover: 'mots espion bluff mot secret', word: 'mots lettres rapidité clavier wordle', horses: 'plateau dés course chevaux', liar: 'cartes bluff menteur', guess: 'images photo deviner flou', primo: 'cartes uno', draw: 'dessin dessiner pictionary', bac: 'mots lettres petit bac', bluff: 'questions mensonge bluff', punch: 'humour phrases blague', sem: 'mots proximité sens cemantix', top7: 'classement listes réponses', quiz: 'questions culture qcm', n25: 'nombres chiffres questions', chess: 'plateau stratégie échecs 2 joueurs', note: 'note avis', c4: 'plateau jetons aligner 2 joueurs puissance', poker: 'cartes jetons argent casino bluff', golf: 'sport balle adresse minigolf mini-golf', spy: 'images photo espion questions undercover imposteur', tank: 'action tir combat guerre char arène bots' };
 const normq = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 function gameMatch(id, q) {
   if (!q) return true;
@@ -419,8 +423,8 @@ function renderGameLobby() {
   $('#set-guess').classList.toggle('hidden', g !== 'guess');
   $('#set-primo').classList.toggle('hidden', g !== 'primo');
   $('#set-draw').classList.toggle('hidden', g !== 'draw');
-  ['bac', 'bluff', 'punch', 'sem', 'top7', 'quiz', 'n25', 'chess', 'c4', 'poker', 'golf'].forEach(k => $('#set-' + k).classList.toggle('hidden', g !== k));
-  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO', draw: 'Draw Time', bac: 'le Petit Bac', bluff: 'le Bluff', punch: 'Punchline', sem: 'Ça chauffe', top7: 'le Top 7', quiz: 'le Quiz', n25: '25 Pile', chess: 'les Échecs', c4: 'le Puissance 4', poker: 'le Poker', golf: 'le Mini-golf' }[g]}`;
+  ['bac', 'bluff', 'punch', 'sem', 'top7', 'quiz', 'n25', 'chess', 'c4', 'poker', 'golf', 'spy', 'tank'].forEach(k => $('#set-' + k).classList.toggle('hidden', g !== k));
+  $('#btn-start').textContent = `▶ Lancer ${{ note: 'le Jeu de la Note', blindtest: 'le Blind test', undercover: "l'Undercover", word: 'Speed Word', horses: 'les Petits chevaux', liar: 'le Bar des Menteurs', guess: 'la Guess Party', primo: 'PRIMO', draw: 'Draw Time', bac: 'le Petit Bac', bluff: 'le Bluff', punch: 'Punchline', sem: 'Ça chauffe', top7: 'le Top 7', quiz: 'le Quiz', n25: '25 Pile', chess: 'les Échecs', c4: 'le Puissance 4', poker: 'le Poker', golf: 'le Mini-golf', spy: 'Photo Espion', tank: 'Tank Arena' }[g]}`;
   $('#btn-start').disabled = !ok;
   if (g === 'blindtest') return;
   const box = $('#set-' + g), gs = state.gs?.[g] || {};
@@ -451,6 +455,20 @@ function renderGameLobby() {
       if (!nx.length) return toast('Garde au moins un thème 😉', 'error');
       socket.emit('gsettings', { themes: nx });
     });
+  }
+  if (g === 'spy') {
+    const on = gs.themes || [];
+    $('#spy-themes').innerHTML = SPY_THEMES.map(t => `<button class="cat ${on.includes(t.id) ? 'on' : ''}" data-t="${t.id}">${t.emoji} ${esc(t.name)} <small>${t.n}</small></button>`).join('') + `<button class="cat" data-t="__all">🎲 Tout cocher</button>`;
+    $$('#spy-themes .cat').forEach(b => b.onclick = () => {
+      if (b.dataset.t === '__all') return socket.emit('gsettings', { themes: SPY_THEMES.map(t => t.id) });
+      const nx = on.includes(b.dataset.t) ? on.filter(x => x !== b.dataset.t) : [...on, b.dataset.t];
+      if (!nx.length) return toast('Garde au moins un thème 😉', 'error');
+      socket.emit('gsettings', { themes: nx });
+    });
+  }
+  if (g === 'tank') {
+    $('#tk-maps').innerHTML = [{ id: 'random', name: 'Au hasard', emoji: '🎲', desc: 'Une carte tirée au sort' }, ...TK_MAPS].map(m => `<button class="tk-mapbtn ${gs.map === m.id ? 'on' : ''}" data-m="${m.id}" title="${esc(m.desc)}"><span>${m.emoji}</span><b>${esc(m.name)}</b><small>${esc(m.desc)}</small></button>`).join('');
+    $$('#tk-maps [data-m]').forEach(b => b.onclick = () => socket.emit('gsettings', { map: b.dataset.m }));
   }
   box.querySelectorAll('.gseg').forEach(seg => seg.querySelectorAll('button').forEach(b => {
     b.classList.toggle('on', String(gs[seg.dataset.key]) === b.dataset.v);
@@ -674,7 +692,7 @@ socket.on('reward', grantCoins);
 const gAct = (type, data) => new Promise(r => socket.emit('g', { type, data }, (res) => { if (res?.error) toast(res.error, 'error'); r(res); }));
 socket.on('g:state', (v) => {
   if (v.game === 'undercover' && window.UC) { if (!$('#v-uc').classList.contains('active')) showView('v-uc'); window.UC.render(v); }
-  const MODS = { bac: 'BAC', bluff: 'BLUFF', punch: 'PUNCH', sem: 'SEM', top7: 'TOP7', quiz: 'QUIZ', n25: 'N25', chess: 'CHESS', c4: 'C4', poker: 'POKER', golf: 'GOLF' };
+  const MODS = { bac: 'BAC', bluff: 'BLUFF', punch: 'PUNCH', sem: 'SEM', top7: 'TOP7', quiz: 'QUIZ', n25: 'N25', chess: 'CHESS', c4: 'C4', poker: 'POKER', golf: 'GOLF', spy: 'SPY', tank: 'TANK' };
   if (MODS[v.game] && window[MODS[v.game]]) { if (!$('#v-' + v.game).classList.contains('active')) showView('v-' + v.game); window[MODS[v.game]].render(v); }
   if (v.game === 'draw' && window.DRAW) { if (!$('#v-draw').classList.contains('active')) showView('v-draw'); window.DRAW.render(v); }
   if (v.game === 'primo' && window.PRIMO) { if (!$('#v-primo').classList.contains('active')) showView('v-primo'); window.PRIMO.render(v); }
@@ -744,24 +762,31 @@ const MODO = (() => {
     ['dark', '🔦', 'Lampe torche'], ['ducks', '🦆', 'Invasion de canards'], ['clown', '🤡', 'Tout le monde en clown'], ['ghost', '👻', 'Bouh !'],
     ['horn', '📯', 'Corne de brume'], ['fakelegend', '🎰', 'Faux légendaire'], ['rain', '🌧️', 'Pluie d\'emojis'], ['msg', '📢', 'Message géant'],
   ];
-  const KN = { icons: '😀 Avatars', colors: '🎨 Couleurs', frames: '🖼️ Cadres', nameFx: '✨ Effets de pseudo', titles: '🏷️ Titres', winFx: '🎉 Victoires', pawns: '♟️ Pions', boards: '🎲 Plateaux', pcfx: '💥 Anim. chevaux', cardbacks: '🃏 Dos de cartes' };
+  const KN = { icons: '😀 Avatars', colors: '🎨 Couleurs', frames: '🖼️ Cadres', nameFx: '✨ Effets de pseudo', titles: '🏷️ Titres', winFx: '🎉 Victoires', pawns: '♟️ Pions', boards: '🎲 Plateaux', pcfx: '💥 Anim. chevaux', cardbacks: '🃏 Dos de cartes', chessb: '♟️ Échiquiers', chesspc: '♞ Pièces d\'échecs' };
+  let itemMode = 'give';
   const done = (ok) => (r) => r?.ok ? toast(ok + (r.n > 1 ? ` (${r.n} joueurs)` : '')) : toast(r?.error || 'Erreur', 'error');
   function panel() {
     let m = $('#modo-panel');
     if (!m) { m = document.createElement('div'); m.id = 'modo-panel'; m.className = 'modo-panel hidden'; document.body.appendChild(m); m.onclick = (e) => { if (e.target === m) m.classList.add('hidden'); }; }
     const others = (state?.players || []).filter(p => p.id !== pid);
-    if (target !== '*' && !others.some(p => p.id === target)) target = '*';
-    const tp = others.find(p => p.id === target);
-    const who = `<div class="modo-who"><button class="${target === '*' ? 'on' : ''}" data-tg="*">👥 Tout le monde</button>${others.map(p => `<button class="${target === p.id ? 'on' : ''}" data-tg="${p.id}">${avatarHTML(p, 22)} ${esc(p.name)}</button>`).join('')}</div>`;
+    const everyone = (state?.players || []).filter(p => p.id === pid).concat(others); // moi en premier (pièces / objets)
+    if (target !== '*' && !everyone.some(p => p.id === target)) target = '*';
+    if (target === pid && tab === 'fun') target = '*';
+    const who = `<div class="modo-who"><button class="${target === '*' ? 'on' : ''}" data-tg="*">👥 Tout le monde</button>${(tab === 'fun' ? others : everyone).map(p => `<button class="${target === p.id ? 'on' : ''}" data-tg="${p.id}">${avatarHTML(p, 22)} ${p.id === pid ? '🙋 Moi' : esc(p.name)}</button>`).join('')}</div>`;
     const tabs = [['coins', '🪙 Pièces'], ['fun', '🎭 Farces'], ['items', '🎁 Objets'], ['room', '🛠️ Salon']];
     let body = '';
     if (tab === 'coins') body = `<h4>Mes pièces <b>🪙 ${save.coins.toLocaleString('fr-FR')}</b></h4>
       <div class="modo-row">${[1000, 10000, 100000].map(n => `<button class="btn btn-yellow btn-sm" data-self="${n}">+${n.toLocaleString('fr-FR')}</button>`).join('')}<button class="btn btn-ghost btn-sm" data-self="max">♾️ 999 999</button></div>
-      <h4>Donner / reprendre des pièces</h4>${others.length ? `${who}<div class="modo-amt"><input class="input" id="modo-n" type="number" value="200"><button class="btn btn-primary btn-sm" id="modo-give">🎁 Donner</button><button class="btn btn-ghost btn-sm" id="modo-steal">🦹 Voler</button></div>` : '<p class="muted small">Personne d\'autre dans le salon.</p>'}`;
+      <div class="modo-row">${[1000, 10000, 100000].map(n => `<button class="btn btn-ghost btn-sm" data-self="-${n}">−${n.toLocaleString('fr-FR')}</button>`).join('')}<button class="btn btn-ghost btn-sm" data-self="zero">🧹 Remettre à 0</button></div>
+      <div class="modo-amt"><input class="input" id="modo-set" type="number" min="0" placeholder="Montant exact"><button class="btn btn-ghost btn-sm" id="modo-setbtn">✏️ Fixer mes pièces</button></div>
+      <h4>Donner / reprendre des pièces</h4>${who}<div class="modo-amt"><input class="input" id="modo-n" type="number" value="200"><button class="btn btn-primary btn-sm" id="modo-give">🎁 Donner</button><button class="btn btn-ghost btn-sm" id="modo-steal">🦹 Reprendre</button></div>
+      <p class="muted small">Marche sur tout le monde, y compris les autres modos et toi-même.</p>`;
     if (tab === 'fun') body = others.length ? `${who}<div class="modo-fx">${FX.map(([k, e, n]) => `<button data-fx="${k}"><span>${e}</span>${n}</button>`).join('')}</div>
       <div class="modo-amt"><input class="input" id="modo-txt" maxlength="120" placeholder="Texte du message géant / emoji de la pluie (ex. 💩)"></div>
       <p class="muted small">Les effets durent quelques secondes et disparaissent tout seuls.</p>` : '<p class="muted small">Personne à embêter pour l\'instant 😇</p>';
-    if (tab === 'items') body = others.length ? `${who}<div class="modo-amt"><select class="input" id="modo-kind">${Object.entries(KN).map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}</select></div><div class="modo-items" id="modo-items"></div>` : '<p class="muted small">Personne d\'autre dans le salon.</p>';
+    if (tab === 'items') body = `${who}<div class="modo-row"><button class="btn btn-sm ${itemMode === 'give' ? 'btn-primary' : 'btn-ghost'}" data-imode="give">🎁 Offrir</button><button class="btn btn-sm ${itemMode === 'take' ? 'btn-primary' : 'btn-ghost'}" data-imode="take">🗑️ Retirer</button></div>
+      <div class="modo-amt"><select class="input" id="modo-kind">${Object.entries(KN).map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}</select>${itemMode === 'take' ? '<button class="btn btn-ghost btn-sm" id="modo-takeall">🗑️ Tout retirer dans cette catégorie</button>' : ''}</div><div class="modo-items ${itemMode}" id="modo-items"></div>
+      <p class="muted small">${itemMode === 'take' ? 'Clique sur un objet pour le retirer (s\'il est équipé, on remet celui de base).' : 'Clique sur un objet pour l\'offrir.'}</p>`;
     if (tab === 'room') body = `<div class="modo-row"><button class="btn btn-yellow btn-sm" data-act="host">👑 Devenir l'hôte</button><button class="btn btn-ghost btn-sm" data-act="lobby">⏹️ Stopper la partie</button></div>
       ${others.length ? `<div class="modo-list">${others.map(p => `<div class="modo-pl">${avatarHTML(p, 30)}<b>${esc(p.name)}</b>
         <button class="btn btn-sm btn-ghost" data-act="rename" data-p="${p.id}" title="Renommer">✏️</button><button class="btn btn-sm btn-ghost" data-act="mute" data-p="${p.id}" title="Couper son chat 2 min">🤐</button><button class="btn btn-sm btn-ghost" data-act="kick" data-p="${p.id}" title="Exclure">🚪</button></div>`).join('')}</div>` : ''}`;
@@ -774,9 +799,12 @@ const MODO = (() => {
     m.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; panel(); });
     m.querySelectorAll('[data-tg]').forEach(b => b.onclick = () => { target = b.dataset.tg; panel(); });
     m.querySelectorAll('[data-self]').forEach(b => b.onclick = () => {
-      if (b.dataset.self === 'max') save.coins = 999999; else save.coins += +b.dataset.self;
-      persist(); renderProfile(); coinFountain(20); sfx('legend'); panel();
+      const v = b.dataset.self;
+      if (v === 'max') save.coins = 999999; else if (v === 'zero') save.coins = 0; else save.coins = Math.max(0, save.coins + +v);
+      persist(); renderProfile(); if (+v > 0 || v === 'max') { coinFountain(20); sfx('legend'); } else sfx('pop'); panel();
     });
+    if ($('#modo-setbtn')) $('#modo-setbtn').onclick = () => { const n = Math.round(+$('#modo-set').value); if (!(n >= 0)) return toast('Montant invalide', 'error'); save.coins = Math.min(9999999, n); persist(); renderProfile(); sfx('pop'); panel(); };
+    m.querySelectorAll('[data-imode]').forEach(b => b.onclick = () => { itemMode = b.dataset.imode; const k = $('#modo-kind')?.value; panel(); if (k) { $('#modo-kind').value = k; $('#modo-kind').onchange(); } });
     const amt = () => Math.round(+$('#modo-n')?.value || 0);
     if ($('#modo-give')) $('#modo-give').onclick = () => { const n = amt(); if (n <= 0) return toast('Montant invalide', 'error'); socket.emit('modoGift', { to: target, coins: n }, done(`🎁 ${n} 🪙 envoyées`)); };
     if ($('#modo-steal')) $('#modo-steal').onclick = () => { const n = amt(); if (n <= 0) return toast('Montant invalide', 'error'); socket.emit('modoGift', { to: target, coins: -n }, done(`🦹 ${n} 🪙 volées`)); };
@@ -788,7 +816,8 @@ const MODO = (() => {
     const drawItems = () => {
       const k = $('#modo-kind').value;
       $('#modo-items').innerHTML = SHOP[k].filter(it => it.price).map(it => `<button data-it="${it.id}" class="r-${SHOP.rarity(it.price)}">${k === 'icons' ? `<em>${esc(it.id)}</em>` : k === 'colors' ? `<i style="background:${esc(it.base || it.id)}"></i><span>${esc(it.name || 'Couleur')}</span>` : `${esc(it.emoji || it.emojis || '🎁')} <span>${esc(it.name || it.id)}</span>`}</button>`).join('');
-      $$('#modo-items [data-it]').forEach(b => b.onclick = () => socket.emit('modoItem', { to: target, kind: k, id: b.dataset.it }, done('🎁 Objet offert')));
+      $$('#modo-items [data-it]').forEach(b => b.onclick = () => socket.emit('modoItem', { to: target, kind: k, id: b.dataset.it, remove: itemMode === 'take' }, done(itemMode === 'take' ? '🗑️ Objet retiré' : '🎁 Objet offert')));
+      if ($('#modo-takeall')) $('#modo-takeall').onclick = () => { if (confirm('Retirer TOUS les objets de cette catégorie ?')) socket.emit('modoItem', { to: target, kind: k, id: '*', remove: true }, done('🗑️ Catégorie vidée')); };
     };
     if ($('#modo-kind')) { $('#modo-kind').onchange = drawItems; drawItems(); }
     m.querySelectorAll('[data-act]').forEach(b => b.onclick = () => {
@@ -803,12 +832,21 @@ const MODO = (() => {
   }
   btn().onclick = () => on && panel();
   socket.on('connect', () => { const k = store.get('mz_modo', ''); if (k) login(k, true); });
-  socket.on('modoGift', ({ coins }) => {
+  socket.on('modoGift', ({ coins, self }) => {
+    if (self) { save.coins = Math.max(0, save.coins + coins); persist(); renderProfile(); return; }
     if (coins < 0) { const n = Math.min(save.coins, -coins); save.coins -= n; persist(); renderProfile(); toast(`🦹 Un voleur masqué t'a piqué ${n} 🪙 !`, 'error'); sfx('buzzer'); document.body.classList.add('sn-shake'); setTimeout(() => document.body.classList.remove('sn-shake'), 500); return; }
     save.coins += coins; persist(); renderProfile();
     toast(`🎁 Cadeau surprise : +${coins} 🪙 !`); coinFountain(Math.min(60, 10 + Math.round(coins / 20))); sfx('legend');
   });
-  socket.on('modoItem', ({ kind, id }) => {
+  socket.on('modoItem', ({ kind, id, remove, self }) => {
+    if (remove) {
+      const ids = id === '*' ? SHOP[kind].filter(x => x.price).map(x => x.id) : [id];
+      let n = 0;
+      ids.forEach(i => { if (save.owned.includes(kind + ':' + i)) { save.owned = save.owned.filter(s => s !== kind + ':' + i); n++; } const lk = LOOK_KEY[kind]; if (save.look[lk] === i) save.look[lk] = SHOP[kind].find(x => !x.price)?.id || SHOP[kind][0].id; });
+      persist(); renderProfile(); pushLook(); applyCardback?.(); window.CHESS?.refresh?.();
+      if (n && !self) toast(id === '*' ? `🗑️ Le modo t'a retiré ${n} objet(s) !` : `🗑️ Le modo t'a retiré « ${SHOP[kind].find(x => x.id === id)?.name || id} »`, 'error');
+      return;
+    }
     const it = SHOP[kind]?.find(x => x.id === id); if (!it) return;
     if (!save.owned.includes(kind + ':' + id)) save.owned.push(kind + ':' + id);
     persist(); renderProfile();
@@ -1131,6 +1169,18 @@ function sfx(name, vol = 1) {
   if (name === 'wall') { osc('sine', 260, 0, .07, .7); noise(.04, 1200, 600, 'bandpass', 1); }
   if (name === 'whoosh') { shaped(.6, x => Math.sin(x * Math.PI), 400, 2200, 'bandpass', 2); }
   if (name === 'sand') { shaped(.4, x => Math.pow(1 - x, 1.5), 3000, 1800, 'highpass', 1.6); }
+  // sons de Tank Arena
+  if (name === 'tkshot') { noise(.16, 1800, 300, 'lowpass', 2.4); const o = osc('sine', 150, 0, .18, .9); o.frequency.exponentialRampToValueAtTime(55, t0 + .18); }
+  if (name === 'tkheavy') { noise(.45, 900, 90, 'lowpass', 3.2); const o = osc('sine', 90, 0, .4, 1); o.frequency.exponentialRampToValueAtTime(35, t0 + .4); }
+  if (name === 'tkmg') { noise(.05, 3200, 1200, 'bandpass', 1.6); }
+  if (name === 'tksnipe') { const o = osc('sawtooth', 2400, 0, .25, .35); o.frequency.exponentialRampToValueAtTime(180, t0 + .25); noise(.08, 6000, 2000, 'highpass', 1.4); }
+  if (name === 'tkflame') { noise(.12, 600, 300, 'bandpass', .9); }
+  if (name === 'tkmissile') { shaped(.6, x => Math.min(1, x * 8) * (1 - x), 1500, 400, 'bandpass', 1.6); }
+  if (name === 'tkboom') { noise(.9, 1200, 60, 'lowpass', 4); const o = osc('sine', 70, 0, .7, 1); o.frequency.exponentialRampToValueAtTime(28, t0 + .7); noise(.3, 4000, 800, 'bandpass', 1, .05); }
+  if (name === 'tkhit') { osc('square', 820, 0, .07, .35); osc('triangle', 1240, 0, .12, .3); noise(.06, 5000, 2500, 'bandpass', .9); }
+  if (name === 'tkbounce') { const o = osc('sine', 1400, 0, .08, .35); o.frequency.exponentialRampToValueAtTime(700, t0 + .08); }
+  if (name === 'tkpick') { [660, 880, 1320].forEach((f, i) => osc('triangle', f, i * .06, i * .06 + .1, .5)); }
+  if (name === 'tktp') { const o = osc('sine', 300, 0, .35, .6); o.frequency.exponentialRampToValueAtTime(1600, t0 + .35); }
   // sons des célébrations divines
   if (name === 'beep') { osc('sine', 880, 0, .16, .9); osc('sine', 1760, 0, .08, .25); }
   if (name === 'beep2') { osc('sine', 1320, 0, .5, .9); osc('triangle', 660, 0, .5, .5); }

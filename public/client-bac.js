@@ -27,14 +27,14 @@
     const k = v.stage + ':' + v.round;
     if (k !== rk) { rk = k; stage(v); }
     else if (v.stage === 'write' || v.stage === 'stopping') progress(v);
-    else if (v.stage === 'vote') voteTable(v, false);
+    else if (v.stage === 'vote' || v.stage === 'results') voteTable(v, false);
     scores(v); timer(v);
     if (v.stage === 'over') showEnd(v); else $('#bc-end').innerHTML = '';
     lastStage = v.stage;
   }
   function timer(v) {
     clearInterval(timerIv);
-    const el = $('#bc-timer'), on = ['write', 'vote'].includes(v.stage);
+    const el = $('#bc-timer'), on = ['write', 'vote', 'results'].includes(v.stage);
     el.classList.toggle('hidden', !on); if (!on) return;
     const end = Date.now() + v.left, tot = v.stage === 'write' ? v.time : Math.max(v.left, 1);
     const t = () => { const l = Math.max(0, end - Date.now()); el.querySelector('i').style.transform = `scaleX(${l / tot})`; el.querySelector('span').textContent = Math.ceil(l / 1000) + ' s'; el.classList.toggle('hot', v.stage === 'write' && l < 10000); };
@@ -97,7 +97,8 @@
           ${avatarHTML(pl, 22)}<span>${empty ? '—' : esc(a.a)}</span>${a.bad ? '<em>✗ lettre</em>' : a.votes ? `<em>❌ ${a.votes}</em>` : ''}${pts}</button>`;
       }).join('')}</div></div>`).join('')}</div>
       ${voting ? `<div class="bc-vfoot"><button class="btn btn-primary" id="bc-ready">${v.ready.includes(pid) ? '✅ Prêt — on attend les autres' : '👍 J\'ai fini de vérifier'}</button>${isHost() ? '<button class="btn btn-ghost" id="bc-next">⏭ Compter les points</button>' : ''}<small>${v.ready.length} / ${Object.keys(v.scores).length} prêts</small></div>`
-        : `<div class="bc-roundpts">${Object.entries(v.roundPts || {}).sort((a, b) => b[1] - a[1]).map(([p, n], i) => `<span style="--i:${i}">${esc(P(p)?.name || '?')} <b>+${n}</b>${v.stopper === p ? ' ✋' : ''}</span>`).join('') || '<em>Personne ne marque…</em>'}</div>`}
+        : `<div class="bc-roundpts">${Object.entries(v.roundPts || {}).sort((a, b) => b[1] - a[1]).map(([p, n], i) => `<span style="--i:${i}">${esc(P(p)?.name || '?')} <b>+${n}</b>${v.stopper === p ? ' ✋' : ''}</span>`).join('') || '<em>Personne ne marque…</em>'}</div>
+          <div class="bc-vfoot"><button class="btn btn-primary" id="bc-ready">${v.ready.includes(pid) ? '✅ Prêt — on attend les autres' : (v.round >= v.rounds ? '🏁 Voir le classement' : '👉 Lettre suivante')}</button>${isHost() ? '<button class="btn btn-ghost" id="bc-next">⏭ Passer</button>' : ''}<small>${v.ready.length} / ${Object.keys(v.scores).length} prêts · prends le temps de lire !</small></div>`}
     </div>`;
     st.innerHTML = html;
     if (!fresh) st.querySelector('.bc-vote').classList.add('still');

@@ -71,7 +71,7 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Boutique : 13 plateaux d'échecs (vus par toi seul) et 14 jeux de pièces (tes pièces s'affichent avec ton skin chez tout le monde). Fichiers : `game-chess.js`, `public/client-chess.js`.
 
 ### 7️⃣ Top 7 (1 à 10 joueurs)
-- Un thème (« les sports préférés des Français », « ce qu'on achète à la boulangerie »…) et ses **7 réponses les plus citées**, cachées sur un plateau télé. 191 thèmes dans `data-top7.js` (classements estimés, modifiables).
+- Un thème (« les sports préférés des Français », « ce qu'on achète à la boulangerie »…) et ses **7 réponses les plus citées**, cachées sur un plateau télé. 574 thèmes dans `data-top7.js` (classements estimés, modifiables).
 - Chacun son tour, on propose une réponse : la n°1 (la plus évidente) vaut **1 point**… la n°7 (la plus rare) **7 points**. Raté, trop tard ou déjà trouvée = 0.
 - Réglages : nombre de thèmes (3 / 5 / 8 / 12), essais par joueur et par thème (2 / 3 / 4), temps pour répondre (15 / 20 / 30 s). Fautes de frappe, accents et pluriels tolérés.
 
@@ -98,6 +98,12 @@ Dans le salon, l'hôte peut **changer de jeu** sans que personne n'ait à se rec
 - Les chevaux avancent case par case en sautillant ; chaque case spéciale a sa propre animation.
 - Boutique : **22 skins de pions** (🐎 Pions), **12 plateaux** (🎲 Plateaux : Bois verni gratuit → Prisme arc-en-ciel légendaire, chacun voit le plateau qu'il a équipé) et **12 animations** de capture / cheval rentré (💥 Animations chevaux, vues par tout le monde, aperçu en cliquant dans la boutique).
 - Pièces : selon la durée de la partie (≈ 4 à 7 🪙/min), +2 par cheval rentré, +2 par capture, gros bonus au vainqueur.
+
+### 📸 Photo Espion (3 à 12 joueurs)
+Un Undercover en images : tout le monde voit la même photo (Wikipédia), sauf l'espion. Chacun son tour, on choisit un joueur et on lui écrit une question ; il répond, puis pose la suivante. Vote final ; l'espion démasqué peut encore gagner en retrouvant la photo parmi 8. 9 thèmes maison (lieux, animaux, nourriture, objets, sports, véhicules, métiers, fêtes, instruments) + les thèmes de Guess Party. Fichiers : `game-spy.js`, `data-spy.js`, `public/client-spy.js`.
+
+### 💥 Tank Arena (1 à 8 joueurs + bots)
+Combat de tanks vu de dessus, en temps réel (physique serveur 40 Hz, instantanés 20 Hz). 8 canons au choix, 10 cartes symétriques (prairie, désert à barils, banquise, ville destructible, volcan, labyrinthe à téléporteurs, jungle, arène néon à rebonds, champ de mines, port), bonus, bots. Vies, durée et nombre de bots réglables. Clavier ZQSD/flèches + souris, ou deux joysticks sur téléphone. Fichiers : `game-tank.js`, `data-tank.js`, `public/client-tank.js`.
 
 ### 🔴 Puissance 4 (2 à 12 joueurs)
 Duel au tour par tour, le gagnant reste et affronte le suivant. Modes : Classique (7×6), Géant (9×7, aligner 5), Bombes (1 bombe par joueur qui pulvérise une zone 3×3).

@@ -232,6 +232,28 @@
           </div>
           <div class="set-block rules"><h4>📜 Règles</h4><p>Tout le monde joue en même temps (les balles des autres sont des fantômes). Tire en arrière pour viser, lâche pour frapper. Eau = +1 coup et retour au point de tir. Sable = ça freine, glace = ça glisse, vent et pentes = ça pousse, flèches = accélération, portails = téléportation, lave et trous noirs = comme l'eau ! 30 trous en 3 parcours (un parcours = 10 trous de difficulté croissante). Le moins de coups gagne.</p></div>
         </div>
+        <div id="set-spy" class="settings gset hidden">
+          <div class="set-block"><h4>🗂️ Thèmes d'images <small class="muted">(plusieurs au choix)</small></h4><div class="cats" id="spy-themes"></div></div>
+          <div class="set-row">
+            <div class="set-block"><h4>🔁 Manches</h4><div class="seg gseg" data-key="rounds"><button data-v="1">1</button><button data-v="3">3</button><button data-v="5">5</button></div></div>
+            <div class="set-block"><h4>❓ Questions par joueur</h4><div class="seg gseg" data-key="qpp"><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button></div></div>
+            <div class="set-block"><h4>⏱️ Temps pour écrire</h4><div class="seg gseg" data-key="time"><button data-v="30">30 s</button><button data-v="45">45 s</button><button data-v="60">1 min</button><button data-v="90">1 min 30</button></div></div>
+          </div>
+          <div class="set-row">
+            <div class="set-block"><h4>💡 L'espion connaît le thème</h4><div class="seg gseg" data-key="hint"><button data-v="1">Oui</button><button data-v="0">Non (plus dur)</button></div></div>
+            <div class="set-block"><h4>🕵️ Espions</h4><div class="seg gseg" data-key="spies"><button data-v="1">1</button><button data-v="2">2 (dès 6 joueurs)</button></div></div>
+          </div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>Tout le monde reçoit la <b>même image</b>… sauf l'<b>espion</b>, qui n'a rien ! Chacun son tour, un joueur choisit quelqu'un et lui <b>écrit une question</b> ; celui-ci répond, puis c'est à lui de poser la suivante. Assez précis pour prouver que tu as vu l'image, assez flou pour ne pas la révéler à l'espion ! À la fin, tout le monde <b>vote</b>. Si l'espion est démasqué, il peut encore gagner en retrouvant l'image parmi 8 propositions (il peut aussi tenter sa chance à tout moment avec « 🎯 Je sais ! »).</p></div>
+        </div>
+        <div id="set-tank" class="settings gset hidden">
+          <div class="set-block"><h4>🗺️ Carte</h4><div class="tk-maps" id="tk-maps"></div></div>
+          <div class="set-row">
+            <div class="set-block"><h4>❤️ Vies par tank</h4><div class="seg gseg" data-key="lives"><button data-v="1">1</button><button data-v="3">3</button><button data-v="5">5</button><button data-v="10">10</button></div></div>
+            <div class="set-block"><h4>⏱️ Durée max</h4><div class="seg gseg" data-key="time"><button data-v="3">3 min</button><button data-v="5">5 min</button><button data-v="8">8 min</button><button data-v="0">♾️</button></div></div>
+            <div class="set-block"><h4>🤖 Bots</h4><div class="seg gseg" data-key="bots"><button data-v="0">0</button><button data-v="1">1</button><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button></div></div>
+          </div>
+          <div class="set-block rules"><h4>📜 Règles</h4><p>Chacun choisit son <b>canon</b> (standard, obusier, mitrailleuse, sniper, fusil à pompe, ricochet, lance-flammes, missile guidé), puis c'est la bagarre ! <b>Ordinateur</b> : ZQSD / flèches pour rouler, la souris pour viser, clic pour tirer. <b>Téléphone</b> : joystick gauche pour rouler, joystick droit pour viser et tirer. Ramasse les bonus (soin, bouclier, vitesse, puissance, invisibilité). Quand tu perds toutes tes vies, tu es éliminé : le dernier tank debout gagne !</p></div>
+        </div>
         <div id="set-chess" class="settings gset hidden">
           <div class="set-block"><h4>🎮 Mode</h4><div class="seg gseg" data-key="mode"><button data-v="classic">♟️ Classique</button><button data-v="c960">🎲 Chess960</button><button data-v="hill">⛰️ Colline</button><button data-v="check3">3️⃣ Trois échecs</button><button data-v="fog">🌫️ Brouillard</button></div>
             <p class="muted small hint2" id="ch-modehelp"></p></div>
@@ -531,6 +553,8 @@
       <div id="v-c4" class="view"></div>
       <div id="v-poker" class="view"></div>
       <div id="v-golf" class="view"></div>
+      <div id="v-spy" class="view"></div>
+      <div id="v-tank" class="view"></div>
       <!-- SPEED WORD -->
       <div id="v-word" class="view"></div>
 
@@ -712,6 +736,8 @@
 <script src="/client-c4.js"></script>
 <script src="/client-poker.js"></script>
 <script src="/client-golf.js"></script>
+<script src="/client-spy.js"></script>
+<script src="/client-tank.js"></script>
 <script src="/cards.js"></script>
 <script src="/client-cards.js"></script>
 <script src="/client-divine.js"></script>
